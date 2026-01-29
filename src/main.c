@@ -1,5 +1,6 @@
 #include "raylib.h"
 
+#define OC_CORE_IMPLEMENTATION
 #include "entity.h"
 
 Entity entities[ENTITIES_MAX_COUNT] = { 0 };
@@ -36,6 +37,10 @@ void entity_update_all() {
 
 int main(void)
 {
+    // Oc_Arena a = { 0 };
+    // Hash_Map(uint32, uint32) hm;
+    // hash_map_put(&a, &hm, 45, 100);
+
     const int screenWidth = 800;
     const int screenHeight = 450;
 

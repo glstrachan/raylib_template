@@ -1,7 +1,7 @@
 #pragma once
 
 #include "raylib.h"
-#include "core.h"
+#include "../external/core.h"
 
 Enum(EntityType, uint32,
     ENTITY_INVALID = 0,
@@ -31,4 +31,4 @@ typedef struct {
 extern Entity entities[ENTITIES_MAX_COUNT];
 extern EntityId next_entity_id;
 
-void entity_update()
+// void entity_update()

@@ -336,6 +336,83 @@ typedef struct {
 #define oc_oom() do { print("Out of memory: {}:{}\n", __FILE__, __LINE__); oc_exit(-1); } while (0)
 
 #define Enum(_name, _type, ...) typedef _type _name; enum { __VA_ARGS__ }
+#define Hash_Map(K, V) struct { struct { K _key; V _value; uint32 filled; }* entries; uint32 count_filled, capacity; }
+#define hash_map_get_from_hash(arena, hm, key, hash) ({                                             \
+        __typeof__((hm)->entries[0]._value)* result = NULL;                          \
+        if ((hm)->capacity) { \
+            uint32 index = hash % (hm)->capacity; \
+            uint32 until_index = index;                                                 \
+            do {                                                                        \
+                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                \
+                    result = &(hm)->entries[index]._value;                               \
+                    break;                                                              \
+                }                                                                       \
+                index = (index + 1) % (hm)->capacity;                                   \
+            } while ((hm)->entries[index].filled && index != until_index);              \
+        } \
+        result;                                                                     \
+    })
+
+#define hash_map_get(arena, hm, key) ({                                             \
+        __typeof__((hm)->entries[0]._value)* result = NULL;                          \
+        if ((hm)->capacity) { \
+            uint32 index = MAP_DEFAULT_HASH_FN(key, MAP_DEFAULT_SEED) % (hm)->capacity; \
+            uint32 until_index = index;                                                 \
+            do {                                                                        \
+                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                \
+                    result = &(hm)->entries[index]._value;                               \
+                    break;                                                              \
+                }                                                                       \
+                index = (index + 1) % (hm)->capacity;                                   \
+            } while ((hm)->entries[index].filled && index != until_index);              \
+        } \
+        result;                                                                     \
+    })
+
+#define hash_map_reserve(arena, hm, reserve_capacity) do {                                                                                              \
+        __typeof__((hm)->entries) new_entries = oc_arena_realloc((arena), (hm)->entries, (hm)->capacity * sizeof(*(hm)->entries), (reserve_capacity) * sizeof(*(hm)->entries)); \
+        memset(new_entries, 0, (reserve_capacity) * sizeof(*(hm)->entries)); \
+        if ((hm)->capacity) {                                                                                                                           \
+            for (uint32 i = 0; i < ((hm)->capacity); ++i) {                                                                                               \
+                if (!(hm)->entries[i].filled) continue;                                                                                               \
+                uint32 index = MAP_DEFAULT_HASH_FN((hm)->entries[i]._key, MAP_DEFAULT_SEED) % (reserve_capacity);                                   \
+                while (new_entries[index].filled) {                                                                                               \
+                    if (MAP_DEFAULT_EQL_FN(new_entries[index]._key, (hm)->entries[i]._key)) {                                                                       \
+                        break;                                                                                                                      \
+                    }                                                                                                                               \
+                    index = (index + 1) % (reserve_capacity);                                                                                       \
+                }                                                                                                                                   \
+                new_entries[index]._key = (hm)->entries[i]._key;                                                                                                    \
+                new_entries[index]._value = (hm)->entries[i]._value;                                                                                                \
+                new_entries[index].filled = 1;                                                                                                    \
+            }                                                                                                                                           \
+        }                                                                                                                                               \
+        (hm)->entries = new_entries;                                                                                                                        \
+        (hm)->capacity = (reserve_capacity);                                                                                                            \
+    } while (0)
+
+#define hash_map_put(arena, hm, key, value) do {                                                                                                 \
+        if ((hm)->count_filled >= (hm)->capacity / 2) {                                                                                          \
+            uint32 new_cap = (hm)->capacity ? (hm)->capacity * 4 : 32;                                                                          \
+            hash_map_reserve(arena, hm, new_cap);                                                                                         \
+        }                                                                                                                                        \
+        uint32 index = MAP_DEFAULT_HASH_FN(key, MAP_DEFAULT_SEED) % (hm)->capacity;                                                                \
+        while ((hm)->entries[index].filled) {                                                                                                      \
+            if (MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                                                                               \
+                break;                                                                                                                           \
+            }                                                                                                                                    \
+            index = (index + 1) % (hm)->capacity;                                                                                                  \
+        }                                                                                                                                        \
+        (hm)->entries[index]._key = key;                                                                                               \
+        (hm)->entries[index]._value = value;                                                                                               \
+        (hm)->entries[index].filled = 1;                                                                                               \
+        (hm)->count_filled++; \
+    } while(0)
+
+#define hash_map_iterator(hm) struct { typeof((hm)->entries[0]._value)* value; typeof((hm)->entries[0]._key)* key; typeof((hm)->capacity) index; }
+#define hash_map_iterator_next(hm, _it) ((_it).index = 0; (_it).index < (hm)->capacity; ++(_it).index) if (((_it).key = &(hm)->entries[(_it).index]._key, (_it).value = &(hm)->entries[(_it).index]._value, (hm)->entries[(_it).index].filled))
+
+
 #define Array(I, V) struct { V* items; I count, capacity; }
 #define oc_array_aligned_append(arena, array, alignment, value)                                                     \
     do {                                                                                         \
@@ -481,6 +558,25 @@ void _oc_printw(void *writer, const char* fmt, ...);
 void _oc_vprintw(void *writer, const char* fmt, va_list args);
 _Noreturn void oc_exit(int status);
 void oc_hex_dump(void* data, int count, int indent, int mark_mod);
+
+size_t stbds_hash_string(string str, size_t seed);
+size_t stbds_hash_string_atom(string str, size_t seed);
+size_t stbds_siphash_bytes(void *p, size_t len, size_t seed);
+
+#define STBDS_SIZE_T_BITS           ((sizeof (size_t)) * 8)
+#define STBDS_ROTATE_LEFT(val, n)   (((val) << (n)) | ((val) >> (STBDS_SIZE_T_BITS - (n))))
+#define STBDS_ROTATE_RIGHT(val, n)  (((val) >> (n)) | ((val) << (STBDS_SIZE_T_BITS - (n))))
+
+#define MAP_DEFAULT &cc->arena, MAP_DEFAULT_HASH_FN, MAP_DEFAULT_EQL_FN, MAP_DEFAULT_SEED
+#define MAP_DEFAULT_HASH_FN(key, value) _Generic((key),	\
+        string : stbds_hash_string_atom					\
+    )(key, value)
+
+#define MAP_DEFAULT_EQL_FN(a, b) _Generic((a),				\
+        string : string_atom_eql						\
+    )(a, b)
+
+#define MAP_DEFAULT_SEED (16u)
 
 // start is clamped to zero if negative
 // end < 0 means to use the end of s
@@ -1235,5 +1331,91 @@ void oc_hex_dump(void* data, int count, int indent, int mark_mod) {
     print("\n");
 }
 
+
+size_t stbds_hash_string(string str, size_t seed)
+{
+    size_t hash = seed;
+    while (str.len-- > 0)
+        hash = STBDS_ROTATE_LEFT(hash, 9) + (unsigned char) *str.ptr++;
+
+    // Thomas Wang 64-to-32 bit mix function, hopefully also works in 32 bits
+    hash ^= seed;
+    hash = (~hash) + (hash << 18);
+    hash ^= hash ^ STBDS_ROTATE_RIGHT(hash,31);
+    hash = hash * 21;
+    hash ^= hash ^ STBDS_ROTATE_RIGHT(hash,11);
+    hash += (hash << 6);
+    hash ^= STBDS_ROTATE_RIGHT(hash,22);
+    return hash+seed;
+}
+
+size_t stbds_hash_string_atom(string str, size_t seed) {
+    (void)seed;
+    size_t key = (size_t)str.ptr;
+    key = (~key) + (key << 21); // key = (key << 21) - key - 1;
+    key = key ^ (key >> 24);
+    key = (key + (key << 3)) + (key << 8); // key * 265
+    key = key ^ (key >> 14);
+    key = (key + (key << 2)) + (key << 4); // key * 21
+    key = key ^ (key >> 28);
+    key = key + (key << 31);
+    return key;
+}
+
+#define STBDS_SIPHASH_C_ROUNDS 1
+#define STBDS_SIPHASH_D_ROUNDS 1
+
+size_t stbds_siphash_bytes(void *p, size_t len, size_t seed)
+{
+  unsigned char *d = (unsigned char *) p;
+  size_t i,j;
+  size_t v0,v1,v2,v3, data;
+
+  // hash that works on 32- or 64-bit registers without knowing which we have
+  // (computes different results on 32-bit and 64-bit platform)
+  // derived from siphash, but on 32-bit platforms very different as it uses 4 32-bit state not 4 64-bit
+  v0 = ((((size_t) 0x736f6d65 << 16) << 16) + 0x70736575) ^  seed;
+  v1 = ((((size_t) 0x646f7261 << 16) << 16) + 0x6e646f6d) ^ ~seed;
+  v2 = ((((size_t) 0x6c796765 << 16) << 16) + 0x6e657261) ^  seed;
+  v3 = ((((size_t) 0x74656462 << 16) << 16) + 0x79746573) ^ ~seed;
+
+  #define STBDS_SIPROUND() \
+    do {                   \
+      v0 += v1; v1 = STBDS_ROTATE_LEFT(v1, 13);  v1 ^= v0; v0 = STBDS_ROTATE_LEFT(v0,STBDS_SIZE_T_BITS/2); \
+      v2 += v3; v3 = STBDS_ROTATE_LEFT(v3, 16);  v3 ^= v2;                                                 \
+      v2 += v1; v1 = STBDS_ROTATE_LEFT(v1, 17);  v1 ^= v2; v2 = STBDS_ROTATE_LEFT(v2,STBDS_SIZE_T_BITS/2); \
+      v0 += v3; v3 = STBDS_ROTATE_LEFT(v3, 21);  v3 ^= v0;                                                 \
+    } while (0)
+
+  for (i=0; i+sizeof(size_t) <= len; i += sizeof(size_t), d += sizeof(size_t)) {
+    data = d[0] | (d[1] << 8) | (d[2] << 16) | (d[3] << 24);
+    data |= (size_t) (d[4] | (d[5] << 8) | (d[6] << 16) | (d[7] << 24)) << 16 << 16; // discarded if size_t == 4
+
+    v3 ^= data;
+    for (j=0; j < STBDS_SIPHASH_C_ROUNDS; ++j)
+      STBDS_SIPROUND();
+    v0 ^= data;
+  }
+  data = len << (STBDS_SIZE_T_BITS-8);
+  switch (len - i) {
+    case 7: data |= ((size_t) d[6] << 24) << 24; // fall through
+    case 6: data |= ((size_t) d[5] << 20) << 20; // fall through
+    case 5: data |= ((size_t) d[4] << 16) << 16; // fall through
+    case 4: data |= (d[3] << 24); // fall through
+    case 3: data |= (d[2] << 16); // fall through
+    case 2: data |= (d[1] << 8); // fall through
+    case 1: data |= d[0]; // fall through
+    case 0: break;
+  }
+  v3 ^= data;
+  for (j=0; j < STBDS_SIPHASH_C_ROUNDS; ++j)
+    STBDS_SIPROUND();
+  v0 ^= data;
+  v2 ^= 0xff;
+  for (j=0; j < STBDS_SIPHASH_D_ROUNDS; ++j)
+    STBDS_SIPROUND();
+
+  return v1^v2^v3; // slightly stronger since v0^v3 in above cancels out final round operation? I tweeted at the authors of SipHash about this but they didn't reply
+}
 
 #endif // OC_CORE_IMPLEMENTATION
