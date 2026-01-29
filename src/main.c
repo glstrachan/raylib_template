@@ -1,5 +1,39 @@
 #include "raylib.h"
 
+#include "entity.h"
+
+Entity entities[ENTITIES_MAX_COUNT] = { 0 };
+EntityId next_entity_id = 1; // 0 is for null entity reference
+
+void entity_update(EntityId id) {
+    Entity* e = &entities[id];
+
+    switch (e->type) {
+    case ENTITY_PLAYER: {
+        if (e->player.target) {
+            Entity* target = &entities[e->player.target];
+            e->position = target->position;
+        } else {
+            e->position.x += 1;
+        }
+    } break;
+    case ENTITY_DOOR: {
+        
+    } break;
+    default:
+        oc_assert(false && "invalid entity");
+        break;
+    }
+}
+
+void entity_update_all() {
+    for (EntityId id = 1; id < next_entity_id; ++id) {
+        if (entities[id].type != ENTITY_INVALID) {
+            entity_update(id);
+        }
+    }
+}
+
 int main(void)
 {
     const int screenWidth = 800;
