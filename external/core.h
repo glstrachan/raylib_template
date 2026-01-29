@@ -343,7 +343,8 @@ typedef struct {
             uint32 index = hash % (hm)->capacity; \
             uint32 until_index = index;                                                 \
             do {                                                                        \
-                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                \
+                typeof(key) key__ = key; \
+                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN(&(hm)->entries[index]._key, &key__)) {                \
                     result = &(hm)->entries[index]._value;                               \
                     break;                                                              \
                 }                                                                       \
@@ -356,10 +357,11 @@ typedef struct {
 #define hash_map_get(arena, hm, key) ({                                             \
         __typeof__((hm)->entries[0]._value)* result = NULL;                          \
         if ((hm)->capacity) { \
-            uint32 index = MAP_DEFAULT_HASH_FN(key, MAP_DEFAULT_SEED) % (hm)->capacity; \
+            typeof(key) key__ = key; \
+            uint32 index = MAP_DEFAULT_HASH_FN(&key__, sizeof(key), MAP_DEFAULT_SEED) % (hm)->capacity; \
             uint32 until_index = index;                                                 \
             do {                                                                        \
-                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                \
+                if ((hm)->entries[index].filled && MAP_DEFAULT_EQL_FN(&(hm)->entries[index]._key, &key__, sizeof(key))) {                \
                     result = &(hm)->entries[index]._value;                               \
                     break;                                                              \
                 }                                                                       \
@@ -375,9 +377,9 @@ typedef struct {
         if ((hm)->capacity) {                                                                                                                           \
             for (uint32 i = 0; i < ((hm)->capacity); ++i) {                                                                                               \
                 if (!(hm)->entries[i].filled) continue;                                                                                               \
-                uint32 index = MAP_DEFAULT_HASH_FN((hm)->entries[i]._key, MAP_DEFAULT_SEED) % (reserve_capacity);                                   \
+                uint32 index = MAP_DEFAULT_HASH_FN(&(hm)->entries[i]._key, sizeof((hm)->entries[i]._key), MAP_DEFAULT_SEED) % (reserve_capacity);                                   \
                 while (new_entries[index].filled) {                                                                                               \
-                    if (MAP_DEFAULT_EQL_FN(new_entries[index]._key, (hm)->entries[i]._key)) {                                                                       \
+                    if (MAP_DEFAULT_EQL_FN(&new_entries[index]._key, &(hm)->entries[i]._key, sizeof((hm)->entries[i]._key))) {                                                                       \
                         break;                                                                                                                      \
                     }                                                                                                                               \
                     index = (index + 1) % (reserve_capacity);                                                                                       \
@@ -396,9 +398,10 @@ typedef struct {
             uint32 new_cap = (hm)->capacity ? (hm)->capacity * 4 : 32;                                                                          \
             hash_map_reserve(arena, hm, new_cap);                                                                                         \
         }                                                                                                                                        \
-        uint32 index = MAP_DEFAULT_HASH_FN(key, MAP_DEFAULT_SEED) % (hm)->capacity;                                                                \
+        typeof(key) key__ = key; \
+        uint32 index = MAP_DEFAULT_HASH_FN(&key__, sizeof(key), MAP_DEFAULT_SEED) % (hm)->capacity;                                                                \
         while ((hm)->entries[index].filled) {                                                                                                      \
-            if (MAP_DEFAULT_EQL_FN((hm)->entries[index]._key, key)) {                                                                               \
+            if (MAP_DEFAULT_EQL_FN(&(hm)->entries[index]._key, &key__, sizeof(key))) {                                                                               \
                 break;                                                                                                                           \
             }                                                                                                                                    \
             index = (index + 1) % (hm)->capacity;                                                                                                  \
@@ -413,7 +416,7 @@ typedef struct {
 #define hash_map_iterator_next(hm, _it) ((_it).index = 0; (_it).index < (hm)->capacity; ++(_it).index) if (((_it).key = &(hm)->entries[(_it).index]._key, (_it).value = &(hm)->entries[(_it).index]._value, (hm)->entries[(_it).index].filled))
 
 
-#define Array(I, V) struct { V* items; I count, capacity; }
+#define Array(V) struct { V* items; uint32 count, capacity; }
 #define oc_array_aligned_append(arena, array, alignment, value)                                                     \
     do {                                                                                         \
         if ((array)->count + 1 > (array)->capacity) {                                            \
@@ -513,7 +516,7 @@ int strcmp(const char *a, const char *b);
 size_t strlen(const char *s);
 _Noreturn void exit(int status);
 // typedef void FILE;
-int fopen_s(FILE**, const char*, const char*);
+// int fopen_s(FILE**, const char*, const char*);
 // int fseek(FILE*, int, int);
 // size_t ftell(FILE*);
 // unsigned long long fwrite(const void *, unsigned long long a, unsigned long long b, FILE *);
@@ -559,22 +562,31 @@ void _oc_vprintw(void *writer, const char* fmt, va_list args);
 _Noreturn void oc_exit(int status);
 void oc_hex_dump(void* data, int count, int indent, int mark_mod);
 
-size_t stbds_hash_string(string str, size_t seed);
-size_t stbds_hash_string_atom(string str, size_t seed);
+size_t stbds_hash_string(string* str, size_t len, size_t seed);
+size_t stbds_hash_string_atom(string* str, size_t len, size_t seed);
 size_t stbds_siphash_bytes(void *p, size_t len, size_t seed);
+
+// size_t oc_hash_int(uint64 i, size_t seed);
+// size_t oc_eql_int(uint64 i, size_t seed);
+
+static inline bool bytes_eql(void* a, void* b, size_t len) {
+    return memcmp(a, b, len) == 0;
+}
 
 #define STBDS_SIZE_T_BITS           ((sizeof (size_t)) * 8)
 #define STBDS_ROTATE_LEFT(val, n)   (((val) << (n)) | ((val) >> (STBDS_SIZE_T_BITS - (n))))
 #define STBDS_ROTATE_RIGHT(val, n)  (((val) >> (n)) | ((val) << (STBDS_SIZE_T_BITS - (n))))
 
 #define MAP_DEFAULT &cc->arena, MAP_DEFAULT_HASH_FN, MAP_DEFAULT_EQL_FN, MAP_DEFAULT_SEED
-#define MAP_DEFAULT_HASH_FN(key, value) _Generic((key),	\
-        string : stbds_hash_string_atom					\
-    )(key, value)
+#define MAP_DEFAULT_HASH_FN(key, len, value) _Generic((key),	\
+        string : stbds_hash_string_atom,					\
+        default : stbds_siphash_bytes						\
+    )(key, len, value)
 
-#define MAP_DEFAULT_EQL_FN(a, b) _Generic((a),				\
-        string : string_atom_eql						\
-    )(a, b)
+#define MAP_DEFAULT_EQL_FN(a, b, len) _Generic((a),				\
+        string : string_atom_eql,						\
+        default : bytes_eql						\
+    )(a, b, len)
 
 #define MAP_DEFAULT_SEED (16u)
 
@@ -1332,11 +1344,11 @@ void oc_hex_dump(void* data, int count, int indent, int mark_mod) {
 }
 
 
-size_t stbds_hash_string(string str, size_t seed)
+size_t stbds_hash_string(string* str, size_t len, size_t seed)
 {
     size_t hash = seed;
-    while (str.len-- > 0)
-        hash = STBDS_ROTATE_LEFT(hash, 9) + (unsigned char) *str.ptr++;
+    while (str->len-- > 0)
+        hash = STBDS_ROTATE_LEFT(hash, 9) + (unsigned char) *str->ptr++;
 
     // Thomas Wang 64-to-32 bit mix function, hopefully also works in 32 bits
     hash ^= seed;
@@ -1349,9 +1361,9 @@ size_t stbds_hash_string(string str, size_t seed)
     return hash+seed;
 }
 
-size_t stbds_hash_string_atom(string str, size_t seed) {
+size_t stbds_hash_string_atom(string* str, size_t len, size_t seed) {
     (void)seed;
-    size_t key = (size_t)str.ptr;
+    size_t key = (size_t)str->ptr;
     key = (~key) + (key << 21); // key = (key << 21) - key - 1;
     key = key ^ (key >> 24);
     key = (key + (key << 3)) + (key << 8); // key * 265

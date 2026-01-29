@@ -37,9 +37,14 @@ void entity_update_all() {
 
 int main(void)
 {
-    // Oc_Arena a = { 0 };
-    // Hash_Map(uint32, uint32) hm;
-    // hash_map_put(&a, &hm, 45, 100);
+    Oc_Arena a = { 0 };
+    Array(uint32) arr = { 0 };
+    oc_array_append(&a, &arr, 65);
+
+    Hash_Map(uint32, uint32) hm;
+    hash_map_put(&a, &hm, 45, 100);
+    uint32* value = hash_map_get(&a, &hm, 45);
+    print("foo {}\n", *value);
 
     const int screenWidth = 800;
     const int screenHeight = 450;
