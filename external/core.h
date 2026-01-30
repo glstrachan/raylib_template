@@ -764,13 +764,13 @@ Oc_Arena_Chunk* oc_arena_new_chunk(Oc_Arena* arena, uword size_in_bytes) {
 Oc_Arena_Save oc_arena_save(Oc_Arena* arena) {
     return (Oc_Arena_Save) {
         .chunk = arena->current,
-        .used = arena->current->used,
+        .used = arena->current ? arena->current->used : 0,
     };
 }
 
 void oc_arena_restore(Oc_Arena* arena, Oc_Arena_Save restore_point) {
     arena->current = restore_point.chunk;
-    arena->current->used = restore_point.used;
+    if (arena->current) arena->current->used = restore_point.used;
 }
 
 void oc_arena_reset(Oc_Arena* arena) {
@@ -799,6 +799,8 @@ void* oc_arena_alloc_aligned(Oc_Arena* arena, uint64 size, uint64 alignment) {
             if (arena->current->next == NULL) {
                 arena->current->next = oc_arena_new_chunk(arena, size);
                 if (!arena->current->next) oc_oom();
+            } else {
+                arena->current->next->used = sizeof(Oc_Arena_Chunk) / sizeof(uword);
             }
             arena->current = arena->current->next;
         }
@@ -828,6 +830,8 @@ void* oc_arena_alloc(Oc_Arena* arena, uint64 size) {
             if (arena->current->next == NULL) {
                 arena->current->next = oc_arena_new_chunk(arena, size);
                 if (!arena->current->next) oc_oom();
+            } else {
+                arena->current->next->used = sizeof(Oc_Arena_Chunk) / sizeof(uword);
             }
             arena->current = arena->current->next;
         }

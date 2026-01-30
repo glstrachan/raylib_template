@@ -9,6 +9,7 @@ add_subdirectory(external/raylib)
 
 set(SOURCES
     src/main.c
+    src/memory_game.c
 )
 
 include_directories(

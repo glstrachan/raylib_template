@@ -7,19 +7,29 @@ Enum(EntityType, uint32,
     ENTITY_INVALID = 0,
     ENTITY_PLAYER,
     ENTITY_DOOR,
+    ENTITY_INTERACT,
+    ENTITY_PLATFORM,
 );
 
 typedef int EntityId;
 
 typedef struct {
     EntityType type;
-    Vector4 position;
+    Vector2 position;
 
     union {
         struct {
-            string name;
-            EntityId target;
+            Vector2 speed;
+            EntityId interacting_with;
         } player;
+
+        // struct {
+        //     EntityId
+        // } interactable;
+
+        struct {
+            Vector2 size;
+        } platform;
 
         struct {
             bool opened;
