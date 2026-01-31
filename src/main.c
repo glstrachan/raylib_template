@@ -4,6 +4,7 @@
 #define OC_CORE_IMPLEMENTATION
 #include "entity.h"
 #include "game.h"
+#include "dialog.h"
 
 #define CLAY_IMPLEMENTATION
 #include "../external/clay/clay.h"
@@ -12,7 +13,6 @@
 
 void memory_game_init();
 void memory_game_update();
-void dialog_update(void);
 
 Oc_Arena arena = { 0 };
 Oc_Arena frame_arena = { 0 };
@@ -46,13 +46,21 @@ int main(void)
     
     Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
     Font dialog_font = LoadFontEx("resources/chihaya.ttf", 60, NULL, 0);
+    Font fonts[] = {
+        font,
+        dialog_font,
+    };
+    Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
 
     game_parameters = (Game_Parameters) {
         .neutral_font = font,
+        .dialog_font = dialog_font,
         .screen_width = screenWidth,
         .screen_height = screenHeight,
     };
     memory_game_init();
+
+    dialog_play(sample_dialog);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -71,20 +79,14 @@ int main(void)
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
 
-                memory_game_update();
-                DrawRectangle(game_parameters.screen_width / 2 - game_parameters.screen_width * 0.3, game_parameters.screen_height - 200, game_parameters.screen_width * 0.6, 100, RED);
+                // memory_game_update();
                 dialog_update();
 
+                Clay_RenderCommandArray renderCommands = Clay_EndLayout();
+                Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();
 
         EndDrawing();
-
-        Clay_RenderCommandArray renderCommands = Clay_EndLayout();
-        Font fonts[] = {
-            font,
-            dialog_font,
-        };
-        Clay_Raylib_Render(renderCommands, fonts);
 
         oc_arena_restore(&frame_arena, save);
     }

@@ -2,6 +2,10 @@
 #include "rlgl.h"
 #include "game.h"
 
+#include "dialog.h"
+
+#include "../external/clay/clay.h"
+
 Enum(Dialog_Type, uint32_t,
     DIALOG_TYPE_SELECTION,
     DIALOG_TYPE_TEXT,
@@ -41,8 +45,6 @@ typedef struct {
         } smth_else;
     };
 } _Dialog_Item;
-
-typedef void (*Dialog_Item)();
 
 static uint32_t total_chars;
 static uint32_t printed_chars;
@@ -95,16 +97,25 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
         timer_init(&char_timer, 100);
     }
 
-    if(total_chars < printed_chars) {
+    bool result = false;
+
+    if(printed_chars < total_chars) {
         if (timer_update(&char_timer)) {
             timer_reset(&char_timer);
             printed_chars++;
         }
         
-        if(IsKeyDown(KEY_SPACE)) {
+        if(IsKeyPressed(KEY_SPACE)) {
             printed_chars = total_chars;
         }
+    } else if(total_chars == printed_chars) {
+        // Draw a continue prompt
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            result = true;
+        }
     }
+
 
     // Figure out some bounds for the text box
     // Lets say its 40% of the screen wide
@@ -116,15 +127,6 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     // Draw the speaker
     // Draw the text
 
-    bool result = false;
-
-    if(total_chars == printed_chars) {
-        // Draw a continue prompt
-
-        if (IsKeyPressed(KEY_E)) {
-            result = true;
-        }
-    }
 
     
     Oc_String_Builder builder;
@@ -133,9 +135,25 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     wprint(&builder.writer, "{}", string_slice(text, 0, printed_chars));
     string display_str = oc_sb_to_string(&builder);
 
-    Vector2 text_size = MeasureTextEx(game_parameters.neutral_font, display_str.ptr, game_parameters.neutral_font.baseSize, 10);
-    Vector2 text_position = { game_parameters.screen_width / 2.0f - text_size.x / 2.0f, game_parameters.screen_height / 2.0f};
-    DrawTextEx(game_parameters.neutral_font, display_str.ptr, text_position, game_parameters.neutral_font.baseSize, 10, (Color){255, 255, 255, 255});
+    Vector2 text_position = {game_parameters.screen_width / 2 - game_parameters.screen_width * 0.3, game_parameters.screen_height - 200};
+    
+    // .left = text_position.x, .right = text_position.x + game_parameters.screen_width * 0.6, .top = text_position.y, .bottom = game_parameters.screen_height 
+    CLAY_AUTO_ID({ 
+        .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+        .layout = { .sizing = {CLAY_SIZING_FIXED(game_parameters.screen_width * 0.6), CLAY_SIZING_FIXED(100)} },
+        .backgroundColor = { 120, 120, 120, 255 },
+    }) {
+        CLAY_TEXT(((Clay_String) { .length = display_str.len, .chars = display_str.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 1, .textColor = {255, 255, 255, 255} }));
+    }
+
+
+    // float p
+    // Vector2 text_size = MeasureTextEx(game_parameters.neutral_font, display_str.ptr, game_parameters.neutral_font.baseSize, 10);
+    // Vector2 text_position = { game_parameters.screen_width / 2.0f - text_size.x / 2.0f, game_parameters.screen_height / 2.0f};
+
+    // DrawRectangle(text_position.x, text_position.y, game_parameters.screen_width * 0.6, 100, RED);
+    // DrawTextEx(game_parameters.neutral_font, display_str.ptr, (Vector2){400, 400}, 60, 10, (Color){255, 255, 255, 255});
+    // DrawTextEx(game_parameters.dialog_font, display_str.ptr, text_position, game_parameters.dialog_font.baseSize, 10, (Color){255, 255, 255, 255});
 
     return result;
 }
@@ -155,8 +173,9 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     } else oc_assert(false);                                      \
 } while (0)
 
-void sample_dialog() {
+void sample_dialog(void) {
     dialog_text("john", "hello, how are you?", 0);
+    dialog_text("potato", "Good, you?", 0);
 
     switch (dialog_selection(
         { "Potato" },
@@ -201,7 +220,7 @@ void dialog_play(Dialog_Item dialog) {
     dialog_max_item = 0;
 }
 
-void dialog_update() {
+void dialog_update(void) {
     if(!current_dialog) return;
 
     dialog_current_item = 0;

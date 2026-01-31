@@ -3,7 +3,7 @@
 #include "../external/core.h"
 
 typedef struct {
-    Font neutral_font;
+    Font neutral_font, dialog_font;
     int screen_width, screen_height;
 } Game_Parameters;
 
