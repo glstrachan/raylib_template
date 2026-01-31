@@ -45,7 +45,7 @@ int main(void)
     Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors });
     
     Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
-    Font dialog_font = LoadFontEx("resources/chihaya.ttf", 60, NULL, 0);
+    Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
     Font fonts[] = {
         font,
         dialog_font,
