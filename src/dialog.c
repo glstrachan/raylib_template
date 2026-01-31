@@ -169,6 +169,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
             dialog_current_item++;                                \
             dialog_max_item++;                                    \
             first_time = true; \
+            return; \
         } else {                                                  \
             first_time = false; \
             return;                                               \
