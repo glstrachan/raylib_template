@@ -11,6 +11,7 @@ set(SOURCES
     src/main.c
     src/dialog.c
     src/memory_game.c
+    src/characters.c
 )
 
 include_directories(

@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "game.h"
 #include "dialog.h"
+#include "characters.h"
 
 #define CLAY_IMPLEMENTATION
 #include "../external/clay/clay.h"
@@ -33,7 +34,7 @@ int main(void)
     const int screenHeight = 1080;
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI);
-    InitWindow(screenWidth, screenHeight, "House Demo");
+    InitWindow(screenWidth, screenHeight, "Travelling Salesman Problems");
     InitAudioDevice();
     SetTargetFPS(240);
     
@@ -67,6 +68,7 @@ int main(void)
 
     memory_game_init();
     dialog_init();
+    characters_init();
 
     dialog_play(sample_dialog);
 
@@ -88,7 +90,11 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
+
+                // TODO: Move this into dialog or smth so we can scriptably change the background
                 DrawTexture(bg_tex, 0, 0, WHITE);
+                characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
+                characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
 
                 // memory_game_update();
                 dialog_update();
@@ -102,6 +108,9 @@ int main(void)
         oc_arena_restore(&frame_arena, save);
     }
 
+    UnloadTexture(bg_tex);
+
+    characters_cleanup();
     dialog_cleanup();
 
     CloseWindow();

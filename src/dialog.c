@@ -89,6 +89,9 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
     customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
 
+    DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
+    textUserData->visible_chars = printed_chars;
+
     CLAY(CLAY_ID("DialogBox"), {
         .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
         .layout = {
@@ -135,7 +138,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
                 },
                 .backgroundColor = {0, 255, 255, 0},
             }) {
-                CLAY_TEXT(((Clay_String) { .length = display_str.len, .chars = display_str.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255} }));
+                CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
             }
         }
         CLAY(CLAY_ID("DialogContinue"), {
@@ -174,7 +177,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
 } while (0)
 
 void sample_dialog(void) {
-    dialog_text("Johnathy", "hello, how are you? hello, how are you? hello, how are yhello, how are you? hello, how are you? hello, ho", 0);
+    dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!", 0);
     dialog_text("potato", "Good, you?", 0);
 
     switch (dialog_selection(

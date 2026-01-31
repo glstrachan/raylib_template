@@ -32,3 +32,8 @@ typedef struct
         CustomLayoutElement_Background background;
     } customData;
 } CustomLayoutElement;
+
+typedef struct
+{
+    uint32_t visible_chars;
+} DialogTextUserData;

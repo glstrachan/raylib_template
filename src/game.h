@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../external/core.h"
+#include "raylib.h"
 
 typedef struct {
     Font neutral_font, dialog_font, dialog_font_big;

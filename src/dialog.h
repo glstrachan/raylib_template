@@ -1,6 +1,5 @@
 #pragma once
 
-
 typedef void (*Dialog_Item)();
 
 void dialog_play(Dialog_Item dialog);

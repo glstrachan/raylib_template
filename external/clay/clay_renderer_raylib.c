@@ -130,21 +130,43 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
             case CLAY_RENDER_COMMAND_TYPE_TEXT: {
                 Clay_TextRenderData *textData = &renderCommand->renderData.text;
                 Font fontToUse = fonts[textData->fontId];
-    
-                int strlen = textData->stringContents.length + 1;
-    
-                if(strlen > temp_render_buffer_len) {
-                    // Grow the temp buffer if we need a larger string
-                    if(temp_render_buffer) free(temp_render_buffer);
-                    temp_render_buffer = (char *) malloc(strlen);
-                    temp_render_buffer_len = strlen;
+                
+                DialogTextUserData* userData = (DialogTextUserData*)renderCommand->userData;
+                uint32_t visibleChars = userData ? userData->visible_chars : UINT32_MAX;
+
+                uint32_t offset = textData->stringContents.chars - textData->stringContents.baseChars;
+
+                float x = boundingBox.x;
+                float y = boundingBox.y;
+                float scaleFactor = textData->fontSize / (float)fontToUse.baseSize;
+                
+                for (int i = 0; i < textData->stringContents.length; i++) {
+                    char c = textData->stringContents.chars[i];
+                    
+                    if (c == '\n') {
+                        x = boundingBox.x;
+                        y += textData->fontSize;
+                        continue;
+                    }
+                    
+                    uint32_t actualPosition = offset + i;
+                    
+                    Color color = CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor);
+                    if (actualPosition >= visibleChars) {
+                        color.a = 0;  // Transparent
+                    }
+                    
+                    DrawTextCodepoint(fontToUse, c, (Vector2){x, y}, textData->fontSize, color);
+                    
+                    int index = c - 32;
+                    if (fontToUse.glyphs[index].advanceX != 0) 
+                        x += fontToUse.glyphs[index].advanceX * scaleFactor;
+                    else 
+                        x += (fontToUse.recs[index].width + fontToUse.glyphs[index].offsetX) * scaleFactor;
+                    
+                    x += textData->letterSpacing;
                 }
-    
-                // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
-                memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
-                temp_render_buffer[textData->stringContents.length] = '\0';
-                DrawTextEx(fontToUse, temp_render_buffer, (Vector2){boundingBox.x, boundingBox.y}, (float)textData->fontSize, (float)textData->letterSpacing, CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor));
-    
+
                 break;
             }
             case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
