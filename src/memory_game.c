@@ -83,15 +83,15 @@ void memory_game_switch_state(Memory_Game_State next_state) {
     game_state = next_state;
 }
 
-void memory_game_init(Game_Parameters parameters) {
+void memory_game_init() {
     memory_game_switch_state(MEMORY_GAME_STATE_SHOW_SHAPES);
 }
 
-void memory_game_update(Game_Parameters parameters) {
+void memory_game_update() {
 
     switch (game_state) {
     case MEMORY_GAME_STATE_SHOW_SHAPES: {
-        if (timer_update(&memorize_timer, GetFrameTime())) {
+        if (timer_update(&memorize_timer)) {
             memory_game_switch_state(MEMORY_GAME_STATE_ASK_QUESTION);
             break;
         }
@@ -106,8 +106,8 @@ void memory_game_update(Game_Parameters parameters) {
             default: oc_assert(false); break;
             }
 
-            float x = ((float)parameters.screen_width) / 2.0f - SPACING * (memory_objects.count - 1) / 2.0f + i * SPACING;
-            float y = (float)parameters.screen_height / 2.0f;
+            float x = ((float)game_parameters.screen_width) / 2.0f - SPACING * (memory_objects.count - 1) / 2.0f + i * SPACING;
+            float y = (float)game_parameters.screen_height / 2.0f;
             const float size = 100.0f;
 
             switch (memory_objects.items[i].shape) {
@@ -145,9 +145,9 @@ void memory_game_update(Game_Parameters parameters) {
         }
 
         string display_str = oc_sb_to_string(&builder);
-        Vector2 text_size = MeasureTextEx(parameters.neutral_font, display_str.ptr, parameters.neutral_font.baseSize, 10);
-        Vector2 text_position = { parameters.screen_width / 2.0f - text_size.x / 2.0f, parameters.screen_height / 2.0f};
-        DrawTextEx(parameters.neutral_font, display_str.ptr, text_position, parameters.neutral_font.baseSize, 10, (Color){255, 255, 255, 255});
+        Vector2 text_size = MeasureTextEx(game_parameters.neutral_font, display_str.ptr, game_parameters.neutral_font.baseSize, 10);
+        Vector2 text_position = { game_parameters.screen_width / 2.0f - text_size.x / 2.0f, game_parameters.screen_height / 2.0f};
+        DrawTextEx(game_parameters.neutral_font, display_str.ptr, text_position, game_parameters.neutral_font.baseSize, 10, (Color){255, 255, 255, 255});
 
         Vector2 mouse = GetMousePosition();
 
@@ -159,8 +159,8 @@ void memory_game_update(Game_Parameters parameters) {
             Color c = { 140, 140, 140, 255 };
             Color c1 = { 255,215,0, 255 };
 
-            float x = ((float)parameters.screen_width) / 2.0f - SPACING * (COUNT_OF_MEMORY_SHAPE - 1) / 2.0f + i * SPACING;
-            float y = text_position.y + parameters.neutral_font.baseSize + 150;
+            float x = ((float)game_parameters.screen_width) / 2.0f - SPACING * (COUNT_OF_MEMORY_SHAPE - 1) / 2.0f + i * SPACING;
+            float y = text_position.y + game_parameters.neutral_font.baseSize + 150;
 
             float dx = x - mouse.x;
             float dy = y - mouse.y;
