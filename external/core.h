@@ -308,7 +308,7 @@ typedef struct {
 
 #define OC_DEFAULT_MAP_ENTRY_COUNT 512
 #define OC_DEFAULT_MAP_SEED 0xf8abc103ba79eb85LLu
-#define OC_ARENA_CHUNK_SIZE (4096 * 8)
+#define OC_ARENA_CHUNK_SIZE (4096 * 80)
 
 #define OC_FD_INPUT  (0u)
 #define OC_FD_OUTPUT (1u)
@@ -747,7 +747,8 @@ _Noreturn int _oc_assert_fail(const char *assertion, const char *file, unsigned 
 
 Oc_Arena_Chunk* oc_arena_new_chunk(Oc_Arena* arena, uword size_in_bytes) {
     // Oc_Arena_Chunk* chunk = malloc(OC_ARENA_CHUNK_SIZE /* should be word aligned */);
-    uword aligned_bytes = oc_align_forward(size_in_bytes + sizeof(Oc_Arena_Chunk), OC_ARENA_CHUNK_SIZE);
+    // uword aligned_bytes = oc_align_forward(size_in_bytes + sizeof(Oc_Arena_Chunk), OC_ARENA_CHUNK_SIZE);
+    uword aligned_bytes = (size_in_bytes + OC_ARENA_CHUNK_SIZE - 1) / OC_ARENA_CHUNK_SIZE * OC_ARENA_CHUNK_SIZE;
     Oc_Arena_Chunk* chunk = oc_allocate_pages(aligned_bytes);
     if (arena->current && chunk == (void*)(arena->current->data + chunk->size)) {
         // if new chunk is right after current chunk, just extend current chunk
@@ -775,7 +776,7 @@ void oc_arena_restore(Oc_Arena* arena, Oc_Arena_Save restore_point) {
 
 void oc_arena_reset(Oc_Arena* arena) {
     arena->current = arena->head;
-    arena->current->used = sizeof(Oc_Arena_Chunk) / sizeof(uword);
+    arena->current->used = 0;
 }
 
 void* oc_arena_alloc_aligned(Oc_Arena* arena, uint64 size, uint64 alignment) {
@@ -800,7 +801,7 @@ void* oc_arena_alloc_aligned(Oc_Arena* arena, uint64 size, uint64 alignment) {
                 arena->current->next = oc_arena_new_chunk(arena, size);
                 if (!arena->current->next) oc_oom();
             } else {
-                arena->current->next->used = sizeof(Oc_Arena_Chunk) / sizeof(uword);
+                arena->current->next->used = 0;
             }
             arena->current = arena->current->next;
         }
@@ -831,7 +832,7 @@ void* oc_arena_alloc(Oc_Arena* arena, uint64 size) {
                 arena->current->next = oc_arena_new_chunk(arena, size);
                 if (!arena->current->next) oc_oom();
             } else {
-                arena->current->next->used = sizeof(Oc_Arena_Chunk) / sizeof(uword);
+                arena->current->next->used = 0;
             }
             arena->current = arena->current->next;
         }

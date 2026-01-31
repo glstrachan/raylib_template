@@ -74,6 +74,8 @@ int main(void)
 
     Texture2D bg_tex = LoadTexture("resources/background.png");
 
+    oc_arena_alloc(&frame_arena, 1);
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
