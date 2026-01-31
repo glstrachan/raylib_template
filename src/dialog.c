@@ -5,6 +5,7 @@
 #include "dialog.h"
 
 #include "../external/clay/clay.h"
+#include "../external/clay/clay_renderer_raylib.h"
 
 Enum(Dialog_Decoration_Type, uint32_t,
     DIALOG_TYPE_DEFAULT = 0,
@@ -26,6 +27,8 @@ static int dialog_max_item;
 static int dialog_current_item;
 static int dialog_current_branch;
 static bool first_time;
+
+static Shader background_shader;
 
 int _dialog_selection(int count, Dialog_Selection items[]) {
     return 0;
@@ -60,7 +63,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     if (first_time) {
         total_chars = text.len;
         printed_chars = 0;
-        timer_init(&char_timer, 100);
+        timer_init(&char_timer, 30);
     }
 
     bool result = false;
@@ -75,30 +78,16 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
             printed_chars = total_chars;
         }
     } else if(total_chars == printed_chars) {
-        // Draw a continue prompt
-
         if (IsKeyPressed(KEY_SPACE)) {
             result = true;
         }
     }
 
-    // Oc_String_Builder builder;
-    // oc_sb_init(&builder, &frame_arena);
-
-    // wprint(&builder.writer, "{}", string_slice(text, 0, printed_chars));
-    // string display_str = oc_sb_to_string(&builder);
     string display_str = string_slice(text, 0, printed_chars);
 
-    // Vector2 text_position = {game_parameters.screen_width / 2 - game_parameters.screen_width * 0.3, game_parameters.screen_height - 200};
-    
-    // .left = text_position.x, .right = text_position.x + game_parameters.screen_width * 0.6, .top = text_position.y, .bottom = game_parameters.screen_height 
-    // CLAY_AUTO_ID({ 
-    //     .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
-    //     .layout = { .sizing = {CLAY_SIZING_FIXED(game_parameters.screen_width * 0.6), CLAY_SIZING_FIXED(100)} },
-    //     .backgroundColor = { 120, 120, 120, 255 },
-    // }) {
-    //     CLAY_TEXT(((Clay_String) { .length = display_str.len, .chars = display_str.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 1, .textColor = {255, 255, 255, 255} }));
-    // }
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
 
     CLAY(CLAY_ID("DialogBox"), {
         .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
@@ -108,10 +97,11 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
                 .width = CLAY_SIZING_PERCENT(0.5),
                 .height = CLAY_SIZING_PERCENT(0.18)
             },
-            .padding = {16, 16, 16, 16},
+            .padding = {16, 16, 20, 10},
             .childGap = 16
         },
-        .backgroundColor = {200, 200, 200, 255},
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .custom = { .customData = customBackgroundData },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
         CLAY(CLAY_ID("DialogName"), {
@@ -119,11 +109,12 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
                     .height = CLAY_SIZING_PERCENT(0.25)
-                }
+                },
+                .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
         }
         CLAY(CLAY_ID("DialogTextContainer"), {
             .layout = {
@@ -152,33 +143,38 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
                     .height = CLAY_SIZING_PERCENT(0.18)
-                }
+                },
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
             },
             .backgroundColor = {200, 0, 0, 0},
-        }) {}
+        }) {
+            if(total_chars == printed_chars) {
+                CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
+            }
+        }
     }
 
     return result;
 }
 
-#define dialog_text(speaker_name, text, decoration) do {          \
-    if (dialog_current_item < dialog_max_item) {                  \
-        dialog_current_item++;                                    \
-    } else if (dialog_current_item == dialog_max_item) {           \
-        if (_dialog_text(_Generic((speaker_name), string : (speaker_name), default: lit(speaker_name)), _Generic((text), string : (text), default: lit(text)), (decoration))) { \
-            dialog_current_item++;                                \
-            dialog_max_item++;                                    \
-            first_time = true; \
-            return; \
-        } else {                                                  \
-            first_time = false; \
-            return;                                               \
-        }                                                         \
-    } else oc_assert(false);                                      \
+#define dialog_text(speaker_name, text, decoration) do {                                                                                                                         \
+    if (dialog_current_item < dialog_max_item) {                                                                                                                                 \
+        dialog_current_item++;                                                                                                                                                   \
+    } else if (dialog_current_item == dialog_max_item) {                                                                                                                         \
+        if (_dialog_text(_Generic((speaker_name), string : (speaker_name), default: lit(speaker_name)), _Generic((text), string : (text), default: lit(text)), (decoration))) {  \
+            dialog_current_item++;                                                                                                                                               \
+            dialog_max_item++;                                                                                                                                                   \
+            first_time = true;                                                                                                                                                   \
+            return;                                                                                                                                                              \
+        } else {                                                                                                                                                                 \
+            first_time = false;                                                                                                                                                  \
+            return;                                                                                                                                                              \
+        }                                                                                                                                                                        \
+    } else oc_assert(false);                                                                                                                                                     \
 } while (0)
 
 void sample_dialog(void) {
-    dialog_text("john", "hello, how are you? hello, how are you? hello, how are y", 0);
+    dialog_text("Johnathy", "hello, how are you? hello, how are you? hello, how are yhello, how are you? hello, how are you? hello, ho", 0);
     dialog_text("potato", "Good, you?", 0);
 
     switch (dialog_selection(
@@ -205,4 +201,12 @@ void dialog_update(void) {
     dialog_current_branch = 0;
 
     current_dialog();
+}
+
+void dialog_init() {
+    background_shader = LoadShader(0, "resources/dialogbackground.fs");
+}
+
+void dialog_cleanup() {
+    UnloadShader(background_shader);
 }

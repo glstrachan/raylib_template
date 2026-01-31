@@ -34,6 +34,7 @@ int main(void)
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "House Demo");
+    InitAudioDevice();
     SetTargetFPS(240);
     
     Camera2D camera = { 0 };
@@ -46,21 +47,30 @@ int main(void)
     
     Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
     Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
+    Font dialog_font_big = LoadFontEx("resources/Itim.ttf", 60, NULL, 0);
+    Font dialog_font_small = LoadFontEx("resources/Itim.ttf", 25, NULL, 0);
     Font fonts[] = {
         font,
         dialog_font,
+        dialog_font_big,
+        dialog_font_small
     };
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
 
     game_parameters = (Game_Parameters) {
         .neutral_font = font,
         .dialog_font = dialog_font,
+        .dialog_font_big = dialog_font_big,
         .screen_width = screenWidth,
         .screen_height = screenHeight,
     };
+
     memory_game_init();
+    dialog_init();
 
     dialog_play(sample_dialog);
+
+    Texture2D bg_tex = LoadTexture("resources/background.png");
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -78,6 +88,7 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
+                DrawTexture(bg_tex, 0, 0, WHITE);
 
                 // memory_game_update();
                 dialog_update();
@@ -90,6 +101,8 @@ int main(void)
 
         oc_arena_restore(&frame_arena, save);
     }
+
+    dialog_cleanup();
 
     CloseWindow();
 

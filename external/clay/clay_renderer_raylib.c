@@ -1,35 +1,9 @@
-#include "raylib.h"
-#include "raymath.h"
-#include "stdint.h"
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
+#include "./clay_renderer_raylib.h"
 
 #define CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(rectangle) (Rectangle) { .x = rectangle.x, .y = rectangle.y, .width = rectangle.width, .height = rectangle.height }
 #define CLAY_COLOR_TO_RAYLIB_COLOR(color) (Color) { .r = (unsigned char)roundf(color.r), .g = (unsigned char)roundf(color.g), .b = (unsigned char)roundf(color.b), .a = (unsigned char)roundf(color.a) }
 
 Camera Raylib_camera;
-
-typedef enum
-{
-    CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL
-} CustomLayoutElementType;
-
-typedef struct
-{
-    Model model;
-    float scale;
-    Vector3 position;
-    Matrix rotation;
-} CustomLayoutElement_3DModel;
-
-typedef struct
-{
-    CustomLayoutElementType type;
-    union {
-        CustomLayoutElement_3DModel model;
-    } customData;
-} CustomLayoutElement;
 
 // Get a ray trace from the screen position (i.e mouse) within a specific section of the screen
 Ray GetScreenToWorldPointWithZDistance(Vector2 position, Camera camera, int screenWidth, int screenHeight, float zDistance)
@@ -242,6 +216,7 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
                 Clay_CustomRenderData *config = &renderCommand->renderData.custom;
                 CustomLayoutElement *customElement = (CustomLayoutElement *)config->customData;
                 if (!customElement) continue;
+                
                 switch (customElement->type) {
                     case CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL: {
                         Clay_BoundingBox rootBox = renderCommands.internalArray[0].boundingBox;
@@ -250,6 +225,27 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
                         BeginMode3D(Raylib_camera);
                             DrawModel(customElement->customData.model.model, positionRay.position, customElement->customData.model.scale * scaleValue, WHITE);        // Draw 3d model with texture
                         EndMode3D();
+                        break;
+                    }
+                    case CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND: {
+                        CustomLayoutElement_Background *data = &customElement->customData.background;
+                        
+                        float time = GetTime();
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "time"), &time, SHADER_UNIFORM_FLOAT);
+                        Vector2 resolution = {boundingBox.width, boundingBox.height};
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "resolution"), &resolution, SHADER_UNIFORM_VEC2);
+
+                        BeginShaderMode(data->shader);
+
+                        if (config->cornerRadius.topLeft > 0) {
+                            float radius = (config->cornerRadius.topLeft * 2) / (float)((boundingBox.width > boundingBox.height) ? boundingBox.height : boundingBox.width);
+                            DrawRectangleRounded((Rectangle) { boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height }, radius, 8, WHITE);
+                        } else {
+                            DrawRectangle(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, WHITE);
+                        }
+                        
+                        EndShaderMode();
+
                         break;
                     }
                     default: break;
