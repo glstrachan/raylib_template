@@ -102,12 +102,17 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
                 } else {
                     color = (Clay_Color) { 0, 0, 0, 0 };
                 }
-                CLAY(CLAY_IDI_LOCAL("SelectionItem", i), {
+                CLAY(CLAY_IDI("SelectionItem", i), {
                     .layout = { .padding = {16, 16, 2, 2} },
-                    .backgroundColor = color,
+                    .backgroundColor = Clay_Hovered() ? (Clay_Color) { 180, 180, 180, 40 } : color,
                     .cornerRadius = CLAY_CORNER_RADIUS(4)
                 }) {
                     CLAY_TEXT(((Clay_String) { .length = strlen(items[i]), .chars = items[i] }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255} }));
+                }
+
+                bool buttonIsHovered = Clay_PointerOver(CLAY_IDI("SelectionItem", i));
+                if (buttonIsHovered && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+                    result = i;
                 }
             }
         }
@@ -122,7 +127,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
             .backgroundColor = {200, 0, 0, 0},
         }) {
             if(total_chars == printed_chars) {
-                CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
+                CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
             }
         }
     }
