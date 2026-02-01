@@ -7,11 +7,6 @@
 #include "../external/clay/clay.h"
 #include "../external/clay/clay_renderer_raylib.h"
 
-Enum(Dialog_Decoration_Type, uint32_t,
-    DIALOG_TYPE_DEFAULT = 0,
-    DIALOG_TYPE_ANGRY,
-    DIALOG_TYPE_SURPRISED    
-);
 
 static uint32_t total_chars;
 static uint32_t printed_chars;
@@ -30,8 +25,6 @@ static bool first_time;
 static int dialog_selection_index;
 
 static Shader background_shader;
-
-#define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 
 int _dialog_selection(string prompt, int count, const char* items[]) {
     int result = -1;
@@ -135,31 +128,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
     return result;
 }
 
-#define dialog_selection(prompt, ...) ({                                             \
-    int selection;                                                                   \
-    if (dialog_current_item < dialog_max_item) {                                     \
-        dialog_current_item++;                                                       \
-        selection = dialog_branches[dialog_current_branch++];                        \
-    } else if (dialog_current_item == dialog_max_item) {                             \
-        const char* items[] = { __VA_ARGS__ };                                       \
-        selection = _dialog_selection(CSTR_TO_STRING(prompt), oc_len(items), items); \
-        if (selection < 0) {                                                         \
-            first_time = false;                                                      \
-            return;                                                                  \
-        } else {                                                                     \
-            dialog_branches[dialog_current_branch++] = selection;                    \
-            dialog_current_item++;                                                   \
-            dialog_max_item++;                                                       \
-            first_time = true;                                                       \
-            return;                                                                  \
-        }                                                                            \
-    } else {                                                                         \
-        oc_assert(false);                                                            \
-    }                                                                                \
-    selection;                                                                       \
-})
-
-bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decoration) {
+bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters) {
 
     // draw the text
     if (first_time) {
@@ -262,38 +231,22 @@ bool _dialog_text(string speaker_name, string text, Dialog_Decoration_Type decor
     return result;
 }
 
-#define dialog_text(speaker_name, text, decoration) do {                                              \
-    if (dialog_current_item < dialog_max_item) {                                                      \
-        dialog_current_item++;                                                                        \
-    } else if (dialog_current_item == dialog_max_item) {                                              \
-        if (_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text), (decoration))) { \
-            dialog_current_item++;                                                                    \
-            dialog_max_item++;                                                                        \
-            first_time = true;                                                                        \
-            return;                                                                                   \
-        } else {                                                                                      \
-            first_time = false;                                                                       \
-            return;                                                                                   \
-        }                                                                                             \
-    } else oc_assert(false);                                                                          \
-} while (0)
-
 void sample_dialog(void) {
-    dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!", 0);
-    dialog_text("potato", "Good, you?", 0);
+    dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
+    dialog_text("potato", "Good, you?");
 
     switch (dialog_selection("Choose a Fruit", "Potato", "Cherry", "Tomato", "Apple")) {
         case 0: {
-            dialog_text("Old Lady", "Wowwwww! you chose potato!", 0);
+            dialog_text("Old Lady", "Wowwwww! you chose potato!");
         } break;
         case 1: {
-            dialog_text("Old Lady", "Cherry's okay", 0);
+            dialog_text("Old Lady", "Cherry's okay");
         } break;
         case 2: {
-            dialog_text("Old Lady", "Oh... you chose tomato", 0);
+            dialog_text("Old Lady", "Oh... you chose tomato");
         } break;
         case 3: {
-            dialog_text("Old Lady", "Apple? really?", 0);
+            dialog_text("Old Lady", "Apple? really?");
         } break;
     }
 }
