@@ -38,7 +38,6 @@ typedef struct {
     Memory_Color color;
 } Memory_Object;
 
-
 const static float SPACING = 150.0f;
 
 static Memory_Game_State game_state = MEMORY_GAME_STATE_ASK_QUESTION;
@@ -202,3 +201,8 @@ void memory_game_update() {
     }
 
 }
+
+Minigame memory_game = {
+    .init = memory_game_init,
+    .update = memory_game_update,
+};

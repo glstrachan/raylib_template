@@ -18,8 +18,13 @@ static inline void timer_init(Game_Timer* timer, int64_t ms) {
     timer->start = ms;
 }
 
-static inline int64_t timer_elapsed(Game_Timer* timer, int64_t ms) {
+static inline int64_t timer_elapsed(Game_Timer* timer) {
     return max(timer->start - timer->tick, 0);
+}
+
+// returns value from 0.0 to 1.0, 0.0. being start of timer, 1.0 being end of timer
+static inline float timer_interpolate(Game_Timer* timer) {
+    return max(0.0f, (float)(timer->start - timer->tick) / (float)timer->start);
 }
 
 static inline void timer_reset(Game_Timer* timer) {
@@ -34,6 +39,11 @@ static inline bool timer_update(Game_Timer* timer) {
 static inline bool timer_ready(Game_Timer* timer) {
     return timer->tick <= 0;
 }
+
+typedef struct {
+    void (*init)(void);
+    void (*update)(void);
+} Minigame;
 
 extern Game_Parameters game_parameters;
 

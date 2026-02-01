@@ -304,13 +304,22 @@ void dialog_play(Dialog_Item dialog) {
     dialog_max_item = 0;
 }
 
+bool dialog_is_done(void) {
+    return current_dialog == NULL;
+}
+
 void dialog_update(void) {
     if(!current_dialog) return;
 
     dialog_current_item = 0;
     dialog_current_branch = 0;
 
+    bool before_ft = first_time;
     current_dialog();
+
+    if (first_time && before_ft) {
+        current_dialog = NULL;
+    }
 }
 
 void dialog_init() {

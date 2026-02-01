@@ -26,7 +26,80 @@ void HandleClayErrors(Clay_ErrorData errorData) {
     }
 }
 
+static Texture2D bg_tex;
 Game_Parameters game_parameters;
+
+static struct {
+    enum {
+        GAME_STATE_TRANSITION,
+        GAME_STATE_IN_DIALOG,
+        GAME_STATE_IN_MINIGAME
+    } state;
+    uint32_t next_state;
+    Minigame* current_minigame;
+
+    Game_Timer transition_timer;
+    Texture2D screenshot;
+} game;
+
+extern Minigame memory_game;
+
+void game_go_to_state(uint32_t next_state) {
+    switch (next_state) {
+    case GAME_STATE_TRANSITION: {
+        Image screenshot = LoadImageFromScreen();
+        game.screenshot = LoadTextureFromImage(screenshot);
+        timer_init(&game.transition_timer, 2000);
+    } break;
+    case GAME_STATE_IN_DIALOG: {
+        dialog_init();
+    } break;
+    case GAME_STATE_IN_MINIGAME: {
+        game.current_minigame->init();
+    } break;
+    default: oc_assert(false);
+    }
+    game.state = next_state;
+}
+
+void game_update() {
+    switch (game.state) {
+    case GAME_STATE_TRANSITION: {
+        if (timer_update(&game.transition_timer)) {
+            game_go_to_state(game.next_state);
+            break;
+        }
+
+        DrawTexture(game.screenshot, 0, 0, WHITE);
+        float interp = timer_interpolate(&game.transition_timer);
+        interp = interp * 2.0f - 1.0f;
+        if (interp < 0.0f) interp = -interp;
+        interp = 1.0f - interp;
+
+        DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
+    } break;
+    case GAME_STATE_IN_DIALOG: {
+        // TODO: Move this into dialog or smth so we can scriptably change the background
+        DrawTexture(bg_tex, 0, 0, WHITE);
+        characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
+        characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
+
+        dialog_update();
+        if (dialog_is_done()) {
+            game.current_minigame = &memory_game;
+
+            // game.next_state = GAME_STATE_IN_MINIGAME;
+            // game_go_to_state(GAME_STATE_TRANSITION);
+
+            game_go_to_state(GAME_STATE_IN_MINIGAME);
+        }
+    } break;
+    case GAME_STATE_IN_MINIGAME: {
+        game.current_minigame->update();
+    } break;
+    default: oc_assert(false);
+    }
+}
 
 int main(void)
 {
@@ -66,15 +139,16 @@ int main(void)
         .screen_height = screenHeight,
     };
 
-    memory_game_init();
     dialog_init();
     characters_init();
 
     dialog_play(sample_dialog);
 
-    Texture2D bg_tex = LoadTexture("resources/background.png");
+    bg_tex = LoadTexture("resources/background.png");
 
     oc_arena_alloc(&frame_arena, 1);
+
+    game.state = GAME_STATE_IN_DIALOG;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -92,15 +166,7 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-
-                // TODO: Move this into dialog or smth so we can scriptably change the background
-                DrawTexture(bg_tex, 0, 0, WHITE);
-                characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
-                characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
-
-                // memory_game_update();
-                dialog_update();
-
+                game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();
