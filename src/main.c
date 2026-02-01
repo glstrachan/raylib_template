@@ -43,6 +43,7 @@ static struct {
 } game;
 
 extern Minigame memory_game;
+extern Minigame smile_game;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
@@ -148,7 +149,10 @@ int main(void)
 
     oc_arena_alloc(&frame_arena, 1);
 
-    game.state = GAME_STATE_IN_DIALOG;
+    // game.state = GAME_STATE_IN_DIALOG;
+    game.current_minigame = &smile_game;
+    game_go_to_state(GAME_STATE_IN_MINIGAME);
+    // game.state = GAME_STATE_IN_MINIGAME;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
