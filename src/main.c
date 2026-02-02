@@ -149,15 +149,21 @@ int main(void)
         .screen_height = screenHeight,
     };
 
-    dialog_init();
-    characters_init();
-    pick_items_init();
+    oc_arena_alloc(&frame_arena, 1);
 
-    encounter_start(sample_encounter);
+    {
+        Oc_Arena_Save save = oc_arena_save(&frame_arena);
+
+        dialog_init();
+        characters_init();
+        pick_items_init();
+        encounter_start(sample_encounter);
+
+        oc_arena_restore(&frame_arena, save);
+    }
+
 
     bg_tex = LoadTexture("resources/background.png");
-
-    oc_arena_alloc(&frame_arena, 1);
 
     game.state = GAME_STATE_IN_ENCOUNTER;
     game.current_minigame = &smile_game;
