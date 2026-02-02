@@ -3,38 +3,55 @@
 #include "game.h"
 #include "jump.h"
 
-Enum(Dialog_Decoration_Type, uint32_t,
-    DIALOG_TYPE_DEFAULT = 0,
-    DIALOG_TYPE_ANGRY,
-    DIALOG_TYPE_SURPRISED    
-);
+/* Core Dialog System */
 
-typedef struct {
-    Dialog_Decoration_Type decoration;
-    float desired_mood;
-} Dialog_Parameters;
+#define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 
 typedef void (*Dialog_Item)();
 
 void dialog_play(Dialog_Item dialog);
 void dialog_update(void);
 
-void sample_dialog(void);
-
 bool dialog_is_done(void);
+
+/* Types of Dialog */
+
 void dialog_init();
 void dialog_cleanup();
 
-bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters);
+typedef struct {
+    uint32_t total_chars;
+    uint32_t printed_chars;
+    Game_Timer char_timer;
+} Dialog_Text_Data;
+
+typedef struct {
+    int dialog_selection_index;
+} Dialog_Selection_Data;
+
+static union {
+    Dialog_Text_Data text;
+    Dialog_Selection_Data selection;
+} data;
+
+bool _dialog_text(string speaker_name, string text);
 int _dialog_selection(string prompt, int count, const char* items[]);
 
-#define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
+#define dialog_text(speaker_name, text) do {                                             \
+    if (my_setjmp(dialog_jump_buf) == 0) {                                               \
+        first_time = true;                                                               \
+        my_longjmp(dialog_jump_back_buf, 1);                                             \
+    }                                                                                    \
+    if (!_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text))) {             \
+        my_longjmp(dialog_jump_back_buf, 1);                                             \
+    }                                                                                    \
+} while (0)
 
-#define dialog_selection(prompt, ...) ({                                       \
+#define dialog_selection(prompt, ...) ({                                             \
     int selection;                                                                   \
     if (my_setjmp(dialog_jump_buf) == 0) {                                           \
         first_time = true;                                                           \
-        my_longjmp(dialog_jump_back_buf, 1);                                     \
+        my_longjmp(dialog_jump_back_buf, 1);                                         \
     }                                                                                \
     {                                                                                \
         const char* items[] = { __VA_ARGS__ };                                       \
@@ -46,14 +63,9 @@ int _dialog_selection(string prompt, int count, const char* items[]);
     selection;                                                                       \
 })
 
-#define dialog_text(speaker_name, text, ...) do {                                                                                       \
-    if (my_setjmp(dialog_jump_buf) == 0) {                                                                                              \
-        first_time = true;                                                                                                              \
-        my_longjmp(dialog_jump_back_buf, 1);                                                                                            \
-    }                                                                                                                                   \
-    if (!_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text), (Dialog_Parameters) { .desired_mood = 0.0f, __VA_ARGS__ })) { \
-        my_longjmp(dialog_jump_back_buf, 1);                                                                                            \
-    }                                                                                                                                   \
-} while (0)
-
 #define dialog_end() do { current_dialog = NULL; my_longjmp(dialog_jump_back_buf, 1); } while (0)
+
+
+/* Dialog Paths */
+
+void sample_dialog(void);
