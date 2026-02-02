@@ -10,34 +10,32 @@
 
 #include "dialog.h"
 
-static uint32_t total_chars;
-static uint32_t printed_chars;
-static Game_Timer char_timer;
-
 typedef struct {
     string name;
 } Dialog_Selection;
 
-static int dialog_selection_index;
-
 static Shader background_shader;
+static union {
+    Dialog_Text_Data text;
+    Dialog_Selection_Data selection;
+} data;
 
 int _dialog_selection(string prompt, int count, const char* items[]) {
     int result = -1;
 
     if (encounter_first_time) {
-        dialog_selection_index = 0;
+        data.selection.index = 0;
         encounter_first_time = false;
     }
 
     if (IsKeyPressed(KEY_RIGHT)) {
-        dialog_selection_index = min(dialog_selection_index + 1, count - 1);
+        data.selection.index = min(data.selection.index + 1, count - 1);
     } else if (IsKeyPressed(KEY_LEFT)) {
-        dialog_selection_index = max(dialog_selection_index - 1, 0);
+        data.selection.index = max(data.selection.index - 1, 0);
     }
 
     if (IsKeyPressed(KEY_ENTER)) {
-        result = dialog_selection_index;
+        result = data.selection.index;
     }
 
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
@@ -45,7 +43,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
     customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
 
     DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
-    textUserData->visible_chars = printed_chars;
+    textUserData->visible_chars = data.text.printed_chars;
 
     CLAY(CLAY_ID("DialogBox"), {
         .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
@@ -87,7 +85,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
         }) {
             for (int i = 0; i < count; ++i) {
                 Clay_Color color;
-                if (i == dialog_selection_index) {
+                if (i == data.selection.index) {
                     color = (Clay_Color) { 180, 180, 180, 80 };
                 } else {
                     color = (Clay_Color) { 0, 0, 0, 0 };
@@ -116,22 +114,20 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            if(total_chars == printed_chars) {
-                CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
-            }
+            CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
         }
     }
 
     return result;
 }
 
-bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters) {
+bool _dialog_text(string speaker_name, string text) {
 
     // draw the text
     if (encounter_first_time) {
-        total_chars = text.len;
-        printed_chars = 0;
-        timer_init(&char_timer, 30);
+        data.text.total_chars = text.len;
+        data.text.printed_chars = 0;
+        timer_init(&data.text.char_timer, 30);
         encounter_first_time = false;
     }
 

@@ -29,10 +29,5 @@ typedef struct {
     int index;
 } Dialog_Selection_Data;
 
-static union {
-    Dialog_Text_Data text;
-    Dialog_Selection_Data selection;
-} data;
-
 bool _dialog_text(string speaker_name, string text);
 int _dialog_selection(string prompt, int count, const char* items[]);

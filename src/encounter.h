@@ -36,7 +36,7 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
         encounter_first_time = true;                                                                                                    \
         my_longjmp(encounter_jump_back_buf, 1);                                                                                         \
     }                                                                                                                                   \
-    if (!_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text), (Dialog_Parameters) { .desired_mood = 0.0f, __VA_ARGS__ })) { \
+    if (!_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text))) { \
         my_longjmp(encounter_jump_back_buf, 1);                                                                                         \
     }                                                                                                                                   \
 } while (0)
