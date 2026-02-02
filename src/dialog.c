@@ -148,8 +148,6 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
         }
     }
 
-    string display_str = string_slice(text, 0, data.text.printed_chars);
-
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
     customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
     customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };

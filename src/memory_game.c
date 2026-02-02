@@ -99,7 +99,7 @@ void memory_game_init() {
     uint64_t totalMemorySize = Clay_MinMemorySize();
     Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
     Clay_SetCurrentContext(NULL);
-    this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors });
+    this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
     Clay_SetCurrentContext(old_ctx);
 
     background_shader = LoadShader(0, "resources/dialogbackground.fs");
@@ -177,7 +177,6 @@ bool memory_game_update() {
         }
     } break;
     case MEMORY_GAME_STATE_ASK_QUESTION: {
-        const char* question;
         Oc_String_Builder builder;
         oc_sb_init(&builder, &frame_arena);
         switch (game_data.game_question.question) {

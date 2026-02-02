@@ -51,7 +51,7 @@ extern Oc_Arena frame_arena;
 extern Oc_Arena arena;
 
 typedef struct {
-    Item_Type items[4];
+    uint32_t items[4];
     bool used[4];
 } Briefcase;
 

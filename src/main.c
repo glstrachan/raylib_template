@@ -91,10 +91,11 @@ void game_update() {
             game.current_minigame = &memory_game;
 
                 // game.next_state = GAME_STATE_IN_MINIGAME;
-                game_go_to_state(GAME_STATE_TRANSITION);
+                // game_go_to_state(GAME_STATE_TRANSITION);
 
             // TODO: go to show day summary
-            game_go_to_state(GAME_STATE_IN_MINIGAME);
+            // game_go_to_state(GAME_STATE_IN_MINIGAME);
+            exit(0);
         }
     } break;
     default: oc_assert(false);
@@ -120,7 +121,7 @@ int main(void)
     
     uint64_t totalMemorySize = Clay_MinMemorySize();
     Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
-    Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors });
+    Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
     
     Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
     Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
@@ -152,7 +153,8 @@ int main(void)
         characters_init();
         pick_items_init();
         pick_encounter_init();
-        encounter_start(sample_encounter);
+        extern Encounter sample_encounter_;
+        encounter_start(&sample_encounter_);
 
         oc_arena_restore(&frame_arena, save);
     }
@@ -160,7 +162,8 @@ int main(void)
 
     bg_tex = LoadTexture("resources/background.png");
 
-    game.state = GAME_STATE_IN_ENCOUNTER;
+    // game.state = GAME_STATE_SELECT_ENCOUNTER;
+    game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
     game.current_minigame = &smile_game;
     // game_go_to_state(GAME_STATE_IN_MINIGAME);
     // game.state = GAME_STATE_IN_MINIGAME;

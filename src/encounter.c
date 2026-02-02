@@ -32,7 +32,7 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter* encounter
     asm volatile("mov %%rsp, %0" : "=r" (this_sequence->old_stack));
     asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
     if (my_setjmp(this_sequence->jump_back_buf) == 0) {
-        this_sequence->encounter();
+        this_sequence->encounter->fn();
     }
     asm volatile("mov %0, %%rsp" :: "r" (this_sequence->old_stack));
 }
@@ -84,14 +84,15 @@ void sample_encounter(void) {
 Encounter sample_encounter_ = {
     .fn = sample_encounter,
     .name = lit("Old Lady"),
-}
+};
 
+static Shader background_shader;
 void pick_encounter_init(void) {
-
+    background_shader = LoadShader(0, "resources/dialogbackground.fs");
 }
 
 void pick_encounter(void) {
-    game.encounter = sample_encounter_;
+    game.encounter = &sample_encounter_;
 }
 
 void pick_encounter_update(void) {
@@ -122,7 +123,7 @@ void pick_encounter_update(void) {
     }) {
         CLAY_TEXT(((Clay_String) { .length = txt.len, .chars = txt.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
         CLAY_AUTO_ID({
-            .layout = { .sizing = { .height = CLAY_SIZING_GROW(0.6) } }
+            .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
         });
         CLAY(CLAY_ID("DialogContinue"), {
             .layout = {

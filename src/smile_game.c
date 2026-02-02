@@ -60,7 +60,11 @@ void smile_game_init(void) {
     acceleration = 0.08;
     acceleration1 = 0.0f;
 
-    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
+    static Encounter encounter = {
+        .fn = smile_dialog_sequence,
+        .name = "Old Lady",
+    };
+    encounter_sequence_start(&dialog_sequence, &encounter);
 }
 
 bool smile_game_update(void) {

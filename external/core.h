@@ -506,15 +506,17 @@ static inline uword oc_align_forward(uword value, uword alignment_in_bytes) {
 }
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 /* --------    libc forwards  -------- */
-void *memset(void *s, int c, size_t n);
-void *memcpy(void *dest, const void *src, size_t n);
-int memcmp(const void *a, const void *b, size_t n);
-int strncmp(const char *a, const char *b, size_t n);
-int strcmp(const char *a, const char *b);
-size_t strlen(const char *s);
-_Noreturn void exit(int status);
+// void *memset(void *s, int c, size_t n);
+// void *memcpy(void *dest, const void *src, size_t n);
+// int memcmp(const void *a, const void *b, size_t n);
+// int strncmp(const char *a, const char *b, size_t n);
+// int strcmp(const char *a, const char *b);
+// size_t strlen(const char *s);
+// __declspec(dllimport) _Noreturn void exit(int status);
 // typedef void FILE;
 // int fopen_s(FILE**, const char*, const char*);
 // int fseek(FILE*, int, int);
@@ -522,9 +524,9 @@ _Noreturn void exit(int status);
 // unsigned long long fwrite(const void *, unsigned long long a, unsigned long long b, FILE *);
 // unsigned long long fread(void *, unsigned long long a, unsigned long long b, FILE *);
 // void fclose(FILE*);
-void* realloc(void *, size_t);
-void* malloc(size_t);
-void* alloca(size_t);
+// __declspec(dllimport) void* realloc(void *, size_t);
+// __declspec(dllimport) void* malloc(size_t);
+// __declspec(dllimport) void* alloca(size_t);
 // #define SEEK_CUR    1
 // #define SEEK_END    2
 // #define SEEK_SET    0
@@ -1367,6 +1369,7 @@ size_t stbds_hash_string(string* str, size_t len, size_t seed)
 }
 
 size_t stbds_hash_string_atom(string* str, size_t len, size_t seed) {
+    (void)len;
     (void)seed;
     size_t key = (size_t)str->ptr;
     key = (~key) + (key << 21); // key = (key << 21) - key - 1;
