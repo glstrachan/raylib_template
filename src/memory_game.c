@@ -145,7 +145,7 @@ bool memory_game_update() {
 
     switch (game_state) {
     case MEMORY_GAME_STATE_SHOW_SHAPES: {
-        if (iterations > 4) {
+        if (iterations > 1) {
             return true;
         }
         if (timer_update(&memorize_timer)) {

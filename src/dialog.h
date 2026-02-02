@@ -29,5 +29,15 @@ typedef struct {
     int index;
 } Dialog_Selection_Data;
 
-bool _dialog_text(string speaker_name, string text);
-int _dialog_selection(string prompt, int count, const char* items[]);
+typedef void (*Encounter)(void);
+
+typedef struct {
+    Encounter encounter;
+    jmp_buf jump_buf, jump_back_buf;
+    void *stack, *old_stack;
+    bool first_time;
+    bool is_done;
+} Encounter_Sequence;
+
+bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text);
+int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[]);

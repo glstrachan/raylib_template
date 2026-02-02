@@ -2,44 +2,53 @@
 #include "encounter.h"
 #include "jump.h"
 
-bool encounter_first_time;
-jmp_buf encounter_jump_buf, encounter_jump_back_buf;
+Encounter_Sequence encounter_top_sequence = { 0 };
 static Encounter current_encounter;
-static void* stack = NULL, *old_stack = NULL;
 
 void encounter_start(Encounter encounter) {
-    if (!stack) {
-        stack = malloc(10 * 1024);
-    }
-    encounter_first_time = true;
     current_encounter = encounter;
-
-
-    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)stack) + 10 * 1024 - 16, 16);
-
-    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
-    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
-    if (my_setjmp(encounter_jump_back_buf) == 0) {
-        current_encounter();
-    }
-    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
+    encounter_sequence_start(&encounter_top_sequence, encounter);
 }
 
 void encounter_update(void) {
-    if(!current_encounter) return;
+    if (!current_encounter) return;
+    encounter_sequence_update(&encounter_top_sequence);
+}
 
-    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
-    if (my_setjmp(encounter_jump_back_buf) == 0) {
-        my_longjmp(encounter_jump_buf, 1);
+void encounter_sequence_start(Encounter_Sequence* sequence, Encounter encounter) {
+    if (!sequence->stack) {
+        sequence->stack = malloc(10 * 1024);
     }
-    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
+    sequence->encounter = encounter;
+    sequence->first_time = true;
+
+    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)sequence->stack) + 10 * 1024 - 16, 16);
+
+    static Encounter_Sequence* this_sequence;
+    this_sequence = sequence; // needed since we modify rsp
+    asm volatile("mov %%rsp, %0" : "=r" (this_sequence->old_stack));
+    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
+    if (my_setjmp(this_sequence->jump_back_buf) == 0) {
+        this_sequence->encounter();
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (this_sequence->old_stack));
+}
+
+void encounter_sequence_update(Encounter_Sequence* sequence) {
+    asm volatile("mov %%rsp, %0" : "=r" (sequence->old_stack));
+    if (my_setjmp(sequence->jump_back_buf) == 0) {
+        my_longjmp(sequence->jump_buf, 1);
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (sequence->old_stack));
 }
 
 bool encounter_is_done(void) {
-    return current_encounter == NULL;
+    return encounter_top_sequence.is_done;
 }
 
 void sample_encounter(void) {
+    encounter_begin();
+
     dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
     dialog_text("potato", "Good, you?");
 

@@ -1,4 +1,5 @@
 #include "dialog.h"
+#include "encounter.h"
 /* 
 top_level_game_state:
     TUTORIAL
@@ -42,6 +43,14 @@ static float smileness;
 static float velocity;
 static float acceleration;
 static float acceleration1;
+Encounter_Sequence dialog_sequence = { 0 };
+
+void smile_dialog_sequence(void) {
+    encounter_begin(&dialog_sequence);
+    dialog_text("Old lady", "soo nice smile u have there");
+    dialog_text("Old lady", "my cat died");
+    encounter_end();
+}
 
 void smile_game_init(void) {
     shader = LoadShader(NULL, "resources/smile_shader.fs");
@@ -50,9 +59,14 @@ void smile_game_init(void) {
     velocity = 0.0f;
     acceleration = 0.08;
     acceleration1 = 0.0f;
+
+    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
 }
 
 bool smile_game_update(void) {
+
+    encounter_sequence_update(&dialog_sequence);
+
     const int width = 100;
     const int padding_offset = 100;
 

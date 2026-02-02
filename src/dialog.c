@@ -20,12 +20,12 @@ static union {
     Dialog_Selection_Data selection;
 } data;
 
-int _dialog_selection(string prompt, int count, const char* items[]) {
+int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[]) {
     int result = -1;
 
-    if (encounter_first_time) {
+    if (sequence->first_time) {
         data.selection.index = 0;
-        encounter_first_time = false;
+        sequence->first_time = false;
     }
 
     if (IsKeyPressed(KEY_RIGHT)) {
@@ -121,14 +121,14 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
     return result;
 }
 
-bool _dialog_text(string speaker_name, string text) {
+bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text) {
 
     // draw the text
-    if (encounter_first_time) {
+    if (sequence->first_time) {
         data.text.total_chars = text.len;
         data.text.printed_chars = 0;
         timer_init(&data.text.char_timer, 30);
-        encounter_first_time = false;
+        sequence->first_time = false;
     }
 
     bool result = false;
