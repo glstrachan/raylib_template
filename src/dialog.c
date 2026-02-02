@@ -17,14 +17,10 @@ typedef struct {
     string name;
 } Dialog_Selection;
 
-static int dialog_branches[1024];
-static int dialog_max_item;
-static int dialog_current_item;
-static int dialog_current_branch;
 static bool first_time;
 static int dialog_selection_index;
 
-jmp_buf dialog_jump_buf, dialog_jump_back_buf;
+static jmp_buf dialog_jump_buf, dialog_jump_back_buf;
 
 static Shader background_shader;
 
@@ -235,27 +231,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters
     return result;
 }
 
-static void* stack, *old_stack;
-
-void start_dialog() {
-    stack = malloc(10 * 1024);
-    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)stack) + 10 * 1024 - 16, 16);
-
-    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
-    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
-    if (my_setjmp(dialog_jump_back_buf) == 0) {
-        sample_dialog();
-    }
-    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
-}
-
-void do_dialog_frame() {
-    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
-    if (my_setjmp(dialog_jump_back_buf) == 0) {
-        my_longjmp(dialog_jump_buf, 1);
-    }
-    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
-}
+static void* stack = NULL, *old_stack = NULL;
 
 void sample_dialog(void) {
     dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
@@ -275,12 +251,26 @@ void sample_dialog(void) {
             dialog_text("Old Lady", "Apple? really?");
         } break;
     }
+
+    dialog_end();
 }
 
 void dialog_play(Dialog_Item dialog) {
+    if (!stack) {
+        stack = malloc(10 * 1024);
+    }
     first_time = true;
     current_dialog = dialog;
-    dialog_max_item = 0;
+
+
+    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)stack) + 10 * 1024 - 16, 16);
+
+    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
+    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
+    if (my_setjmp(dialog_jump_back_buf) == 0) {
+        sample_dialog();
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
 }
 
 bool dialog_is_done(void) {
@@ -290,11 +280,14 @@ bool dialog_is_done(void) {
 void dialog_update(void) {
     if(!current_dialog) return;
 
-    dialog_current_item = 0;
-    dialog_current_branch = 0;
-
     bool before_ft = first_time;
-    current_dialog();
+
+
+    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
+    if (my_setjmp(dialog_jump_back_buf) == 0) {
+        my_longjmp(dialog_jump_buf, 1);
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
 
     if (first_time && before_ft) {
         current_dialog = NULL;
