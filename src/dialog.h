@@ -29,10 +29,15 @@ typedef struct {
     int index;
 } Dialog_Selection_Data;
 
-typedef void (*Encounter)(void);
+typedef void (*Encounter_Fn)(void);
+
+typedef struct Encounter {
+    Encounter_Fn fn;
+    string name;
+} Encounter;
 
 typedef struct {
-    Encounter encounter;
+    Encounter* encounter;
     jmp_buf jump_buf, jump_back_buf;
     void *stack, *old_stack;
     bool first_time;

@@ -49,3 +49,32 @@ extern Game_Parameters game_parameters;
 
 extern Oc_Arena frame_arena;
 extern Oc_Arena arena;
+
+typedef struct {
+    Item_Type items[4];
+    bool used[4];
+} Briefcase;
+
+typedef struct {
+    enum {
+        GAME_STATE_TUTORIAL,
+        GAME_STATE_SELECT_ITEMS,
+        GAME_STATE_SELECT_ENCOUNTER,
+        GAME_STATE_IN_ENCOUNTER,
+        GAME_STATE_DAY_SUMMARY,
+        GAME_STATE_PLAYTHROUGH_SUMMARY,
+    } state;
+
+    uint32_t next_state;
+    Minigame* current_minigame;
+
+    Game_Timer transition_timer;
+    Texture2D screenshot;
+
+    Briefcase briefcase;
+    struct Encounter* encounter;
+
+    uint8_t current_day;
+} Game_State;
+extern Game_State game;
+

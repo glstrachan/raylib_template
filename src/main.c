@@ -31,35 +31,26 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 static Texture2D bg_tex;
 Game_Parameters game_parameters;
 
-static struct {
-    enum {
-        GAME_STATE_TRANSITION,
-        GAME_STATE_IN_ENCOUNTER,
-        GAME_STATE_IN_MINIGAME
-    } state;
-
-    uint32_t next_state;
-    Minigame* current_minigame;
-
-    Game_Timer transition_timer;
-    Texture2D screenshot;
-} game;
+Game_State game = { 0 };
 
 extern Minigame memory_game;
 extern Minigame smile_game;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
-    case GAME_STATE_TRANSITION: {
-        Image screenshot = LoadImageFromScreen();
-        game.screenshot = LoadTextureFromImage(screenshot);
-        timer_init(&game.transition_timer, 2000);
+    // case GAME_STATE_TRANSITION: {
+    //     Image screenshot = LoadImageFromScreen();
+    //     game.screenshot = LoadTextureFromImage(screenshot);
+    //     timer_init(&game.transition_timer, 2000);
+    // } break;
+    case GAME_STATE_SELECT_ITEMS: {
+        choose_pickable();
+    } break;
+    case GAME_STATE_SELECT_ENCOUNTER: {
+        pick_encounter();
     } break;
     case GAME_STATE_IN_ENCOUNTER: {
         dialog_init();
-    } break;
-    case GAME_STATE_IN_MINIGAME: {
-        game.current_minigame->init();
     } break;
     default: oc_assert(false);
     }
@@ -69,19 +60,25 @@ void game_go_to_state(uint32_t next_state) {
 
 void game_update() {
     switch (game.state) {
-        case GAME_STATE_TRANSITION: {
-            if (timer_update(&game.transition_timer)) {
-                game_go_to_state(game.next_state);
-                break;
-            }
+    //     case GAME_STATE_TRANSITION: {
+    //         if (timer_update(&game.transition_timer)) {
+    //             game_go_to_state(game.next_state);
+    //             break;
+    //         }
 
-            DrawTexture(game.screenshot, 0, 0, WHITE);
-            float interp = timer_interpolate(&game.transition_timer);
-            interp = interp * 2.0f - 1.0f;
-            if (interp < 0.0f) interp = -interp;
-            interp = 1.0f - interp;
+    //         DrawTexture(game.screenshot, 0, 0, WHITE);
+    //         float interp = timer_interpolate(&game.transition_timer);
+    //         interp = interp * 2.0f - 1.0f;
+    //         if (interp < 0.0f) interp = -interp;
+    //         interp = 1.0f - interp;
 
-        DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
+    //     DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
+    // } break;
+    case GAME_STATE_SELECT_ITEMS: {
+        pick_items_update();
+    } break;
+    case GAME_STATE_SELECT_ENCOUNTER: {
+        pick_encounter_update();
     } break;
     case GAME_STATE_IN_ENCOUNTER: {
         // TODO: Move this into dialog or smth so we can scriptably change the background
@@ -99,9 +96,6 @@ void game_update() {
             // TODO: go to show day summary
             game_go_to_state(GAME_STATE_IN_MINIGAME);
         }
-    } break;
-    case GAME_STATE_IN_MINIGAME: {
-        game.current_minigame->update();
     } break;
     default: oc_assert(false);
     }
@@ -157,6 +151,7 @@ int main(void)
         dialog_init();
         characters_init();
         pick_items_init();
+        pick_encounter_init();
         encounter_start(sample_encounter);
 
         oc_arena_restore(&frame_arena, save);
@@ -187,7 +182,6 @@ int main(void)
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
                 game_update();
-                // pick_items_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();

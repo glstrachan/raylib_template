@@ -4,13 +4,17 @@
 
 extern Encounter_Sequence encounter_top_sequence;
 
-void encounter_start(Encounter encounter);
+void encounter_start(Encounter* encounter);
 void encounter_update(void);
-void encounter_sequence_start(Encounter_Sequence* sequence, Encounter encounter);
+void encounter_sequence_start(Encounter_Sequence* sequence, Encounter* encounter);
 void encounter_sequence_update(Encounter_Sequence* sequence);
 
 bool encounter_is_done(void);
 void sample_encounter(void);
+
+void pick_encounter_init(void);
+void pick_encounter(void);
+void pick_encounter_update(void);
 
 extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
 
