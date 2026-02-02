@@ -12,6 +12,7 @@ set(SOURCES
     src/main.c
     src/dialog.c
     src/characters.c
+    src/jump.c
 
     src/memory_game.c
     src/smile_game.c

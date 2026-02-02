@@ -24,6 +24,8 @@ static int dialog_current_branch;
 static bool first_time;
 static int dialog_selection_index;
 
+jmp_buf dialog_jump_buf, dialog_jump_back_buf;
+
 static Shader background_shader;
 
 int _dialog_selection(string prompt, int count, const char* items[]) {
@@ -31,6 +33,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
 
     if (first_time) {
         dialog_selection_index = 0;
+        first_time = false;
     }
 
     if (IsKeyPressed(KEY_RIGHT)) {
@@ -135,6 +138,7 @@ bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters
         total_chars = text.len;
         printed_chars = 0;
         timer_init(&char_timer, 30);
+        first_time = false;
     }
 
     bool result = false;
@@ -229,6 +233,28 @@ bool _dialog_text(string speaker_name, string text, Dialog_Parameters parameters
     }
 
     return result;
+}
+
+static void* stack, *old_stack;
+
+void start_dialog() {
+    stack = malloc(10 * 1024);
+    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)stack) + 10 * 1024 - 16, 16);
+
+    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
+    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
+    if (my_setjmp(dialog_jump_back_buf) == 0) {
+        sample_dialog();
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
+}
+
+void do_dialog_frame() {
+    asm volatile("mov %%rsp, %0" : "=r" (old_stack));
+    if (my_setjmp(dialog_jump_back_buf) == 0) {
+        my_longjmp(dialog_jump_buf, 1);
+    }
+    asm volatile("mov %0, %%rsp" :: "r" (old_stack));
 }
 
 void sample_dialog(void) {

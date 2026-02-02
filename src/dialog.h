@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game.h"
+#include "jump.h"
 
 Enum(Dialog_Decoration_Type, uint32_t,
     DIALOG_TYPE_DEFAULT = 0,
@@ -29,42 +30,28 @@ int _dialog_selection(string prompt, int count, const char* items[]);
 
 #define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 
-#define dialog_selection(prompt, ...) ({                                             \
+#define dialog_selection(prompt, ...) ({                                       \
     int selection;                                                                   \
-    if (dialog_current_item < dialog_max_item) {                                     \
-        dialog_current_item++;                                                       \
-        selection = dialog_branches[dialog_current_branch++];                        \
-    } else if (dialog_current_item == dialog_max_item) {                             \
+    if (my_setjmp(dialog_jump_buf) == 0) {                                           \
+        first_time = true;                                                           \
+        return;                                                                      \
+    }                                                                                \
+    {                                                                                \
         const char* items[] = { __VA_ARGS__ };                                       \
         selection = _dialog_selection(CSTR_TO_STRING(prompt), oc_len(items), items); \
         if (selection < 0) {                                                         \
-            first_time = false;                                                      \
-            return;                                                                  \
-        } else {                                                                     \
-            dialog_branches[dialog_current_branch++] = selection;                    \
-            dialog_current_item++;                                                   \
-            dialog_max_item++;                                                       \
-            first_time = true;                                                       \
-            return;                                                                  \
+            my_longjmp(dialog_jump_back_buf, 1);                                     \
         }                                                                            \
-    } else {                                                                         \
-        oc_assert(false);                                                            \
     }                                                                                \
     selection;                                                                       \
 })
 
-#define dialog_text(speaker_name, text, ...) do {                                              \
-    if (dialog_current_item < dialog_max_item) {                                                      \
-        dialog_current_item++;                                                                        \
-    } else if (dialog_current_item == dialog_max_item) {                                              \
-        if (_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text), ((Dialog_Parameters) { .desired_mood = 0.0, __VA_ARGS__ }))) { \
-            dialog_current_item++;                                                                    \
-            dialog_max_item++;                                                                        \
-            first_time = true;                                                                        \
-            return;                                                                                   \
-        } else {                                                                                      \
-            first_time = false;                                                                       \
-            return;                                                                                   \
-        }                                                                                             \
-    } else oc_assert(false);                                                                          \
+#define dialog_text(speaker_name, text, ...) do {                                                                                       \
+    if (my_setjmp(dialog_jump_buf) == 0) {                                                                                              \
+        first_time = true;                                                                                                              \
+        return;                                                                                                                         \
+    }                                                                                                                                   \
+    if (!_dialog_text(CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text), (Dialog_Parameters) { .desired_mood = 0.0f, __VA_ARGS__ })) { \
+        my_longjmp(dialog_jump_back_buf, 1);                                                                                            \
+    }                                                                                                                                   \
 } while (0)

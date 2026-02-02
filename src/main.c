@@ -150,9 +150,14 @@ int main(void)
     oc_arena_alloc(&frame_arena, 1);
 
     // game.state = GAME_STATE_IN_DIALOG;
-    game.current_minigame = &smile_game;
-    game_go_to_state(GAME_STATE_IN_MINIGAME);
+    // game.current_minigame = &smile_game;
+    // game_go_to_state(GAME_STATE_IN_MINIGAME);
     // game.state = GAME_STATE_IN_MINIGAME;
+
+    void start_dialog();
+    void do_dialog_frame();
+
+    start_dialog();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -170,7 +175,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                game_update();
+                do_dialog_frame();
+                // game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();

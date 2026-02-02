@@ -17,18 +17,18 @@ static int foobar;
 
 
 
-static void smile_encounter(void) {
-    dialog_text("foo");
-    string greet = lookupgreeting();
-    dialog_text("You", greet);
+// static void smile_encounter(void) {
+//     dialog_text("foo");
+//     string greet = lookupgreeting();
+//     dialog_text("You", greet);
 
-    // do_minigame(smile_game);
+//     // do_minigame(smile_game);
 
-    switch (dialog_selection("Choose a greeting", 
-        "Hello", "Hi", "Howdy", "whats fuckin up?")) {
-    case 0: dialogt(); break;
-    }
-}
+//     switch (dialog_selection("Choose a greeting", 
+//         "Hello", "Hi", "Howdy", "whats fuckin up?")) {
+//     case 0: dialogt(); break;
+//     }
+// }
 
 
 
