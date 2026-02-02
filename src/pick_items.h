@@ -32,14 +32,10 @@ Item_Data item_data[] = {
 
 void items_init() {
     for(Item_Type item = 0; item < ITEM_COUNT; item++) {
-        Oc_Arena_Save save = oc_arena_save(&arena);
-
         Oc_String_Builder builder;
         oc_sb_init(&builder, &arena);
         wprint(&builder.writer, "resources/{}", item_data[item].name);
         string texture_path = oc_sb_to_string(&builder);
-
-        oc_arena_restore(&arena, save);
 
         item_data[item].texture = LoadTexture(texture_path.ptr);
     }
