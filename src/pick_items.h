@@ -3,12 +3,6 @@
 #include "game.h"
 
 #define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
-#define STRING_TO_CSTR(str) ({                                \
-    char* cstr = malloc(sizeof(char) * ((str).len + 1));      \
-    memcpy(cstr, (str).ptr, (str).len);                       \
-    cstr[(str).len] = '\0';                                   \
-    cstr;                                                     \
-})
 
 typedef struct {
     string name;
@@ -42,13 +36,12 @@ void items_init() {
 
         Oc_String_Builder builder;
         oc_sb_init(&builder, &arena);
-        wprint(&builder.writer, "resources/");
-        oc_sb_append_string(&builder, item_data[item].name);
+        wprint(&builder.writer, "resources/{}", item_data[item].name);
         string texture_path = oc_sb_to_string(&builder);
 
         oc_arena_restore(&arena, save);
 
-        item_data[item].texture = LoadTexture(STRING_TO_CSTR(texture_path));
+        item_data[item].texture = LoadTexture(texture_path.ptr);
     }
 }
 
