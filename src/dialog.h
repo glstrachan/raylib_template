@@ -26,7 +26,7 @@ typedef struct {
 } Dialog_Text_Data;
 
 typedef struct {
-    int dialog_selection_index;
+    int index;
 } Dialog_Selection_Data;
 
 static union {

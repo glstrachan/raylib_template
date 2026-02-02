@@ -162,18 +162,18 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
     int result = -1;
 
     if(first_time) {
-        data.selection.dialog_selection_index = 0;
+        data.selection.index = 0;
         first_time = false;
     }
 
     if (IsKeyPressed(KEY_RIGHT)) {
-        data.selection.dialog_selection_index = min(data.selection.dialog_selection_index + 1, count - 1);
+        data.selection.index = min(data.selection.index + 1, count - 1);
     } else if (IsKeyPressed(KEY_LEFT)) {
-        data.selection.dialog_selection_index = max(data.selection.dialog_selection_index - 1, 0);
+        data.selection.index = max(data.selection.index - 1, 0);
     }
 
     if (IsKeyPressed(KEY_ENTER)) {
-        result = data.selection.dialog_selection_index;
+        result = data.selection.index;
     }
 
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
@@ -220,7 +220,7 @@ int _dialog_selection(string prompt, int count, const char* items[]) {
         }) {
             for (int i = 0; i < count; ++i) {
                 Clay_Color color;
-                if (i == data.selection.dialog_selection_index) {
+                if (i == data.selection.index) {
                     color = (Clay_Color) { 180, 180, 180, 80 };
                 } else {
                     color = (Clay_Color) { 0, 0, 0, 0 };

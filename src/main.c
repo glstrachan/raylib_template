@@ -6,6 +6,7 @@
 #include "game.h"
 #include "dialog.h"
 #include "characters.h"
+#include "pick_items.h"
 
 #define CLAY_IMPLEMENTATION
 #include "../external/clay/clay.h"
@@ -35,6 +36,7 @@ static struct {
         GAME_STATE_IN_DIALOG,
         GAME_STATE_IN_MINIGAME
     } state;
+
     uint32_t next_state;
     Minigame* current_minigame;
 
@@ -47,58 +49,59 @@ extern Minigame smile_game;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
-    case GAME_STATE_TRANSITION: {
-        Image screenshot = LoadImageFromScreen();
-        game.screenshot = LoadTextureFromImage(screenshot);
-        timer_init(&game.transition_timer, 2000);
-    } break;
-    case GAME_STATE_IN_DIALOG: {
-        dialog_init();
-    } break;
-    case GAME_STATE_IN_MINIGAME: {
-        game.current_minigame->init();
-    } break;
-    default: oc_assert(false);
+        case GAME_STATE_TRANSITION: {
+            Image screenshot = LoadImageFromScreen();
+            game.screenshot = LoadTextureFromImage(screenshot);
+            timer_init(&game.transition_timer, 2000);
+        } break;
+        case GAME_STATE_IN_DIALOG: {
+            dialog_init();
+        } break;
+        case GAME_STATE_IN_MINIGAME: {
+            game.current_minigame->init();
+        } break;
+        default: oc_assert(false);
     }
+
     game.state = next_state;
 }
 
 void game_update() {
     switch (game.state) {
-    case GAME_STATE_TRANSITION: {
-        if (timer_update(&game.transition_timer)) {
-            game_go_to_state(game.next_state);
-            break;
-        }
+        case GAME_STATE_TRANSITION: {
+            if (timer_update(&game.transition_timer)) {
+                game_go_to_state(game.next_state);
+                break;
+            }
 
-        DrawTexture(game.screenshot, 0, 0, WHITE);
-        float interp = timer_interpolate(&game.transition_timer);
-        interp = interp * 2.0f - 1.0f;
-        if (interp < 0.0f) interp = -interp;
-        interp = 1.0f - interp;
+            DrawTexture(game.screenshot, 0, 0, WHITE);
+            float interp = timer_interpolate(&game.transition_timer);
+            interp = interp * 2.0f - 1.0f;
+            if (interp < 0.0f) interp = -interp;
+            interp = 1.0f - interp;
 
-        DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
-    } break;
-    case GAME_STATE_IN_DIALOG: {
-        // TODO: Move this into dialog or smth so we can scriptably change the background
-        DrawTexture(bg_tex, 0, 0, WHITE);
-        characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
-        characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
+            DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
+        } break;
+        case GAME_STATE_IN_DIALOG: {
+            // TODO: Move this into dialog or smth so we can scriptably change the background
+            DrawTexture(bg_tex, 0, 0, WHITE);
+            characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
+            characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
 
-        dialog_update();
-        if (dialog_is_done()) {
-            game.current_minigame = &memory_game;
+            dialog_update();
+            if (dialog_is_done()) {
+                game.current_minigame = &memory_game;
 
-            // game.next_state = GAME_STATE_IN_MINIGAME;
-            // game_go_to_state(GAME_STATE_TRANSITION);
+                // game.next_state = GAME_STATE_IN_MINIGAME;
+                game_go_to_state(GAME_STATE_TRANSITION);
 
-            game_go_to_state(GAME_STATE_IN_MINIGAME);
-        }
-    } break;
-    case GAME_STATE_IN_MINIGAME: {
-        game.current_minigame->update();
-    } break;
-    default: oc_assert(false);
+                // game_go_to_state(GAME_STATE_IN_MINIGAME);
+            }
+        } break;
+        case GAME_STATE_IN_MINIGAME: {
+            game.current_minigame->update();
+        } break;
+        default: oc_assert(false);
     }
 }
 
@@ -142,6 +145,7 @@ int main(void)
 
     dialog_init();
     characters_init();
+    pick_items_init();
 
     dialog_play(sample_dialog);
 
@@ -170,7 +174,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                game_update();
+                // game_update();
+                pick_items_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();
@@ -182,6 +187,7 @@ int main(void)
 
     UnloadTexture(bg_tex);
 
+    pick_items_cleanup();
     characters_cleanup();
     dialog_cleanup();
 
