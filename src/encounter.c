@@ -28,17 +28,11 @@ void encounter_start(Encounter encounter) {
 void encounter_update(void) {
     if(!current_encounter) return;
 
-    bool before_ft = encounter_first_time;
-
     asm volatile("mov %%rsp, %0" : "=r" (old_stack));
     if (my_setjmp(encounter_jump_back_buf) == 0) {
         my_longjmp(encounter_jump_buf, 1);
     }
     asm volatile("mov %0, %%rsp" :: "r" (old_stack));
-
-    if (encounter_first_time && before_ft) {
-        current_encounter = NULL;
-    }
 }
 
 bool encounter_is_done(void) {
@@ -63,6 +57,14 @@ void sample_encounter(void) {
             dialog_text("Old Lady", "Apple? really?");
         } break;
     }
+
+    extern Minigame memory_game, smile_game;
+    encounter_minigame(&memory_game);
+
+    dialog_text("Old Lady", "Wow impressive!");
+    dialog_text("Old Lady", "Now try this");
+
+    encounter_minigame(&smile_game);
 
     encounter_end();
 }

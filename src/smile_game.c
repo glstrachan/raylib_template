@@ -52,7 +52,7 @@ void smile_game_init(void) {
     acceleration1 = 0.0f;
 }
 
-void smile_game_update(void) {
+bool smile_game_update(void) {
     const int width = 100;
     const int padding_offset = 100;
 
@@ -147,6 +147,8 @@ void smile_game_update(void) {
         DrawSplineCatmullRom(points, oc_len(points), 4.0f, color);
         DrawSplineCatmullRom(points1, oc_len(points1), 4.0f, color);
     }
+
+    return false;
 }
 
 Minigame smile_game = {

@@ -37,3 +37,5 @@ typedef struct
 {
     uint32_t visible_chars;
 } DialogTextUserData;
+
+void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts);

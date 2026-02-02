@@ -96,15 +96,19 @@ void game_update() {
                 // game.next_state = GAME_STATE_IN_MINIGAME;
                 game_go_to_state(GAME_STATE_TRANSITION);
 
-                // game_go_to_state(GAME_STATE_IN_MINIGAME);
-            }
-        } break;
-        case GAME_STATE_IN_MINIGAME: {
-            game.current_minigame->update();
-        } break;
-        default: oc_assert(false);
+            // TODO: go to show day summary
+            game_go_to_state(GAME_STATE_IN_MINIGAME);
+        }
+    } break;
+    case GAME_STATE_IN_MINIGAME: {
+        game.current_minigame->update();
+    } break;
+    default: oc_assert(false);
     }
 }
+
+Clay_Arena global_clay_arena;
+Font* global_clay_fonts;
 
 int main(void)
 {
@@ -134,6 +138,7 @@ int main(void)
         dialog_font_big,
         dialog_font_small
     };
+    global_clay_fonts = fonts;
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
 
     game_parameters = (Game_Parameters) {

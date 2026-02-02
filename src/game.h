@@ -42,7 +42,7 @@ static inline bool timer_ready(Game_Timer* timer) {
 
 typedef struct {
     void (*init)(void);
-    void (*update)(void);
+    bool (*update)(void);
 } Minigame;
 
 extern Game_Parameters game_parameters;

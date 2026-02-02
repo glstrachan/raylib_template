@@ -1,6 +1,8 @@
 #include "raylib.h"
 #include "rlgl.h"
 #include "game.h"
+#include "../external/clay/clay.h"
+#include "../external/clay/clay_renderer_raylib.h"
 
 Enum(Memory_Color, uint32_t,
     MEMORY_COLOR_RED,
@@ -48,6 +50,7 @@ static union {
     } game_question;
 } game_data;
 
+static int iterations;
 static Game_Timer memorize_timer;
 
 static Array(Memory_Object) memory_objects = { 0 };
@@ -68,6 +71,7 @@ void memory_game_switch_state(Memory_Game_State next_state) {
     } break;
     case MEMORY_GAME_STATE_ASK_QUESTION: {
         Memory_Question question = GetRandomValue(0, COUNT_OF_MEMORY_QUESTION - 1);
+        game_data.game_question.question = question;
         switch (question) {
         case MEMORY_QUESTION_NTH_SHAPE:
         case MEMORY_QUESTION_NTH_COLOR:
@@ -82,15 +86,70 @@ void memory_game_switch_state(Memory_Game_State next_state) {
     game_state = next_state;
 }
 
+extern void HandleClayErrors(Clay_ErrorData errorData);
+static Clay_Context* this_ctx;
+static Shader background_shader;
+
 void memory_game_init() {
     memory_game_switch_state(MEMORY_GAME_STATE_SHOW_SHAPES);
+    iterations = 0;
+
+    Clay_Context* old_ctx = Clay_GetCurrentContext();
+
+    uint64_t totalMemorySize = Clay_MinMemorySize();
+    Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
+    Clay_SetCurrentContext(NULL);
+    this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors });
+    Clay_SetCurrentContext(old_ctx);
+
+    background_shader = LoadShader(0, "resources/dialogbackground.fs");
 }
 
-void memory_game_update() {
+bool memory_game_update() {
+    Clay_Context* old_ctx = Clay_GetCurrentContext();
+    Clay_SetCurrentContext(this_ctx);
+    // Clay_Initialize(global_clay_arena, (Clay_Dimensions) {game_parameters.screen_width, game_parameters.screen_height}, (Clay_ErrorHandler) { HandleClayErrors });
+
+    Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
+    Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+    Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, GetFrameTime());
+
+    Clay_BeginLayout();
+
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
+
+
+    CLAY(CLAY_ID("DialogBox"), {
+        .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+        .layout = {
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+            .sizing = {
+                .width = CLAY_SIZING_PERCENT(0.8),
+                .height = CLAY_SIZING_PERCENT(0.6)
+            },
+            .padding = {16, 16, 16, 16},
+            .childGap = 16
+        },
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .custom = { .customData = customBackgroundData },
+        .cornerRadius = CLAY_CORNER_RADIUS(16)
+    }) {
+    }
+
+    Clay_RenderCommandArray renderCommands = Clay_EndLayout();
+    extern Font* global_clay_fonts;
+    Clay_Raylib_Render(renderCommands, global_clay_fonts);
+    Clay_SetCurrentContext(old_ctx);
 
     switch (game_state) {
     case MEMORY_GAME_STATE_SHOW_SHAPES: {
+        if (iterations > 4) {
+            return true;
+        }
         if (timer_update(&memorize_timer)) {
+            iterations++;
             memory_game_switch_state(MEMORY_GAME_STATE_ASK_QUESTION);
             break;
         }
@@ -200,6 +259,7 @@ void memory_game_update() {
     } break;
     }
 
+    return false;
 }
 
 Minigame memory_game = {
