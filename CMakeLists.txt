@@ -13,6 +13,7 @@ set(SOURCES
     src/dialog.c
     src/characters.c
     src/jump.c
+    src/encounter.c
 
     src/memory_game.c
     src/smile_game.c
