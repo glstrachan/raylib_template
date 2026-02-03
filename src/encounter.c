@@ -121,7 +121,7 @@ void pick_encounter_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(STR_TO_CLAY_STRING(txt), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(STR_TO_CLAY_STRING(txt), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_AUTO_ID({
             .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
         });
@@ -148,7 +148,7 @@ void pick_encounter_update(void) {
                 .cornerRadius = CLAY_CORNER_RADIUS(40),
                 .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
             }) {
-                CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                     extern Encounter sample_encounter_;
                     game.encounter = &sample_encounter_;

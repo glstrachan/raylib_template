@@ -150,7 +150,7 @@ void pick_items_update() {
                     .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 },
                 .backgroundColor = {0, 200, 0, 0},
-            }) { CLAY_TEXT(((Clay_String) { .length = day_string.len, .chars = day_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); }
+            }) { CLAY_TEXT(((Clay_String) { .length = day_string.len, .chars = day_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); }
             CLAY(CLAY_ID("PickItemsCenter"), {
                 .layout = {
                     .childGap = 16,
@@ -173,14 +173,14 @@ void pick_items_update() {
                     },
                     .backgroundColor = {200, 0, 200, 0},
                 }) {
-                    CLAY_TEXT((CLAY_STRING("Items Sold")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT((CLAY_STRING("Items Sold")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     CLAY(CLAY_ID("PickItemsSoldCount"), {
                         .layout = {
                             .padding = {10, 10, 0, 0},
                         },
                         .backgroundColor = {77, 107, 226, 255},
                         .cornerRadius = CLAY_CORNER_RADIUS(6),
-                    }) { CLAY_TEXT(((Clay_String) { .length = items_sold_string.len, .chars = items_sold_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); };
+                    }) { CLAY_TEXT(((Clay_String) { .length = items_sold_string.len, .chars = items_sold_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
                 }
                 CLAY(CLAY_ID("PickItemsQuota"), {
                     .layout = {
@@ -193,14 +193,14 @@ void pick_items_update() {
                     },
                     .backgroundColor = {200, 0, 200, 0},
                 }) {
-                    CLAY_TEXT((CLAY_STRING("4 Day Item Quota")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT((CLAY_STRING("4 Day Item Quota")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     CLAY(CLAY_ID("PickItemsQuotaCount"), {
                         .layout = {
                             .padding = {10, 10, 0, 0},
                         },
                         .backgroundColor = {77, 107, 226, 255},
                         .cornerRadius = CLAY_CORNER_RADIUS(6),
-                    }) { CLAY_TEXT((CLAY_STRING("12")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); };
+                    }) { CLAY_TEXT((CLAY_STRING("12")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
                 }
             }
             CLAY(CLAY_ID("PickItemsRight"), {
@@ -227,7 +227,7 @@ void pick_items_update() {
                     .cornerRadius = CLAY_CORNER_RADIUS(40),
                     .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
                 }) {
-                    CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                         game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
                     }

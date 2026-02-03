@@ -8,11 +8,13 @@
 #include "dialog.h"
 #include "characters.h"
 #include "pick_items.h"
+#include "font_manager.h"
 
 #define CLAY_IMPLEMENTATION
 #include "../external/clay/clay.h"
 #include "../external/clay/clay_renderer_raylib.c"
 // #include "memory_game.h"
+
 
 void memory_game_init();
 void memory_game_update();
@@ -126,8 +128,8 @@ void game_update() {
             .custom = { .customData = make_cool_background() },
             .cornerRadius = CLAY_CORNER_RADIUS(16)
         }) {
-            CLAY_TEXT(title, CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
-            CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", 4), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(title, CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", 4), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
             CLAY(CLAY_ID("ItemsList"), {
                 .layout = { .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM, .padding = {50} },
             }) {
@@ -136,7 +138,7 @@ void game_update() {
                         .layout = { .sizing = { .width = CLAY_SIZING_FIXED(200) }, .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, .padding = {16, 16, 16, 16} },
                         .backgroundColor = {100, 100, 100, 255},
                     }) {
-                        CLAY_TEXT(oc_format(&frame_arena, "Item {}", i), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {255, 255, 255, 255} }));
+                        CLAY_TEXT(oc_format(&frame_arena, "Item {}", i), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     }
                 }
             }
@@ -167,7 +169,7 @@ void game_update() {
                     .cornerRadius = CLAY_CORNER_RADIUS(40),
                     .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
                 }) {
-                    CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                         game_go_to_state(GAME_STATE_SELECT_ITEMS);
                     }
@@ -180,7 +182,8 @@ void game_update() {
 }
 
 Clay_Arena global_clay_arena;
-Font* global_clay_fonts;
+Font_Manager* global_font_manager;
+// Font* global_clay_fonts;
 
 int main(void)
 {
@@ -195,30 +198,34 @@ int main(void)
     Camera2D camera = { 0 };
     camera.offset = (Vector2) { 0.0f, 0.0f };
     camera.zoom = 1.0f;
+
+    Font_Manager font_manager = { .arena = &arena, .font_paths = (const char *[]) {
+        [FONT_ROBOTO] = "resources/Roboto-Light.ttf",
+        [FONT_ITIM]   = "resources/Itim.ttf",
+    } };
+    global_font_manager = &font_manager;
     
     uint64_t totalMemorySize = Clay_MinMemorySize();
     Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
     Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
     
     game_shaders.background_shader = LoadShader(0, "resources/dialogbackground.fs");
+
     
-    Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
-    Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
-    Font dialog_font_big = LoadFontEx("resources/Itim.ttf", 60, NULL, 0);
-    Font dialog_font_small = LoadFontEx("resources/Itim.ttf", 25, NULL, 0);
-    Font fonts[] = {
-        font,
-        dialog_font,
-        dialog_font_big,
-        dialog_font_small
-    };
-    global_clay_fonts = fonts;
-    Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
+    // Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
+    // Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
+    // Font dialog_font_big = LoadFontEx("resources/Itim.ttf", 60, NULL, 0);
+    // Font dialog_font_small = LoadFontEx("resources/Itim.ttf", 25, NULL, 0);
+    // Font fonts[] = {
+    //     font,
+    //     dialog_font,
+    //     dialog_font_big,
+    //     dialog_font_small
+    // };
+    // global_clay_fonts = fonts;
+    Clay_SetMeasureTextFunction(Raylib_MeasureText, &font_manager);
 
     game_parameters = (Game_Parameters) {
-        .neutral_font = font,
-        .dialog_font = dialog_font,
-        .dialog_font_big = dialog_font_big,
         .screen_width = screenWidth,
         .screen_height = screenHeight,
     };
@@ -268,7 +275,7 @@ int main(void)
                 pick_items_update();
                 // game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
-                Clay_Raylib_Render(renderCommands, fonts);
+                Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();
 
         EndDrawing();
