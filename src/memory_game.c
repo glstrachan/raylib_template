@@ -86,59 +86,32 @@ void memory_game_switch_state(Memory_Game_State next_state) {
     game_state = next_state;
 }
 
-extern void HandleClayErrors(Clay_ErrorData errorData);
-static Clay_Context* this_ctx;
-static Shader background_shader;
+
 
 void memory_game_init() {
     memory_game_switch_state(MEMORY_GAME_STATE_SHOW_SHAPES);
     iterations = 0;
-
-    Clay_Context* old_ctx = Clay_GetCurrentContext();
-
-    uint64_t totalMemorySize = Clay_MinMemorySize();
-    Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
-    Clay_SetCurrentContext(NULL);
-    this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
-    Clay_SetCurrentContext(old_ctx);
-
-    background_shader = LoadShader(0, "resources/dialogbackground.fs");
 }
 
 bool memory_game_update() {
-    Clay_Context* old_ctx = Clay_GetCurrentContext();
-    Clay_SetCurrentContext(this_ctx);
-    // Clay_Initialize(global_clay_arena, (Clay_Dimensions) {game_parameters.screen_width, game_parameters.screen_height}, (Clay_ErrorHandler) { HandleClayErrors });
-
-    Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
-    Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-    Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, GetFrameTime());
-
-    Clay_BeginLayout();
-
-    CustomLayoutElement* customBackgroundData = make_cool_background();
-
-    CLAY(CLAY_ID("DialogBox"), {
-        .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
-        .layout = {
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-            .sizing = {
-                .width = CLAY_SIZING_PERCENT(0.8),
-                .height = CLAY_SIZING_PERCENT(0.6)
+    retarted_clay_renderer() {
+        CLAY(CLAY_ID("DialogBox"), {
+            .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+            .layout = {
+                .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                .sizing = {
+                    .width = CLAY_SIZING_PERCENT(0.8),
+                    .height = CLAY_SIZING_PERCENT(0.6)
+                },
+                .padding = {16, 16, 16, 16},
+                .childGap = 16
             },
-            .padding = {16, 16, 16, 16},
-            .childGap = 16
-        },
-        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-        .custom = { .customData = customBackgroundData },
-        .cornerRadius = CLAY_CORNER_RADIUS(16)
-    }) {
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .custom = { .customData = make_cool_background() },
+            .cornerRadius = CLAY_CORNER_RADIUS(16)
+        }) {
+        }
     }
-
-    Clay_RenderCommandArray renderCommands = Clay_EndLayout();
-    extern Font* global_clay_fonts;
-    Clay_Raylib_Render(renderCommands, global_clay_fonts);
-    Clay_SetCurrentContext(old_ctx);
 
     switch (game_state) {
     case MEMORY_GAME_STATE_SHOW_SHAPES: {

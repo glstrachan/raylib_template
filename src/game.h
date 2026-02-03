@@ -103,3 +103,30 @@ typedef struct {
 extern Game_State game;
 
 void game_go_to_state(uint32_t next_state);
+
+
+extern void HandleClayErrors(Clay_ErrorData errorData);
+
+#define retarted_clay_renderer() for (int i = 1, j = 1, k = 1; i; --i) for (static Clay_Context* old_ctx = NULL, *this_ctx = NULL; j; --j) for (({                            \
+    old_ctx = Clay_GetCurrentContext();                                                                                                                         \
+    Clay_SetCurrentContext(this_ctx);                                                                                                                                         \
+                                                                                                                                                                              \
+    if (!this_ctx) {                                                                                                                                                          \
+        uint64_t totalMemorySize = Clay_MinMemorySize();                                                                                                                      \
+        Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));                                                                   \
+        Clay_SetCurrentContext(NULL);                                                                                                                                         \
+        this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors, NULL }); \
+    }                                                                                                                                                                         \
+                                                                                                                                                                              \
+    Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });                                                              \
+    Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));                                                                  \
+    Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, GetFrameTime());                                                                           \
+                                                                                                                                                                              \
+    Clay_BeginLayout();                                                                                                                                                       \
+}); k; ({                                                                                                                                                                     \
+    Clay_RenderCommandArray renderCommands = Clay_EndLayout();                                                                                                                \
+    extern Font* global_clay_fonts;                                                                                                                                           \
+    Clay_Raylib_Render(renderCommands, global_clay_fonts);                                                                                                                    \
+    Clay_SetCurrentContext(old_ctx);                                                                                                                                          \
+    --k; \
+}))
