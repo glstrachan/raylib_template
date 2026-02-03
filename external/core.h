@@ -34,6 +34,8 @@ typedef struct {
     uword len;
 } string;
 
+#define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
+
 #if OC_PLATFORM_WINDOWS
     #define WIN32_LEAN_AND_MEAN
     // #include "Windows.h"

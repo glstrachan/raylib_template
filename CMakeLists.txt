@@ -14,6 +14,7 @@ set(SOURCES
     src/characters.c
     src/jump.c
     src/encounter.c
+    src/pick_items.c
 
     src/memory_game.c
     src/smile_game.c
@@ -26,4 +27,4 @@ include_directories(
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} raylib)
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-escape-codes)

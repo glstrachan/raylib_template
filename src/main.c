@@ -184,7 +184,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                game_update();
+                pick_items_update();
+                // game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();
