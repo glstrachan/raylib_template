@@ -10,6 +10,7 @@
 static Texture2D shop_bg_tex;
 static Texture2D shelf_tex;
 static Texture2D briefcase_tex;
+static Shader item_bg_shader;
 
 typedef struct {
     // Persistent item pool
@@ -50,6 +51,7 @@ void pick_items_init() {
     shop_bg_tex = LoadTexture("resources/background_shop.png");
     shelf_tex = LoadTexture("resources/shelf.png");
     briefcase_tex = LoadTexture("resources/briefcase.png");
+    item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
 
     // Initialize item pool to have 2 of each item
     for(int32_t i = 0; i < 2; i++) {
@@ -245,7 +247,19 @@ void pick_items_update() {
     Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
 
     for(int i = 0; i < 10; i++) {
-        DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {255, 0, 255, 100});
+        if (i < 6 && PICKED_PICKABLE(i) != ITEM_COUNT && !(selection_data.is_selecting && selection_data.selected_index == i)) {
+
+        } else {
+            DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {255, 0, 255, 100});
+        }
+    }
+
+    for(uint32_t i = 0; i < 6; i++) {
+        if(PICKED_PICKABLE(i) == ITEM_COUNT) continue;
+        Texture2D texture = item_data[PICKED_PICKABLE(i)].texture;
+        float x = item_locations[i].x - texture.width * 0.5;
+        float y = item_locations[i].y - texture.height * 0.5;
+
     }
 
     for(uint32_t i = 0; i < 10; i++) {
@@ -262,7 +276,13 @@ void pick_items_update() {
             x += delta.x;
             y += delta.y;
         }
-        
+
+        if (i < 6) {
+            BeginShaderMode(item_bg_shader);
+                DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
+            EndShaderMode();
+        }
+
         DrawTexture(texture, x, y, WHITE);
     }
 

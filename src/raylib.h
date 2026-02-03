@@ -126,6 +126,19 @@ static inline void ClayDrawTexture(Texture2D texture, int posX, int posY, Color 
     Clay__Raylib(&config);
 }
 
+static inline void ClayDrawTexturePro(Texture2D texture, Rectangle dst, Rectangle src, Vector2 origin, float rotation, Color tint) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE_PRO,
+        .color = tint,
+        .texture = texture,
+        .dst = dst,
+        .src = src,
+        .point = origin,
+        .rotation = rotation,
+    };
+    Clay__Raylib(&config);
+}
+
 static inline void ClayBeginShaderMode(Shader shader) {
     Clay_RaylibElementConfig config = {
         .fn = CLAY_RAYLIB_FUNCTION_BEGIN_SHADER_MODE,
@@ -185,6 +198,7 @@ static inline void ClayDrawSplineCatmullRom(const Vector2 *points, int pointCoun
 #define DrawTextureV(...) ClayDrawTextureV(__VA_ARGS__)
 #define DrawTextEx(...) ClayDrawTextEx(__VA_ARGS__)
 #define DrawTexture(...) ClayDrawTexture(__VA_ARGS__)
+#define DrawTexturePro(...) ClayDrawTexturePro(__VA_ARGS__)
 #define BeginShaderMode(...) ClayBeginShaderMode(__VA_ARGS__)
 #define EndShaderMode(...) ClayEndShaderMode(__VA_ARGS__)
 #define SetShaderValue(...) ClaySetShaderValue(__VA_ARGS__)

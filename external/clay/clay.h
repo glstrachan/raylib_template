@@ -567,6 +567,7 @@ typedef CLAY_PACKED_ENUM {
     CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE,
     CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE_LINES,
     CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE,
+    CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE_PRO,
     CLAY_RAYLIB_FUNCTION_DRAW_SPLINE_CATMULL_ROM,
     CLAY_RAYLIB_FUNCTION_DRAW_TEXT,
 
@@ -596,10 +597,13 @@ typedef struct Clay_RaylibElementConfig {
             union {
                 const char* text;
                 float thickness;
+                float rotation;
             };
+            Rectangle src;
             union {
                 Font font;
                 Vector2 v3;
+                Rectangle dst;
             };
             Color color;
         };
