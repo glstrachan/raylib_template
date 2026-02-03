@@ -256,11 +256,22 @@ void pick_items_update() {
 
         // Check if this particular item is being selected
         if(selection_data.is_selecting && selection_data.selected_index == i) {
+            continue;
             Vector2 delta = Vector2Subtract(mouse, selection_data.initial_location);
             x += delta.x;
             y += delta.y;
         }
         
+        DrawTexture(texture, x, y, WHITE);
+    }
+
+    if (selection_data.is_selecting) {
+        Texture2D texture = item_data[PICKED_PICKABLE(selection_data.selected_index)].texture;
+
+        Vector2 delta = Vector2Subtract(mouse, selection_data.initial_location);
+        float x = delta.x + item_locations[selection_data.selected_index].x - texture.width * 0.5;
+        float y = delta.y + item_locations[selection_data.selected_index].y - texture.height * 0.5;
+
         DrawTexture(texture, x, y, WHITE);
     }
 
