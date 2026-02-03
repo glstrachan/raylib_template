@@ -27,4 +27,4 @@ include_directories(
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} raylib)
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-escape-codes)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-escape-codes -Wno-initializer-overrides)

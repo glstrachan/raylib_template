@@ -38,9 +38,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
         result = data.selection.index;
     }
 
-    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
-    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
-    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
+    CustomLayoutElement* customBackgroundData = make_cool_background();
 
     DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
     textUserData->visible_chars = data.text.printed_chars;
@@ -148,9 +146,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
         }
     }
 
-    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
-    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
-    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
+    CustomLayoutElement* customBackgroundData = make_cool_background();
 
     DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
     textUserData->visible_chars = data.text.printed_chars;

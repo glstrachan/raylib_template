@@ -101,10 +101,7 @@ void pick_encounter_update(void) {
     wprint(&sb.writer, "Selling to {}", game.encounter->name);
     string txt = oc_sb_to_string(&sb);
 
-    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
-    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
-    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
-
+    CustomLayoutElement* customBackgroundData = make_cool_background();
 
     CLAY(CLAY_ID("DialogBox"), {
         .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },

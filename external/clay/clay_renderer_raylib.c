@@ -194,7 +194,10 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
             }
             case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
                 Clay_RectangleRenderData *config = &renderCommand->renderData.rectangle;
-                if (config->cornerRadius.topLeft > 0) {
+                if (config->cornerRadius.topLeft > boundingBox.width || config->cornerRadius.topLeft > boundingBox.height) {
+                    float radius = min(boundingBox.width, boundingBox.height) / 2.0f;
+                    DrawRectangleRounded((Rectangle) { boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height }, radius, 8, CLAY_COLOR_TO_RAYLIB_COLOR(config->backgroundColor));
+                } else if (config->cornerRadius.topLeft > 0) {
                     float radius = (config->cornerRadius.topLeft * 2) / (float)((boundingBox.width > boundingBox.height) ? boundingBox.height : boundingBox.width);
                     DrawRectangleRounded((Rectangle) { boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height }, radius, 8, CLAY_COLOR_TO_RAYLIB_COLOR(config->backgroundColor));
                 } else {
@@ -254,8 +257,12 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
                         
                         float time = GetTime();
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "time"), &time, SHADER_UNIFORM_FLOAT);
-                        Vector2 resolution = {boundingBox.width, boundingBox.height};
+                        Vector2 resolution = {GetScreenWidth(), GetScreenHeight()};
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "resolution"), &resolution, SHADER_UNIFORM_VEC2);
+                        float color1[] = {data->color1.r / 255.0f, data->color1.g / 255.0f, data->color1.b / 255.0f, data->color1.a / 255.0f};
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "color1"), color1, SHADER_UNIFORM_VEC4);
+                        float color2[] = {data->color2.r / 255.0f, data->color2.g / 255.0f, data->color2.b / 255.0f, data->color2.a / 255.0f};
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "color2"), color2, SHADER_UNIFORM_VEC4);
 
                         BeginShaderMode(data->shader);
 

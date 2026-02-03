@@ -14,8 +14,6 @@ encounter: (person, item)
 */
 
 
-static int foobar;
-
 
 
 // static void smile_encounter(void) {
@@ -62,7 +60,7 @@ void smile_game_init(void) {
 
     static Encounter encounter = {
         .fn = smile_dialog_sequence,
-        .name = "Old Lady",
+        .name = lit("Old Lady"),
     };
     encounter_sequence_start(&dialog_sequence, &encounter);
 }

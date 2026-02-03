@@ -116,10 +116,7 @@ bool memory_game_update() {
 
     Clay_BeginLayout();
 
-    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
-    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
-    customBackgroundData->customData.background = (CustomLayoutElement_Background) { background_shader };
-
+    CustomLayoutElement* customBackgroundData = make_cool_background();
 
     CLAY(CLAY_ID("DialogBox"), {
         .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },

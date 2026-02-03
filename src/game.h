@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include "../external/clay/clay_renderer_raylib.h"
 #include "../external/core.h"
 #include "raylib.h"
 
@@ -49,6 +51,18 @@ extern Game_Parameters game_parameters;
 
 extern Oc_Arena frame_arena;
 extern Oc_Arena arena;
+
+typedef struct {
+    Shader background_shader;
+} Game_Shaders;
+extern Game_Shaders game_shaders;
+
+#define make_cool_background(...) ({                                                                                                                                                                                                                                               \
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));                                                                                                                                                                         \
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;                                                                                                                                                                                                            \
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = game_shaders.background_shader, .color1 = { 0.196f * 255.0f, 0.196f * 255.0f, 0.196f * 255.0f, 255.0f }, .color2 = { 0.184f * 255.0f, 0.184f * 255.0f, 0.184f * 255.0f, 255.0f }, __VA_ARGS__ }; \
+    customBackgroundData;                                                                                                                                                                                                                                                          \
+})
 
 typedef struct {
     uint32_t items[4];

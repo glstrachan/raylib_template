@@ -1,3 +1,6 @@
+#pragma once
+
+#include "clay.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "stdint.h"
@@ -22,6 +25,7 @@ typedef struct
 typedef struct
 {
     Shader shader;
+    Color color1, color2;
 } CustomLayoutElement_Background;
 
 typedef struct
