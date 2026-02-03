@@ -68,7 +68,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_TEXT(((Clay_String) { .length = prompt.len, .chars = prompt.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(((Clay_String) { .length = prompt.len, .chars = prompt.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         }
         CLAY(CLAY_ID("DialogTextContainer"), {
             .layout = {
@@ -93,7 +93,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
                     .backgroundColor = Clay_Hovered() ? (Clay_Color) { 180, 180, 180, 40 } : color,
                     .cornerRadius = CLAY_CORNER_RADIUS(4)
                 }) {
-                    CLAY_TEXT(((Clay_String) { .length = strlen(items[i]), .chars = items[i] }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT(((Clay_String) { .length = strlen(items[i]), .chars = items[i] }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 }
 
                 bool buttonIsHovered = Clay_PointerOver(CLAY_IDI("SelectionItem", i));
@@ -112,7 +112,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
+            CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
         }
     }
 
@@ -176,7 +176,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         }
         CLAY(CLAY_ID("DialogTextContainer"), {
             .layout = {
@@ -197,7 +197,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                 },
                 .backgroundColor = {0, 255, 255, 0},
             }) {
-                CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = 1, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
+                CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
             }
         }
         CLAY(CLAY_ID("DialogContinue"), {
@@ -211,7 +211,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             .backgroundColor = {200, 0, 0, 0},
         }) {
             if(data.text.total_chars == data.text.printed_chars) {
-                CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
+                CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
             }
         }
     }

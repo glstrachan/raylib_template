@@ -15,6 +15,7 @@ set(SOURCES
     src/jump.c
     src/encounter.c
     src/pick_items.c
+    src/font_manager.c
 
     src/memory_game.c
     src/smile_game.c

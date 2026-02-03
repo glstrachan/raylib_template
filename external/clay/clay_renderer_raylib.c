@@ -65,8 +65,10 @@ Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig
     int lineCharCount = 0;
 
     float textHeight = config->fontSize;
-    Font* fonts = (Font*)userData;
-    Font fontToUse = fonts[config->fontId];
+
+    Font_Manager* fm = userData;
+    Font fontToUse = font_manager_get_font(fm, config->fontId, config->fontSize);
+
     // Font failed to load, likely the fonts are in the wrong place relative to the execution dir.
     // RayLib ships with a default font, so we can continue with that built in one. 
     if (!fontToUse.glyphs) {
@@ -119,7 +121,7 @@ void Clay_Raylib_Close()
 }
 
 
-void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
+void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
 {
     for (int j = 0; j < renderCommands.length; j++)
     {
@@ -129,7 +131,8 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
         {
             case CLAY_RENDER_COMMAND_TYPE_TEXT: {
                 Clay_TextRenderData *textData = &renderCommand->renderData.text;
-                Font fontToUse = fonts[textData->fontId];
+
+                Font fontToUse = font_manager_get_font(fonts, textData->fontId, textData->fontSize);
                 
                 DialogTextUserData* userData = (DialogTextUserData*)renderCommand->userData;
                 uint32_t visibleChars = userData ? userData->visible_chars : UINT32_MAX;

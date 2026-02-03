@@ -42,5 +42,5 @@ typedef struct
     uint32_t visible_chars;
 } DialogTextUserData;
 
-void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts);
+void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts);
 Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData);

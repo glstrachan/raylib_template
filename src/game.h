@@ -104,7 +104,6 @@ extern Game_State game;
 
 void game_go_to_state(uint32_t next_state);
 
-
 extern void HandleClayErrors(Clay_ErrorData errorData);
 
 #define retarted_clay_renderer() for (int i = 1, j = 1, k = 1; i; --i) for (static Clay_Context* old_ctx = NULL, *this_ctx = NULL; j; --j) for (({                            \
@@ -112,12 +111,12 @@ extern void HandleClayErrors(Clay_ErrorData errorData);
     Clay_SetCurrentContext(this_ctx);                                                                                                                                         \
                                                                                                                                                                               \
     if (!this_ctx) {                                                                                                                                                          \
-        extern Font* global_clay_fonts;                                                                                                                                           \
+        extern Font* global_font_manager;                                                                                                                                           \
         uint64_t totalMemorySize = Clay_MinMemorySize();                                                                                                                      \
         Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));                                                                   \
         Clay_SetCurrentContext(NULL);                                                                                                                                         \
         this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors, NULL }); \
-        Clay_SetMeasureTextFunction(Raylib_MeasureText, global_clay_fonts); \
+        Clay_SetMeasureTextFunction(Raylib_MeasureText, global_font_manager); \
     }                                                                                                                                                                         \
                                                                                                                                                                               \
     Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });                                                              \
@@ -127,8 +126,12 @@ extern void HandleClayErrors(Clay_ErrorData errorData);
     Clay_BeginLayout();                                                                                                                                                       \
 }); k; ({                                                                                                                                                                     \
     Clay_RenderCommandArray renderCommands = Clay_EndLayout();                                                                                                                \
-    extern Font* global_clay_fonts;                                                                                                                                           \
-    Clay_Raylib_Render(renderCommands, global_clay_fonts);                                                                                                                    \
+    extern Font* global_font_manager;                                                                                                                                           \
+    Clay_Raylib_Render(renderCommands, global_font_manager);                                                                                                                    \
     Clay_SetCurrentContext(old_ctx);                                                                                                                                          \
     --k; \
 }))
+
+
+#define FONT_ROBOTO (1u)
+#define FONT_ITIM   (2u)
