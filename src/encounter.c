@@ -101,40 +101,61 @@ void pick_encounter_update(void) {
     wprint(&sb.writer, "Selling to {}", game.encounter->name);
     string txt = oc_sb_to_string(&sb);
 
-    CustomLayoutElement* customBackgroundData = make_cool_background();
+    
 
-    CLAY(CLAY_ID("DialogBox"), {
+    CLAY(CLAY_ID("DaySummary"), {
         .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
         .layout = {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
             .sizing = {
-                .width = CLAY_SIZING_PERCENT(0.8),
+                .width = CLAY_SIZING_PERCENT(0.5),
                 .height = CLAY_SIZING_PERCENT(0.6)
+
+                // .width = CLAY_SIZING_FIXED(100),
+                // .height = CLAY_SIZING_FIXED(100)
             },
-            .padding = {16, 16, 16, 16},
+            .padding = {40, 16, 30, 16},
             .childGap = 16
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-        .custom = { .customData = customBackgroundData },
+        .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(((Clay_String) { .length = txt.len, .chars = txt.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(STR_TO_CLAY_STRING(txt), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
         CLAY_AUTO_ID({
             .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
         });
-        CLAY(CLAY_ID("DialogContinue"), {
+        CLAY(CLAY_ID("DaySummaryBottom"), {
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
+                    .height = CLAY_SIZING_FIXED(100)
                 },
-                .childAlignment = { .x = CLAY_ALIGN_X_RIGHT, .y = CLAY_ALIGN_Y_CENTER }
+                .childAlignment = { .x = CLAY_ALIGN_X_RIGHT, .y = CLAY_ALIGN_Y_BOTTOM }
             },
-            .backgroundColor = {200, 0, 0, 255},
+            .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_TEXT((CLAY_STRING("Enter to Select")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {135, 135, 135, 255} }));
+            CLAY(CLAY_ID("DaySummaryNextDay"), {
+                .layout = {
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                    .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
+                },
+                .custom = {
+                    .customData = Clay_Hovered() ?
+                        make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
+                        make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
+                },
+                .cornerRadius = CLAY_CORNER_RADIUS(40),
+                .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
+            }) {
+                CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    extern Encounter sample_encounter_;
+                    game.encounter = &sample_encounter_;
+                    game_go_to_state(GAME_STATE_IN_ENCOUNTER);
+                }
+            }
         }
     }
-
-    // DrawTextEx(game_parameters.dialog_font_big, txt.ptr, (Vector2) { game_parameters.screen_width / 2.0f, 100.0f }, game_parameters.dialog_font_big.baseSize, 10, ())
 }
 

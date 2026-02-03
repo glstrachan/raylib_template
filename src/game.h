@@ -6,6 +6,7 @@
 #include "raylib.h"
 
 #include "pick_items.h"
+#define STR_TO_CLAY_STRING(str) ({ string __s = (str); ((Clay_String) { .length = __s.len, .chars = __s.ptr }); })
 
 typedef struct {
     Font neutral_font, dialog_font, dialog_font_big;
@@ -101,3 +102,4 @@ typedef struct {
 } Game_State;
 extern Game_State game;
 
+void game_go_to_state(uint32_t next_state);

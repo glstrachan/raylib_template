@@ -156,7 +156,7 @@ static inline void Clay__SuppressUnusedLatchDefinitionVariableWarning(void) { (v
 #define CLAY__WRAPPER_STRUCT(type) typedef struct { type wrapped; } CLAY__WRAPPER_TYPE(type)
 #define CLAY__CONFIG_WRAPPER(type, ...) (CLAY__INIT(CLAY__WRAPPER_TYPE(type)) { __VA_ARGS__ }).wrapped
 
-#define CLAY_TEXT(text, textConfig) Clay__OpenTextElement(text, textConfig)
+#define CLAY_TEXT(text, textConfig) do { typeof(text) str = (text); Clay__OpenTextElement(_Generic((str), string: ((Clay_String) { .length = ((string*)&str)->len, .chars = ((string*)&str)->ptr }), default: str), textConfig); } while (0)
 
 #ifdef __cplusplus
 
