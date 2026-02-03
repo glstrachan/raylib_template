@@ -14,7 +14,6 @@ typedef struct {
     string name;
 } Dialog_Selection;
 
-static Shader background_shader;
 static union {
     Dialog_Text_Data text;
     Dialog_Selection_Data selection;
@@ -220,9 +219,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
 }
 
 void dialog_init() {
-    background_shader = LoadShader(0, "resources/dialogbackground.fs");
 }
 
 void dialog_cleanup() {
-    UnloadShader(background_shader);
 }

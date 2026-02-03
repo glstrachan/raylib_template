@@ -9,6 +9,7 @@ typedef struct {
 } Item_Data;
 
 #define ITEM_LIST(X) \
+    X(ITEM_NONE,   NULL,   NULL) \
     X(ITEM_VACUUM,   "vacuum",   "Sucks up dirt") \
     X(ITEM_BOOKS,    "books",    "Knowledge")     \
     X(ITEM_KNIVES,   "knives",   "Sharp")         \
@@ -41,3 +42,5 @@ void pick_items_cleanup();
 void choose_pickable();
 
 void pick_items_update();
+
+extern Item_Data item_data[];

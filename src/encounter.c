@@ -3,7 +3,7 @@
 
 #include "encounter.h"
 #include "jump.h"
-
+#include "pick_items.h"
 
 Encounter_Sequence encounter_top_sequence = { 0 };
 static Encounter* current_encounter;
@@ -86,9 +86,9 @@ Encounter sample_encounter_ = {
     .name = lit("Old Lady"),
 };
 
-static Shader background_shader;
+static Texture2D house_bg;
 void pick_encounter_init(void) {
-    background_shader = LoadShader(0, "resources/dialogbackground.fs");
+    house_bg = LoadTexture("resources/background.png");
 }
 
 void pick_encounter(void) {
@@ -96,23 +96,15 @@ void pick_encounter(void) {
 }
 
 void pick_encounter_update(void) {
-    Oc_String_Builder sb;
-    oc_sb_init(&sb, &frame_arena);
-    wprint(&sb.writer, "Selling to {}", game.encounter->name);
-    string txt = oc_sb_to_string(&sb);
+    DrawTexture(house_bg, 0, 0, WHITE);
 
-    
-
-    CLAY(CLAY_ID("DaySummary"), {
+    CLAY(CLAY_ID("PickEncounter"), {
         .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
         .layout = {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
             .sizing = {
                 .width = CLAY_SIZING_PERCENT(0.5),
                 .height = CLAY_SIZING_PERCENT(0.6)
-
-                // .width = CLAY_SIZING_FIXED(100),
-                // .height = CLAY_SIZING_FIXED(100)
             },
             .padding = {40, 16, 30, 16},
             .childGap = 16
@@ -121,11 +113,11 @@ void pick_encounter_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(STR_TO_CLAY_STRING(txt), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", game.encounter->name), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_AUTO_ID({
             .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
         });
-        CLAY(CLAY_ID("DaySummaryBottom"), {
+        CLAY(CLAY_ID("PickEncounterLower"), {
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
@@ -135,7 +127,7 @@ void pick_encounter_update(void) {
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY(CLAY_ID("DaySummaryNextDay"), {
+            CLAY(CLAY_ID("PickEncounterStartSelling"), {
                 .layout = {
                     .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                     .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
@@ -145,14 +137,87 @@ void pick_encounter_update(void) {
                         make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
                         make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
                 },
-                .cornerRadius = CLAY_CORNER_RADIUS(40),
+                .cornerRadius = CLAY_CORNER_RADIUS(10000),
                 .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
             }) {
-                CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                     extern Encounter sample_encounter_;
                     game.encounter = &sample_encounter_;
                     game_go_to_state(GAME_STATE_IN_ENCOUNTER);
+                }
+            }
+        }
+    }
+}
+
+void day_summary_update(void) {
+    DrawTexture(house_bg, 0, 0, WHITE);
+
+    int sold = 0;
+    CLAY(CLAY_ID("DaySummary"), {
+        .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+        .layout = {
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+            .sizing = {
+                .width = CLAY_SIZING_PERCENT(0.5),
+                .height = CLAY_SIZING_PERCENT(0.6)
+            },
+            .padding = {40, 16, 30, 16},
+            .childGap = 16
+        },
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .custom = { .customData = make_cool_background() },
+        .cornerRadius = CLAY_CORNER_RADIUS(16)
+    }) {
+        CLAY_TEXT(oc_format(&frame_arena, "Day {} Summary", game.current_day), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", 4), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY(CLAY_ID("ItemsList"), {
+            .layout = { .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM, .padding = {50} },
+        }) {
+            for (int i = 0; i < 4; ++i) {
+                if (game.items_sold_today[i].item == ITEM_NONE) break;
+                Item_Data* data = &item_data[game.items_sold_today[i].item];
+
+                CLAY_AUTO_ID({
+                    .layout = { .childGap = 16, .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }, .padding = {16, 16, 0, 0} },
+                    .backgroundColor = {100, 100, 100, 0},
+                }) {
+                    CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_FIXED(100), .height = CLAY_SIZING_FIXED(100) } }, .image = { .imageData = &data->texture } });
+                    CLAY_TEXT(data->name, CLAY_TEXT_CONFIG({ .fontSize = 35, .fontId = FONT_ROBOTO, .textColor = {255, 255, 255, 255} }));
+                }
+            }
+        }
+
+        CLAY_AUTO_ID({
+            .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
+        });
+        CLAY(CLAY_ID("DialogContinue"), {
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_PERCENT(1.0),
+                    .height = CLAY_SIZING_FIXED(100)
+                },
+                .childAlignment = { .x = CLAY_ALIGN_X_RIGHT, .y = CLAY_ALIGN_Y_BOTTOM }
+            },
+            .backgroundColor = {200, 0, 0, 0},
+        }) {
+            CLAY(CLAY_ID("PickItemsStartDay"), {
+                .layout = {
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                    .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
+                },
+                .custom = {
+                    .customData = Clay_Hovered() ?
+                        make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
+                        make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
+                },
+                .cornerRadius = CLAY_CORNER_RADIUS(10000),
+                .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
+            }) {
+                CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    game_go_to_state(GAME_STATE_SELECT_ITEMS);
                 }
             }
         }

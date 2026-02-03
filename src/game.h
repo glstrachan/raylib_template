@@ -88,7 +88,6 @@ typedef struct {
     } state;
 
     uint32_t next_state;
-    Minigame* current_minigame;
 
     Game_Timer transition_timer;
     Texture2D screenshot;
@@ -98,6 +97,7 @@ typedef struct {
 
     uint8_t current_day;
 
+    Item_Sold items_sold_today[4];
     Array(Item_Sold) prev_items_sold;
 } Game_State;
 extern Game_State game;
@@ -134,3 +134,5 @@ extern Font_Manager* global_font_manager;
 
 #define FONT_ROBOTO (1u)
 #define FONT_ITIM   (2u)
+
+void day_summary_update(void);

@@ -29,13 +29,14 @@ Item_Data item_data[] = {
 };
 
 void items_init() {
-    for(Item_Type item = 0; item < ITEM_COUNT; item++) {
+    for(Item_Type item = 1; item < ITEM_COUNT; item++) {
         Oc_String_Builder builder;
         oc_sb_init(&builder, &arena);
         wprint(&builder.writer, "resources/{}.png", item_data[item].name);
         string texture_path = oc_sb_to_string(&builder);
 
         item_data[item].texture = LoadTexture(texture_path.ptr);
+        SetTextureFilter(item_data[item].texture, TEXTURE_FILTER_BILINEAR);
     }
 }
 
@@ -52,15 +53,15 @@ void pick_items_init() {
 
     // Initialize item pool to have 2 of each item
     for(int32_t i = 0; i < 2; i++) {
-        for(Item_Type item = 0; item < ITEM_COUNT; item++) {
-            data.remaining_inventory[i * item] = item;
+        for(Item_Type item = 1; item < ITEM_COUNT; item++) {
+            data.remaining_inventory[i * (ITEM_COUNT - 1) + (item - 1)] = item;
         }
     }
 
     // TODO: Verify that the above loop actually double initializes stuff
 
     // Shuffling algorithm
-    for(int32_t i = ITEM_COUNT * 2 - 1; i >= 0; i--) {
+    for(int32_t i = (ITEM_COUNT - 1) * 2 - 1; i >= 0; i--) {
         uint32_t j = GetRandomValue(0, i);
         Item_Type temp = data.remaining_inventory[j];
         data.remaining_inventory[j] = data.remaining_inventory[i];
