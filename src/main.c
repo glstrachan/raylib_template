@@ -12,7 +12,8 @@
 
 #define CLAY_IMPLEMENTATION
 #include "../external/clay/clay.h"
-#include "../external/clay/clay_renderer_raylib.c"
+// #include "../external/clay/clay_renderer_raylib.c"
+
 // #include "memory_game.h"
 
 
@@ -199,31 +200,22 @@ int main(void)
     camera.offset = (Vector2) { 0.0f, 0.0f };
     camera.zoom = 1.0f;
 
-    Font_Manager font_manager = { .arena = &arena, .font_paths = (const char *[]) {
-        [FONT_ROBOTO] = "resources/Roboto-Light.ttf",
-        [FONT_ITIM]   = "resources/Itim.ttf",
-    } };
-    global_font_manager = &font_manager;
     
     uint64_t totalMemorySize = Clay_MinMemorySize();
-    Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
-    Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
+    Clay_Arena clay_arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
+    Clay_Initialize(clay_arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
     
     game_shaders.background_shader = LoadShader(0, "resources/dialogbackground.fs");
 
-    
-    // Font font = LoadFontEx("resources/Roboto-Light.ttf", 60, NULL, 0);
-    // Font dialog_font = LoadFontEx("resources/Itim.ttf", 40, NULL, 0);
-    // Font dialog_font_big = LoadFontEx("resources/Itim.ttf", 60, NULL, 0);
-    // Font dialog_font_small = LoadFontEx("resources/Itim.ttf", 25, NULL, 0);
-    // Font fonts[] = {
-    //     font,
-    //     dialog_font,
-    //     dialog_font_big,
-    //     dialog_font_small
-    // };
-    // global_clay_fonts = fonts;
-    Clay_SetMeasureTextFunction(Raylib_MeasureText, &font_manager);
+    Font_Manager font_manager = {
+        .arena = &arena,
+        .font_paths = (const char *[]) {
+            [FONT_ROBOTO] = "resources/Roboto-Light.ttf",
+            [FONT_ITIM]   = "resources/Itim.ttf",
+        },
+    };
+    global_font_manager = &font_manager;
+    Clay_SetMeasureTextFunction(Raylib_MeasureText, global_font_manager);
 
     game_parameters = (Game_Parameters) {
         .screen_width = screenWidth,
@@ -272,8 +264,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                pick_items_update();
-                // game_update();
+                // pick_items_update();
+                game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();

@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "../raylib/raylib/include/raylib.h"
 
 // SIMD includes on supported platforms
 #if !defined(CLAY_DISABLE_SIMD) && (defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64))
@@ -557,6 +558,63 @@ typedef struct Clay_BorderElementConfig {
 
 CLAY__WRAPPER_STRUCT(Clay_BorderElementConfig);
 
+
+typedef CLAY_PACKED_ENUM {
+    CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE,
+    CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_LINES,
+    CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE,
+    CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE_LINES,
+    CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE,
+    CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE_LINES,
+    CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE,
+    CLAY_RAYLIB_FUNCTION_DRAW_SPLINE_CATMULL_ROM,
+    CLAY_RAYLIB_FUNCTION_DRAW_TEXT,
+
+    CLAY_RAYLIB_FUNCTION_BEGIN_SHADER_MODE,
+    CLAY_RAYLIB_FUNCTION_END_SHADER_MODE,
+    CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE,
+    CLAY_RAYLIB_FUNCTION_SET_SHAPES_TEXTURE,
+} Clay_RaylibRenderFunction;
+
+// Controls settings related to element borders.
+typedef struct Clay_RaylibElementConfig {
+    Clay_RaylibRenderFunction fn;
+    union {
+        struct {
+            union {
+                Vector2 point;
+                Vector2 v1;
+                struct { const Vector2* points; int pointsCount; };
+            };
+            union {
+                Texture2D texture;
+                Vector2 size;
+                Vector2 v2;
+                float radius;
+                struct { float fontSize; float spacing; };
+            };
+            union {
+                const char* text;
+                float thickness;
+            };
+            union {
+                Font font;
+                Vector2 v3;
+            };
+            Color color;
+        };
+
+        struct {
+            Shader shader;
+            int shaderLocIdx;
+            const void* shaderValue;
+            int uniformType;
+        };
+    };
+} Clay_RaylibElementConfig;
+
+CLAY__WRAPPER_STRUCT(Clay_RaylibElementConfig);
+
 // Render Command Data -----------------------------
 
 // Render command data when commandType == CLAY_RENDER_COMMAND_TYPE_TEXT
@@ -641,6 +699,7 @@ typedef union Clay_RenderData {
     Clay_BorderRenderData border;
     // Render command data when commandType == CLAY_RENDER_COMMAND_TYPE_SCISSOR_START|END
     Clay_ClipRenderData clip;
+    Clay_RaylibElementConfig raylib;
 } Clay_RenderData;
 
 // Miscellaneous Structs & Enums ---------------------------------
@@ -686,6 +745,7 @@ typedef CLAY_PACKED_ENUM {
     CLAY_RENDER_COMMAND_TYPE_SCISSOR_END,
     // The renderer should provide a custom implementation for handling this render command based on its .customData
     CLAY_RENDER_COMMAND_TYPE_CUSTOM,
+    CLAY_RENDER_COMMAND_TYPE_RAYLIB,
 } Clay_RenderCommandType;
 
 typedef struct Clay_RenderCommand {
@@ -926,9 +986,12 @@ CLAY_DLL_EXPORT void Clay__OpenElementWithId(Clay_ElementId elementId);
 CLAY_DLL_EXPORT void Clay__ConfigureOpenElement(const Clay_ElementDeclaration config);
 CLAY_DLL_EXPORT void Clay__ConfigureOpenElementPtr(const Clay_ElementDeclaration *config);
 CLAY_DLL_EXPORT void Clay__CloseElement(void);
+CLAY_DLL_EXPORT void Clay__CalculateFinalLayout(void);
 CLAY_DLL_EXPORT Clay_ElementId Clay__HashString(Clay_String key, uint32_t seed);
 CLAY_DLL_EXPORT Clay_ElementId Clay__HashStringWithOffset(Clay_String key, uint32_t offset, uint32_t seed);
 CLAY_DLL_EXPORT void Clay__OpenTextElement(Clay_String text, Clay_TextElementConfig *textConfig);
+CLAY_DLL_EXPORT void Clay__Raylib(Clay_RaylibElementConfig* config);
+
 CLAY_DLL_EXPORT Clay_TextElementConfig *Clay__StoreTextElementConfig(Clay_TextElementConfig config);
 CLAY_DLL_EXPORT uint32_t Clay__GetParentElementId(void);
 
@@ -1061,8 +1124,6 @@ typedef struct {
     void* userData;
 } Clay_SharedElementConfig;
 
-CLAY__WRAPPER_STRUCT(Clay_SharedElementConfig);
-
 Clay__WarningArray Clay__WarningArray_Allocate_Arena(int32_t capacity, Clay_Arena *arena);
 Clay__Warning *Clay__WarningArray_Add(Clay__WarningArray *array, Clay__Warning item);
 void* Clay__Array_Allocate_Arena(int32_t capacity, uint32_t itemSize, Clay_Arena *arena);
@@ -1094,6 +1155,7 @@ typedef CLAY_PACKED_ENUM {
     CLAY__ELEMENT_CONFIG_TYPE_IMAGE,
     CLAY__ELEMENT_CONFIG_TYPE_TEXT,
     CLAY__ELEMENT_CONFIG_TYPE_CUSTOM,
+    CLAY__ELEMENT_CONFIG_TYPE_RAYLIB,
     CLAY__ELEMENT_CONFIG_TYPE_SHARED,
 } Clay__ElementConfigType;
 
@@ -1106,6 +1168,7 @@ typedef union {
     Clay_ClipElementConfig *clipElementConfig;
     Clay_BorderElementConfig *borderElementConfig;
     Clay_SharedElementConfig *sharedElementConfig;
+    Clay_RaylibElementConfig *raylibElementConfig;
 } Clay_ElementConfigUnion;
 
 typedef struct {
@@ -2068,6 +2131,39 @@ void Clay__OpenTextElement(Clay_String text, Clay_TextElementConfig *textConfig)
     parentElement->childrenOrTextContent.children.length++;
 }
 
+void Clay__Raylib(Clay_RaylibElementConfig* config) {
+    Clay_Context* context = Clay_GetCurrentContext();
+    if (context->layoutElements.length == context->layoutElements.capacity - 1 || context->booleanWarnings.maxElementsExceeded) {
+        context->booleanWarnings.maxElementsExceeded = true;
+        return;
+    }
+
+    Clay_LayoutElement *parentElement = Clay__GetOpenLayoutElement();
+
+    Clay_LayoutElement layoutElement = CLAY__DEFAULT_STRUCT;
+    Clay_LayoutElement *raylibElement = Clay_LayoutElementArray_Add(&context->layoutElements, layoutElement);
+    Clay__int32_tArray_Set(&context->layoutElementClipElementIds, context->layoutElements.length - 1, 0);
+
+    Clay__int32_tArray_Add(&context->layoutElementChildrenBuffer, context->layoutElements.length - 1);
+    Clay_ElementId elementId = Clay__HashNumber(parentElement->childrenOrTextContent.children.length + parentElement->floatingChildrenCount, parentElement->id);
+    raylibElement->id = elementId.id;
+    Clay__AddHashMapItem(elementId, raylibElement);
+    Clay__StringArray_Add(&context->layoutElementIdStrings, elementId.stringId);
+    raylibElement->dimensions = CLAY__INIT(Clay_Dimensions) { 0.0f, 0.0f };
+    raylibElement->minDimensions = CLAY__INIT(Clay_Dimensions) { 0.0f, 0.0f };
+    // raylibElement->childrenOrTextContent.textElementData = Clay__TextElementDataArray_Add(&context->textElementData, CLAY__INIT(Clay__TextElementData) { .text = text, .preferredDimensions = textMeasured->unwrappedDimensions, .elementIndex = context->layoutElements.length - 1 });
+
+    Clay_RaylibElementConfig* cfg = malloc(sizeof(*cfg));
+    *cfg = *config;
+    raylibElement->elementConfigs = CLAY__INIT(Clay__ElementConfigArraySlice) {
+        .length = 1,
+        .internalArray = Clay__ElementConfigArray_Add(&context->elementConfigs, CLAY__INIT(Clay_ElementConfig) { .type = CLAY__ELEMENT_CONFIG_TYPE_RAYLIB, .config = { .raylibElementConfig = cfg }})
+    };
+    
+    raylibElement->layoutConfig = &CLAY_LAYOUT_DEFAULT;
+    parentElement->childrenOrTextContent.children.length++;
+}
+
 void Clay__ConfigureOpenElementPtr(const Clay_ElementDeclaration *declaration) {
     Clay_Context* context = Clay_GetCurrentContext();
     Clay_LayoutElement *openLayoutElement = Clay__GetOpenLayoutElement();
@@ -2931,6 +3027,13 @@ void Clay__CalculateFinalLayout(void) {
                             emitRectangle = false;
                             break;
                         }
+                        case CLAY__ELEMENT_CONFIG_TYPE_RAYLIB: {
+                            renderCommand.commandType = CLAY_RENDER_COMMAND_TYPE_RAYLIB;
+                            renderCommand.renderData = CLAY__INIT(Clay_RenderData) {
+                                .raylib = *elementConfig->config.raylibElementConfig,
+                            };
+                            emitRectangle = false;
+                        } break;
                         default: break;
                     }
                     if (shouldRender) {
@@ -4452,3 +4555,5 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution.
 */
+
+

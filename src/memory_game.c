@@ -94,7 +94,8 @@ void memory_game_init() {
 }
 
 bool memory_game_update() {
-    retarted_clay_renderer() {
+
+    // retarted_clay_renderer() {
         CLAY(CLAY_ID("DialogBox"), {
             .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
             .layout = {
@@ -110,8 +111,7 @@ bool memory_game_update() {
             .custom = { .customData = make_cool_background() },
             .cornerRadius = CLAY_CORNER_RADIUS(16)
         }) {
-        }
-    }
+    // }
 
     switch (game_state) {
     case MEMORY_GAME_STATE_SHOW_SHAPES: {
@@ -171,10 +171,14 @@ bool memory_game_update() {
             break;
         }
 
+        Font font = font_manager_get_font(global_font_manager, FONT_ROBOTO, 60);
         string display_str = oc_sb_to_string(&builder);
-        Vector2 text_size = MeasureTextEx(game_parameters.neutral_font, display_str.ptr, game_parameters.neutral_font.baseSize, 10);
+        Vector2 text_size = MeasureTextEx(font, display_str.ptr, font.baseSize, 10);
         Vector2 text_position = { game_parameters.screen_width / 2.0f - text_size.x / 2.0f, game_parameters.screen_height / 2.0f};
-        DrawTextEx(game_parameters.neutral_font, display_str.ptr, text_position, game_parameters.neutral_font.baseSize, 10, (Color){255, 255, 255, 255});
+
+        // CLAY_TEXT(((Clay_String) { .length = 5, .chars  = c }), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 30, .textColor = {255, 255, 255, 255} }));
+        // CLAY_TEXT(display_str, CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 30, .textColor = {255, 255, 255, 255} }));
+        DrawTextEx(font, display_str.ptr, text_position, font.baseSize, 10, (Color){255, 255, 255, 255});
 
         Vector2 mouse = GetMousePosition();
 
@@ -187,7 +191,7 @@ bool memory_game_update() {
             Color c1 = { 255,215,0, 255 };
 
             float x = ((float)game_parameters.screen_width) / 2.0f - SPACING * (COUNT_OF_MEMORY_SHAPE - 1) / 2.0f + i * SPACING;
-            float y = text_position.y + game_parameters.neutral_font.baseSize + 150;
+            float y = text_position.y + 150;
 
             float dx = x - mouse.x;
             float dy = y - mouse.y;
@@ -227,6 +231,8 @@ bool memory_game_update() {
 
     } break;
     }
+
+        }
 
     return false;
 }

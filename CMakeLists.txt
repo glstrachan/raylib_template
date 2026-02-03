@@ -16,6 +16,7 @@ set(SOURCES
     src/encounter.c
     src/pick_items.c
     src/font_manager.c
+    external/clay/clay_renderer_raylib.c
 
     src/memory_game.c
     src/smile_game.c

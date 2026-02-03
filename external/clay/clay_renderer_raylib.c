@@ -1,4 +1,6 @@
+#define DONT_INCLUDE_RAYLIB_STUB
 #include "./clay_renderer_raylib.h"
+#include "../../src/font_manager.h"
 
 #define CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(rectangle) (Rectangle) { .x = rectangle.x, .y = rectangle.y, .width = rectangle.width, .height = rectangle.height }
 #define CLAY_COLOR_TO_RAYLIB_COLOR(color) (Color) { .r = (unsigned char)roundf(color.r), .g = (unsigned char)roundf(color.g), .b = (unsigned char)roundf(color.b), .a = (unsigned char)roundf(color.a) }
@@ -284,6 +286,60 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                 }
                 break;
             }
+            case CLAY_RENDER_COMMAND_TYPE_RAYLIB: {
+                Clay_RaylibElementConfig *config = &renderCommand->renderData.raylib;
+                switch (config->fn) {
+                case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE: {
+                    DrawRectangleV(config->point, config->size, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_LINES: {
+                    Rectangle rect = {
+                        config->point.x, config->point.y,
+                        config->size.x, config->size.y,
+                    };
+                    DrawRectangleLinesEx(rect, config->thickness, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE: {
+                    DrawCircleV(config->point, config->radius, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE_LINES: {
+                    DrawCircleLinesV(config->point, config->radius, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE: {
+                    DrawTriangle(config->v1, config->v2, config->v3, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_TRIANGLE_LINES: {
+                    DrawTriangleLines(config->v1, config->v2, config->v3, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_TEXT: {
+                    DrawTextEx(config->font, config->text, config->point, config->fontSize, config->spacing, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE: {
+                    DrawTextureV(config->texture, config->point, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_BEGIN_SHADER_MODE: {
+                    BeginShaderMode(config->shader);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_END_SHADER_MODE: {
+                    EndShaderMode();
+                } break;
+                case CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE: {
+                    SetShaderValue(config->shader, config->shaderLocIdx, config->shaderValue, config->uniformType);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_SET_SHAPES_TEXTURE: {
+                    Rectangle rect = {
+                        config->point.x, config->point.y,
+                        config->size.x, config->size.y,
+                    };
+                    SetShapesTexture(config->texture, rect);
+                } break;
+                default: {
+                    printf("Error: unhandled render command.");
+                    exit(1);
+                } break;
+                }
+            } break;
+            case CLAY_RENDER_COMMAND_TYPE_NONE: break;
             default: {
                 printf("Error: unhandled render command.");
                 exit(1);

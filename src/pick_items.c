@@ -129,7 +129,7 @@ void pick_items_update() {
     string items_sold_string = oc_sb_to_string(&builder);
 
     // Draw extra info
-    retarted_clay_renderer() {
+    // retarted_clay_renderer() {
         CLAY(CLAY_ID("PickItemsTopBox"), {
             .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
             .layout = {
@@ -234,7 +234,7 @@ void pick_items_update() {
                 }
             }
         }
-    }
+    // }
 
     /* Code to handle dragging and associated bs */
 

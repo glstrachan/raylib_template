@@ -4,12 +4,12 @@
 #include "../external/clay/clay_renderer_raylib.h"
 #include "../external/core.h"
 #include "raylib.h"
+#include "font_manager.h"
 
 #include "pick_items.h"
 #define STR_TO_CLAY_STRING(str) ({ string __s = (str); ((Clay_String) { .length = __s.len, .chars = __s.ptr }); })
 
 typedef struct {
-    Font neutral_font, dialog_font, dialog_font_big;
     int screen_width, screen_height;
 } Game_Parameters;
 
@@ -105,13 +105,13 @@ extern Game_State game;
 void game_go_to_state(uint32_t next_state);
 
 extern void HandleClayErrors(Clay_ErrorData errorData);
+extern Font_Manager* global_font_manager;
 
 #define retarted_clay_renderer() for (int i = 1, j = 1, k = 1; i; --i) for (static Clay_Context* old_ctx = NULL, *this_ctx = NULL; j; --j) for (({                            \
     old_ctx = Clay_GetCurrentContext();                                                                                                                         \
     Clay_SetCurrentContext(this_ctx);                                                                                                                                         \
                                                                                                                                                                               \
     if (!this_ctx) {                                                                                                                                                          \
-        extern Font* global_font_manager;                                                                                                                                           \
         uint64_t totalMemorySize = Clay_MinMemorySize();                                                                                                                      \
         Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));                                                                   \
         Clay_SetCurrentContext(NULL);                                                                                                                                         \
@@ -126,7 +126,6 @@ extern void HandleClayErrors(Clay_ErrorData errorData);
     Clay_BeginLayout();                                                                                                                                                       \
 }); k; ({                                                                                                                                                                     \
     Clay_RenderCommandArray renderCommands = Clay_EndLayout();                                                                                                                \
-    extern Font* global_font_manager;                                                                                                                                           \
     Clay_Raylib_Render(renderCommands, global_font_manager);                                                                                                                    \
     Clay_SetCurrentContext(old_ctx);                                                                                                                                          \
     --k; \

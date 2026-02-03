@@ -1,7 +1,7 @@
 #pragma once
 
 #include "clay.h"
-#include "raylib.h"
+#include "../raylib/raylib/include/raylib.h"
 #include "raymath.h"
 #include "stdint.h"
 #include "string.h"

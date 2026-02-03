@@ -106,7 +106,8 @@ bool smile_game_update(void) {
     Color red = {255, 0, 0, 255};
     Color green = {0, 255, 0, 255};
     BeginShaderMode(shader);
-        Vector2 resolution = {rect.width, rect.height};
+        static Vector2 resolution;
+        resolution = (Vector2) {rect.width, rect.height};
         SetShaderValue(shader, GetShaderLocation(shader, "resolution"), &resolution, SHADER_UNIFORM_VEC2);
         SetShaderValue(shader, GetShaderLocation(shader, "smile_0to1"), &sweetspot, SHADER_UNIFORM_FLOAT);
 
@@ -130,33 +131,25 @@ bool smile_game_update(void) {
         float gap = 200.0f;
         float smileness_scale = -height * 0.5 * ((1.0f - smileness) * 2.0f - 1.0f) * 5.0f;
 
-        Vector2 points[] = {
-            {startpoint_x, midline + smileness_scale * 3.0f},
-            {startpoint_x, midline + smileness_scale * 3.0f},
-            {startpoint_x + gap, midline + height + smileness_scale},
-            {startpoint_x + gap * 2.0f, midline + height},
-            {startpoint_x + gap * 3.0f, midline + height},
-            {startpoint_x + gap * 4.0f, midline + height + smileness_scale},
-            {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f},
-            {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f},
-            // {startpoint_x + gap * 4.0f, midline - height + smileness_scale},
-            // {startpoint_x + gap * 3.0f, midline - height},
-            // {startpoint_x + gap * 2.0f, midline - height},
-            // {startpoint_x + gap, midline - height + smileness_scale},
-            // {startpoint_x, midline + smileness_scale * 3.0f},
-            // {startpoint_x, midline + smileness_scale * 3.0f},
-        };
+        static Vector2 points[8];
+        points[0] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
+        points[1] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
+        points[2] = (Vector2) {startpoint_x + gap, midline + height + smileness_scale};
+        points[3] = (Vector2) {startpoint_x + gap * 2.0f, midline + height};
+        points[4] = (Vector2) {startpoint_x + gap * 3.0f, midline + height};
+        points[5] = (Vector2) {startpoint_x + gap * 4.0f, midline + height + smileness_scale};
+        points[6] = (Vector2) {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f};
+        points[7] = (Vector2) {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f};
 
-        Vector2 points1[] = {
-            {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f},
-            {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f},
-            {startpoint_x + gap * 4.0f, midline - height + smileness_scale},
-            {startpoint_x + gap * 3.0f, midline - height},
-            {startpoint_x + gap * 2.0f, midline - height},
-            {startpoint_x + gap, midline - height + smileness_scale},
-            {startpoint_x, midline + smileness_scale * 3.0f},
-            {startpoint_x, midline + smileness_scale * 3.0f},
-        };
+        static Vector2 points1[8];
+        points1[0] = (Vector2) {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f};
+        points1[1] = (Vector2) {startpoint_x + gap * 5.0f, midline  + smileness_scale * 3.0f};
+        points1[2] = (Vector2) {startpoint_x + gap * 4.0f, midline - height + smileness_scale};
+        points1[3] = (Vector2) {startpoint_x + gap * 3.0f, midline - height};
+        points1[4] = (Vector2) {startpoint_x + gap * 2.0f, midline - height};
+        points1[5] = (Vector2) {startpoint_x + gap, midline - height + smileness_scale};
+        points1[6] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
+        points1[7] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
 
         Color color = {200, 10, 50, 255};
         // DrawSplineLinear(points, oc_len(points), 1.0f, (Color){255, 255, 255, 255});
