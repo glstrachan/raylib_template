@@ -9,18 +9,18 @@ typedef struct {
 } Item_Data;
 
 #define ITEM_LIST(X) \
-    X(ITEM_VACUUM,   "Vacuum",   "Sucks up dirt") \
-    X(ITEM_BOOKS,    "Books",    "Knowledge")     \
-    X(ITEM_KNIVES,   "Knives",   "Sharp")         \
-    X(ITEM_LOLLIPOP, "Lollipop", "Sweet treat")   \
-    X(ITEM_COMPUTER, "Computer", "Beep boop")     \
-    // X(ITEM_VACUUM,   "A", "")                  \
-    // X(ITEM_BOOKS,    "B", "")                  \
-    // X(ITEM_KNIVES,   "C", "")                  \
-    // X(ITEM_LOLLIPOP, "D", "")                  \
-    // X(ITEM_COMPUTER, "E", "")                  \
-    // X(ITEM_VACUUM,   "F", "")                  \
-    // X(ITEM_BOOKS,    "G",  "")     
+    X(ITEM_VACUUM,   "vacuum",   "Sucks up dirt") \
+    X(ITEM_BOOKS,    "books",    "Knowledge")     \
+    X(ITEM_KNIVES,   "knives",   "Sharp")         \
+    X(ITEM_LOLLIPOP, "lollipop", "Sweet treat")   \
+    X(ITEM_COMPUTER, "computer", "Beep boop")     \
+    X(ITEM_A, "computer", "")                            \
+    X(ITEM_B, "computer", "")                            \
+    X(ITEM_C, "computer", "")                            \
+    X(ITEM_D, "computer", "")                            \
+    X(ITEM_E, "computer", "")                            \
+    X(ITEM_F, "computer", "")                            \
+    X(ITEM_G, "computer", "")                             
 
 #define X(id, name, desc) id,
 Enum(Item_Type, uint32_t,
@@ -30,6 +30,7 @@ Enum(Item_Type, uint32_t,
 #undef X
 
 void items_init();
+void items_cleanup();
 
 void pick_items_init();
 

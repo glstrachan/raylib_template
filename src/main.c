@@ -232,6 +232,8 @@ int main(void)
         characters_init();
         pick_items_init();
         pick_encounter_init();
+        items_init();
+        choose_pickable();
         // extern Encounter sample_encounter_;
         // encounter_start(&sample_encounter_);
 
@@ -263,8 +265,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                // pick_items_update();
-                game_update();
+                pick_items_update();
+                // game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();
@@ -276,6 +278,7 @@ int main(void)
 
     UnloadTexture(bg_tex);
 
+    items_cleanup();
     pick_items_cleanup();
     characters_cleanup();
     dialog_cleanup();
