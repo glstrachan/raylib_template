@@ -88,6 +88,7 @@ void pick_items_update() {
                 .height = CLAY_SIZING_PERCENT(0.125)
             },
         },
+        .custom = { .customData = make_cool_background() },
         .backgroundColor = {47, 47, 47, 255},
     }) {
         CLAY(CLAY_ID("PickItemsLeft"), {
@@ -168,6 +169,7 @@ void pick_items_update() {
                     .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
                 },
                 .backgroundColor = {200, 51, 0, 255},
+                .custom = { .customData = make_cool_background(.color1 = { 244.0f, 51.0f, 0.0f, 255.0f }, .color2 = { 252.0f, 51.0f, 0.0f }) },
                 .cornerRadius = CLAY_CORNER_RADIUS(40),
                 .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
             }) { CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); }

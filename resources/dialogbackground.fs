@@ -9,7 +9,7 @@ uniform vec4 color2;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / resolution.x;
-    uv += time / 20;
+    uv += time / 40;
     
     float scale = 48.0;
     uv *= scale;
