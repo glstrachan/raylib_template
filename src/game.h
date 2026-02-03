@@ -112,10 +112,12 @@ extern void HandleClayErrors(Clay_ErrorData errorData);
     Clay_SetCurrentContext(this_ctx);                                                                                                                                         \
                                                                                                                                                                               \
     if (!this_ctx) {                                                                                                                                                          \
+        extern Font* global_clay_fonts;                                                                                                                                           \
         uint64_t totalMemorySize = Clay_MinMemorySize();                                                                                                                      \
         Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));                                                                   \
         Clay_SetCurrentContext(NULL);                                                                                                                                         \
         this_ctx = Clay_Initialize(arena, (Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height }, (Clay_ErrorHandler) { HandleClayErrors, NULL }); \
+        Clay_SetMeasureTextFunction(Raylib_MeasureText, global_clay_fonts); \
     }                                                                                                                                                                         \
                                                                                                                                                                               \
     Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });                                                              \

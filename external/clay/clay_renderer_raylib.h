@@ -43,3 +43,4 @@ typedef struct
 } DialogTextUserData;
 
 void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts);
+Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData);
