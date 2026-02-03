@@ -79,6 +79,16 @@ void pick_items_update() {
     DrawTexture(shelf_tex, 400, 200, WHITE);
     // Draw the set of items in the briefcase
     DrawTexture(briefcase_tex, 1100, 430, WHITE);
+
+    Oc_String_Builder builder;
+    oc_sb_init(&builder, &arena);
+    wprint(&builder.writer, "Day {}/4", game.current_day);
+    string day_string = oc_sb_to_string(&builder);
+
+    oc_sb_init(&builder, &arena);
+    wprint(&builder.writer, "{}", game.prev_items_sold.count);
+    string items_sold_string = oc_sb_to_string(&builder);
+
     // Draw extra info
     CLAY(CLAY_ID("PickItemsTopBox"), {
         .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
@@ -100,7 +110,7 @@ void pick_items_update() {
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
             },
             .backgroundColor = {0, 200, 0, 0},
-        }) { CLAY_TEXT((CLAY_STRING("Day 3/4")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); }
+        }) { CLAY_TEXT(((Clay_String) { .length = day_string.len, .chars = day_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); }
         CLAY(CLAY_ID("PickItemsCenter"), {
             .layout = {
                 .childGap = 16,
@@ -130,7 +140,7 @@ void pick_items_update() {
                     },
                     .backgroundColor = {77, 107, 226, 255},
                     .cornerRadius = CLAY_CORNER_RADIUS(6),
-                }) { CLAY_TEXT((CLAY_STRING("8")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); };
+                }) { CLAY_TEXT(((Clay_String) { .length = items_sold_string.len, .chars = items_sold_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); };
             }
             CLAY(CLAY_ID("PickItemsQuota"), {
                 .layout = {
@@ -176,3 +186,9 @@ void pick_items_update() {
         }
     }
 }
+
+// You have a set of points where items can be placed
+
+// You can click on a point to grab the associated item
+
+// 

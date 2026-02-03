@@ -1,5 +1,7 @@
 #pragma once
 
+#include "characters.h"
+
 typedef struct {
     string name;
     string description;

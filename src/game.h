@@ -5,6 +5,8 @@
 #include "../external/core.h"
 #include "raylib.h"
 
+#include "pick_items.h"
+
 typedef struct {
     Font neutral_font, dialog_font, dialog_font_big;
     int screen_width, screen_height;
@@ -70,6 +72,11 @@ typedef struct {
 } Briefcase;
 
 typedef struct {
+    Item_Type item;
+    Character_Type character;
+} Item_Sold;
+
+typedef struct {
     enum {
         GAME_STATE_TUTORIAL,
         GAME_STATE_SELECT_ITEMS,
@@ -89,6 +96,8 @@ typedef struct {
     struct Encounter* encounter;
 
     uint8_t current_day;
+
+    Array(Item_Sold) prev_items_sold;
 } Game_State;
 extern Game_State game;
 
