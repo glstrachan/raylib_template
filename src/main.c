@@ -53,7 +53,7 @@ void game_go_to_state(uint32_t next_state) {
         pick_encounter();
     } break;
     case GAME_STATE_IN_ENCOUNTER: {
-        dialog_init();
+        encounter_start(game.encounter);
     } break;
     case GAME_STATE_DAY_SUMMARY:background_shader = LoadShader(0, "resources/dialogbackground.fs"); break;
     default: oc_assert(false);
@@ -108,8 +108,6 @@ void game_update() {
         wprint(&sb.writer, "Day {} Summary", game.current_day);
         string title = oc_sb_to_string(&sb);
 
-        CustomLayoutElement* customBackgroundData = make_cool_background();
-
         CLAY(CLAY_ID("DaySummary"), {
             .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
             .layout = {
@@ -125,10 +123,24 @@ void game_update() {
                 .childGap = 16
             },
             .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-            .custom = { .customData = customBackgroundData },
+            .custom = { .customData = make_cool_background() },
             .cornerRadius = CLAY_CORNER_RADIUS(16)
         }) {
-            CLAY_TEXT(((Clay_String) { .length = title.len, .chars = title.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(title, CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", 4), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+            CLAY(CLAY_ID("ItemsList"), {
+                .layout = { .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM, .padding = {50} },
+            }) {
+                for (int i = 0; i < 4; ++i) {
+                    CLAY_AUTO_ID({
+                        .layout = { .sizing = { .width = CLAY_SIZING_FIXED(200) }, .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, .padding = {16, 16, 16, 16} },
+                        .backgroundColor = {100, 100, 100, 255},
+                    }) {
+                        CLAY_TEXT(oc_format(&frame_arena, "Item {}", i), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = 3, .textColor = {255, 255, 255, 255} }));
+                    }
+                }
+            }
+
             CLAY_AUTO_ID({
                 .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
             });
@@ -142,14 +154,23 @@ void game_update() {
                 },
                 .backgroundColor = {200, 0, 0, 0},
             }) {
-                CLAY_AUTO_ID({
-                    .cornerRadius = CLAY_CORNER_RADIUS(100),
-                    .backgroundColor = {200, 0, 0, 255},
+                CLAY(CLAY_ID("PickItemsStartDay"), {
                     .layout = {
-                        .padding = {16, 16, 10, 10},
+                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                        .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
                     },
+                    .custom = {
+                        .customData = Clay_Hovered() ?
+                            make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
+                            make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
+                    },
+                    .cornerRadius = CLAY_CORNER_RADIUS(40),
+                    .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
                 }) {
-                    CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 30, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                    if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                        game_go_to_state(GAME_STATE_SELECT_ITEMS);
+                    }
                 }
             }
         }
@@ -211,8 +232,8 @@ int main(void)
         characters_init();
         pick_items_init();
         pick_encounter_init();
-        extern Encounter sample_encounter_;
-        encounter_start(&sample_encounter_);
+        // extern Encounter sample_encounter_;
+        // encounter_start(&sample_encounter_);
 
         oc_arena_restore(&frame_arena, save);
     }
@@ -242,8 +263,8 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                pick_items_update();
-                // game_update();
+                // pick_items_update();
+                game_update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, fonts);
             EndMode2D();

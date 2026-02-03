@@ -169,10 +169,19 @@ void pick_items_update() {
                     .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
                 },
                 .backgroundColor = {200, 51, 0, 255},
-                .custom = { .customData = make_cool_background(.color1 = { 244.0f, 51.0f, 0.0f, 255.0f }, .color2 = { 252.0f, 51.0f, 0.0f }) },
+                .custom = {
+                    .customData = Clay_Hovered() ?
+                        make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
+                        make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
+                },
                 .cornerRadius = CLAY_CORNER_RADIUS(40),
                 .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
-            }) { CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} })); }
+            }) {
+                CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = 2, .textColor = {255, 255, 255, 255} }));
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+                }
+            }
         }
     }
 }

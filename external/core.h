@@ -336,6 +336,12 @@ typedef struct {
 #define oc_len(arr) (sizeof(arr)/sizeof((arr)[0]))
 #define oc_pun(value, type) ({ __typeof__(value) _v = (value); *(type*)&_v; })
 #define oc_oom() do { print("Out of memory: {}:{}\n", __FILE__, __LINE__); oc_exit(-1); } while (0)
+#define oc_format(arena, fmt, ...) ({        \
+    Oc_String_Builder sb;                    \
+    oc_sb_init(&sb, arena);                  \
+    wprint(&sb.writer, fmt, ## __VA_ARGS__); \
+    oc_sb_to_string(&sb);                    \
+})
 
 #define Enum(_name, _type, ...) typedef _type _name; enum { __VA_ARGS__ }
 #define Hash_Map(K, V) struct { struct { K _key; V _value; uint32 filled; }* entries; uint32 count_filled, capacity; }
