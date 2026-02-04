@@ -224,11 +224,11 @@ void pick_items_update() {
                     .backgroundColor = {200, 51, 0, 255},
                     .custom = {
                         .customData = Clay_Hovered() ?
-                            make_cool_background(.color1 = { 214, 51, 0, 255 }, .color2 = { 222, 51, 0, 255 }) :
+                            make_cool_background(.color1 = { 162, 32, 0, 255 }, .color2 = { 169, 33, 0, 255 }) :
                             make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
                     },
                     .cornerRadius = CLAY_CORNER_RADIUS(40),
-                    .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
+                    .border = Clay_Hovered() ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {113, 24, 0, 255} } : (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} }, // TODO: Make this consistent for other parts of UI
                 }) {
                     CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                     if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -247,11 +247,7 @@ void pick_items_update() {
     Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
 
     for(int i = 0; i < 10; i++) {
-        if (i < 6 && PICKED_PICKABLE(i) != ITEM_COUNT && !(selection_data.is_selecting && selection_data.selected_index == i)) {
-
-        } else {
-            DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {255, 0, 255, 100});
-        }
+        DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {255, 0, 255, 100});
     }
 
     for(uint32_t i = 0; i < 6; i++) {
@@ -276,12 +272,6 @@ void pick_items_update() {
             x += delta.x;
             y += delta.y;
         }
-
-        // if (i < 6) {
-        //     BeginShaderMode(item_bg_shader);
-        //         DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, BLACK);
-        //     EndShaderMode();
-        // }
 
         DrawTexture(texture, x, y, WHITE);
     }
@@ -308,10 +298,31 @@ void pick_items_update() {
             }
         }
     }
+    
+    string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
+    string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
 
-    // TODO: Draw the item info section
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && selection_data.is_selecting) {
-        
+        CLAY(CLAY_ID("PickItemsInfo"), {
+            .floating = { .offset = {420, 210}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
+            .layout = {
+                .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+                .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                .sizing = {
+                    .width = CLAY_SIZING_FIXED(500),
+                    .height = CLAY_SIZING_FIT()
+                },
+                .padding = {20, 20, 10, 20}
+            },
+            .custom = { .customData = make_cool_background() },
+            .backgroundColor = {255, 47, 47, 255},
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .cornerRadius = CLAY_CORNER_RADIUS(16)
+        }) {
+            CLAY_TEXT(((Clay_String) { .length = name.len, .chars = name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+            CLAY_TEXT(((Clay_String) { .length = description.len, .chars = description.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+            
+        }
     }
 
     if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -330,6 +341,4 @@ void pick_items_update() {
 
         selection_data.is_selecting = false;
     }
-
-    // TODO: Handle start day button
 }
