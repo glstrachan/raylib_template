@@ -47,11 +47,19 @@ void items_cleanup() {
     }
 }
 
+static struct {
+    bool is_selecting;
+    int32_t selected_index;
+    Vector2 initial_location;
+} selection_data;
+
 void pick_items_init() {
     shop_bg_tex = LoadTexture("resources/background_shop.png");
     shelf_tex = LoadTexture("resources/shelf.png");
     briefcase_tex = LoadTexture("resources/briefcase.png");
     item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
+    selection_data.is_selecting = false;
+    selection_data.selected_index = -1;
 
     // Initialize item pool to have 2 of each item
     for(int32_t i = 0; i < 2; i++) {
@@ -106,12 +114,6 @@ static Vector2 item_locations[10] = {
     (Vector2) {1220, 670},
     (Vector2) {1480, 700}
 };
-
-static struct {
-    bool is_selecting;
-    uint32_t selected_index;
-    Vector2 initial_location;
-} selection_data;
 
 void pick_items_update() {
     /* Code to draw top bar*/
@@ -298,11 +300,11 @@ void pick_items_update() {
             }
         }
     }
-    
-    string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
-    string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
 
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && selection_data.is_selecting) {
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) || selection_data.selected_index != -1) {
+        string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
+        string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
+
         CLAY(CLAY_ID("PickItemsInfo"), {
             .floating = { .offset = {420, 210}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
             .layout = {
