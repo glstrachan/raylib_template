@@ -2,6 +2,12 @@
 #include "characters.h"
 #include "raylib.h"
 
+Character_Data character_data[] = {
+    #define X(id, name) [id] = { lit(name) },
+    CHARACTERS_LIST(X)
+    #undef X
+};
+
 static const Vector2 position_left = {500,  750};
 static const Vector2 position_right = {1150, 750};
 
@@ -30,6 +36,8 @@ void characters_draw(Character_Type type, Character_Position pos) {
         case CHARACTERS_FATMAN:
             tex = fatman_tex;
             break;
+        case CHARACTERS_COUNT:
+        case CHARACTERS_NONE: oc_assert(false); break;
     }
 
     Vector2 position = (pos == CHARACTERS_LEFT ? position_left : position_right);

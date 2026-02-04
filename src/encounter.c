@@ -157,7 +157,7 @@ void pick_encounter_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", game.current_character), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", character_data[game.current_character].name), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_TEXT(oc_format(&frame_arena, "Pick item to sell"), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
 
         CLAY_AUTO_ID({
