@@ -4,9 +4,9 @@
 
 extern Encounter_Sequence encounter_top_sequence;
 
-void encounter_start(Encounter* encounter);
+void encounter_start(Encounter_Fn encounter);
 void encounter_update(void);
-void encounter_sequence_start(Encounter_Sequence* sequence, Encounter* encounter);
+void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encounter);
 void encounter_sequence_update(Encounter_Sequence* sequence);
 
 bool encounter_is_done(void);

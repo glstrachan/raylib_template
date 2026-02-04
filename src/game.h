@@ -93,7 +93,9 @@ typedef struct {
     Texture2D screenshot;
 
     Briefcase briefcase;
-    struct Encounter* encounter;
+    Item_Type current_item;
+    Character_Type current_character;
+    void (*encounter)(void);
 
     uint8_t current_day;
 

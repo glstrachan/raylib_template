@@ -6,9 +6,9 @@
 #include "pick_items.h"
 
 Encounter_Sequence encounter_top_sequence = { 0 };
-static Encounter* current_encounter;
+static Encounter_Fn current_encounter;
 
-void encounter_start(Encounter* encounter) {
+void encounter_start(Encounter_Fn encounter) {
     current_encounter = encounter;
     encounter_sequence_start(&encounter_top_sequence, encounter);
 }
@@ -18,7 +18,7 @@ void encounter_update(void) {
     encounter_sequence_update(&encounter_top_sequence);
 }
 
-void encounter_sequence_start(Encounter_Sequence* sequence, Encounter* encounter) {
+void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encounter) {
     if (!sequence->stack) {
         sequence->stack = malloc(10 * 1024);
     }
@@ -32,7 +32,7 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter* encounter
     asm volatile("mov %%rsp, %0" : "=r" (this_sequence->old_stack));
     asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
     if (my_setjmp(this_sequence->jump_back_buf) == 0) {
-        this_sequence->encounter->fn();
+        this_sequence->encounter();
     }
     asm volatile("mov %0, %%rsp" :: "r" (this_sequence->old_stack));
 }
@@ -104,7 +104,8 @@ void pick_encounter_init(void) {
 }
 
 void pick_encounter(void) {
-    game.encounter = &sample_encounter_;
+    game.current_character = CHARACTERS_OLDLADY;
+    // game.encounter = &sample_encounter_;
     selected_item = -1;
 }
 
@@ -115,6 +116,8 @@ static Vector2 pick_item_locations[] = {
     (Vector2) {1220, 670},
     (Vector2) {1480, 700}
 };
+
+Encounter_Fn get_encounter_fn(void);
 
 void pick_encounter_update(void) {
     DrawTexture(house_bg, 0, 0, WHITE);
@@ -154,7 +157,7 @@ void pick_encounter_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", game.encounter->name), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", game.current_character), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_TEXT(oc_format(&frame_arena, "Pick item to sell"), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
 
         CLAY_AUTO_ID({
@@ -196,8 +199,6 @@ void pick_encounter_update(void) {
                     BeginShaderMode(item_bg_shader);
                         DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
                     EndShaderMode();
-
-                    // DrawTexture(texture, x, y, WHITE);
                 }
             }
         }
@@ -224,9 +225,11 @@ void pick_encounter_update(void) {
                 .border = { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} },
             }) {
                 CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    extern Encounter sample_encounter_;
-                    game.encounter = &sample_encounter_;
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && selected_item != -1) {
+                    // extern Encounter sample_encounter_;
+                    // game.encounter = &sample_encounter_;
+                    game.current_item = game.briefcase.items[selected_item];
+                    game.encounter = get_encounter_fn();
                     game_go_to_state(GAME_STATE_IN_ENCOUNTER);
                 }
             }
@@ -345,3 +348,7 @@ const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
         [ITEM_COMPUTER] = sample_encounter,
     },
 };
+
+Encounter_Fn get_encounter_fn(void) {
+    return encounters[game.current_character][game.current_item];
+}
