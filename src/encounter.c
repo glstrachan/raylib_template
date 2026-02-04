@@ -52,7 +52,7 @@ bool encounter_is_done(void) {
 void sample_encounter(void) {
     encounter_begin();
 
-    // dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
+    // dialog_text("Old Lady", "You darn whippersnappers!!");
     // dialog_text("potato", "Good, you?");
 
     // switch (dialog_selection("Choose a Fruit", "Potato", "Cherry", "Tomato", "Apple")) {
