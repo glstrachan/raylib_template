@@ -41,7 +41,7 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
         __current_sequence->first_time = true;                                                                                                    \
         my_longjmp(__current_sequence->jump_back_buf, 1);                                                                                         \
     }                                                                                                                                   \
-    if (!_dialog_text(__current_sequence, CSTR_TO_STRING(speaker_name), CSTR_TO_STRING(text))) { \
+    if (!_dialog_text(__current_sequence, character_data[(speaker_name)].name, CSTR_TO_STRING(text))) { \
         my_longjmp(__current_sequence->jump_back_buf, 1);                                                                                         \
     }                                                                                                                                   \
 } while (0)

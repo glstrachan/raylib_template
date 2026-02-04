@@ -45,8 +45,8 @@ Encounter_Sequence dialog_sequence = { 0 };
 
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
-    dialog_text("Old lady", "soo nice smile u have there");
-    dialog_text("Old lady", "my cat died");
+    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there");
+    dialog_text(CHARACTERS_OLDLADY, "my cat died");
     encounter_end();
 }
 

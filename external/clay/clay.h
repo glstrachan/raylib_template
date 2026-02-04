@@ -582,13 +582,13 @@ typedef struct Clay_RaylibElementConfig {
     Clay_RaylibRenderFunction fn;
     union {
         struct {
+            Texture2D texture;
             union {
                 Vector2 point;
                 Vector2 v1;
                 struct { const Vector2* points; int pointsCount; };
             };
             union {
-                Texture2D texture;
                 Vector2 size;
                 Vector2 v2;
                 float radius;
