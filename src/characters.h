@@ -5,7 +5,8 @@ Enum(Character_Type, uint32_t,
     CHARACTERS_OLDLADY,
     CHARACTERS_NERD,
     CHARACTERS_SHOTGUNNER,
-    CHARACTERS_FATMAN
+    CHARACTERS_FATMAN,
+    CHARACTERS_COUNT,
 );
 
 Enum(Character_Position, uint32_t,

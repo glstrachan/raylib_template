@@ -277,11 +277,11 @@ void pick_items_update() {
             y += delta.y;
         }
 
-        if (i < 6) {
-            BeginShaderMode(item_bg_shader);
-                DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
-            EndShaderMode();
-        }
+        // if (i < 6) {
+        //     BeginShaderMode(item_bg_shader);
+        //         DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, BLACK);
+        //     EndShaderMode();
+        // }
 
         DrawTexture(texture, x, y, WHITE);
     }
