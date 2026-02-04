@@ -1,12 +1,26 @@
 #pragma once
 
-Enum(Character_Type, uint32_t,
-    CHARACTERS_SALESMAN,
-    CHARACTERS_OLDLADY,
-    CHARACTERS_NERD,
-    CHARACTERS_SHOTGUNNER,
-    CHARACTERS_FATMAN
-);
+
+#define CHARACTERS_LIST(X)                 \
+    X(CHARACTERS_NONE,   NULL)             \
+    X(CHARACTERS_SALESMAN,   "Salesman")   \
+    X(CHARACTERS_OLDLADY,    "Old Lady")   \
+    X(CHARACTERS_NERD,   "Nerd")           \
+    X(CHARACTERS_SHOTGUNNER, "Shotgunner") \
+    X(CHARACTERS_FATMAN, "Fat Man")        \
+    X(CHARACTERS_COUNT, "Count")
+
+typedef struct {
+    string name;
+} Character_Data;
+
+extern Character_Data character_data[];
+
+typedef enum {
+    #define X(id, name) id,
+    CHARACTERS_LIST(X)
+    #undef X
+} Character_Type;
 
 Enum(Character_Position, uint32_t,
     CHARACTERS_LEFT,

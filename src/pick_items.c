@@ -47,11 +47,19 @@ void items_cleanup() {
     }
 }
 
+static struct {
+    bool is_selecting;
+    int32_t selected_index;
+    Vector2 initial_location;
+} selection_data;
+
 void pick_items_init() {
     shop_bg_tex = LoadTexture("resources/background_shop.png");
     shelf_tex = LoadTexture("resources/shelf.png");
     briefcase_tex = LoadTexture("resources/briefcase.png");
     item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
+    selection_data.is_selecting = false;
+    selection_data.selected_index = -1;
 
     // Initialize item pool to have 2 of each item
     for(int32_t i = 0; i < 2; i++) {
@@ -107,12 +115,6 @@ static Vector2 item_locations[10] = {
     (Vector2) {1480, 700}
 };
 
-static struct {
-    bool is_selecting;
-    uint32_t selected_index;
-    Vector2 initial_location;
-} selection_data;
-
 void pick_items_update() {
     /* Code to draw top bar*/
 
@@ -132,113 +134,111 @@ void pick_items_update() {
     string items_sold_string = oc_sb_to_string(&builder);
 
     // Draw extra info
-    // retarted_clay_renderer() {
-        CLAY(CLAY_ID("PickItemsTopBox"), {
-            .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
+    CLAY(CLAY_ID("PickItemsTopBox"), {
+        .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
+        .layout = {
+            .sizing = {
+                .width = CLAY_SIZING_PERCENT(1.0),
+                .height = CLAY_SIZING_PERCENT(0.125)
+            },
+        },
+        .custom = { .customData = make_cool_background() },
+        .backgroundColor = {47, 47, 47, 255},
+    }) {
+        CLAY(CLAY_ID("PickItemsLeft"), {
             .layout = {
                 .sizing = {
-                    .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_PERCENT(0.125)
+                    .width = CLAY_SIZING_GROW(),
+                    .height = CLAY_SIZING_PERCENT(1.0)
+                },
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+            },
+            .backgroundColor = {0, 200, 0, 0},
+        }) { CLAY_TEXT(((Clay_String) { .length = day_string.len, .chars = day_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); }
+        CLAY(CLAY_ID("PickItemsCenter"), {
+            .layout = {
+                .childGap = 16,
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                .sizing = {
+                    .width = CLAY_SIZING_PERCENT(0.5),
+                    .height = CLAY_SIZING_PERCENT(1.0)
                 },
             },
-            .custom = { .customData = make_cool_background() },
-            .backgroundColor = {47, 47, 47, 255},
+            .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY(CLAY_ID("PickItemsLeft"), {
-                .layout = {
-                    .sizing = {
-                        .width = CLAY_SIZING_GROW(),
-                        .height = CLAY_SIZING_PERCENT(1.0)
-                    },
-                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-                },
-                .backgroundColor = {0, 200, 0, 0},
-            }) { CLAY_TEXT(((Clay_String) { .length = day_string.len, .chars = day_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); }
-            CLAY(CLAY_ID("PickItemsCenter"), {
+            CLAY(CLAY_ID("PickItemsSold"), {
                 .layout = {
                     .childGap = 16,
                     .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                     .sizing = {
-                        .width = CLAY_SIZING_PERCENT(0.5),
+                        .width = CLAY_SIZING_GROW(),
                         .height = CLAY_SIZING_PERCENT(1.0)
                     },
                 },
-                .backgroundColor = {200, 0, 0, 0},
+                .backgroundColor = {200, 0, 200, 0},
             }) {
-                CLAY(CLAY_ID("PickItemsSold"), {
+                CLAY_TEXT((CLAY_STRING("Items Sold")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                CLAY(CLAY_ID("PickItemsSoldCount"), {
                     .layout = {
-                        .childGap = 16,
-                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-                        .sizing = {
-                            .width = CLAY_SIZING_GROW(),
-                            .height = CLAY_SIZING_PERCENT(1.0)
-                        },
+                        .padding = {10, 10, 0, 0},
                     },
-                    .backgroundColor = {200, 0, 200, 0},
-                }) {
-                    CLAY_TEXT((CLAY_STRING("Items Sold")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                    CLAY(CLAY_ID("PickItemsSoldCount"), {
-                        .layout = {
-                            .padding = {10, 10, 0, 0},
-                        },
-                        .backgroundColor = {77, 107, 226, 255},
-                        .cornerRadius = CLAY_CORNER_RADIUS(6),
-                    }) { CLAY_TEXT(((Clay_String) { .length = items_sold_string.len, .chars = items_sold_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
-                }
-                CLAY(CLAY_ID("PickItemsQuota"), {
-                    .layout = {
-                        .childGap = 16,
-                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-                        .sizing = {
-                            .width = CLAY_SIZING_GROW(),
-                            .height = CLAY_SIZING_PERCENT(1.0)
-                        },
-                    },
-                    .backgroundColor = {200, 0, 200, 0},
-                }) {
-                    CLAY_TEXT((CLAY_STRING("4 Day Item Quota")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                    CLAY(CLAY_ID("PickItemsQuotaCount"), {
-                        .layout = {
-                            .padding = {10, 10, 0, 0},
-                        },
-                        .backgroundColor = {77, 107, 226, 255},
-                        .cornerRadius = CLAY_CORNER_RADIUS(6),
-                    }) { CLAY_TEXT((CLAY_STRING("12")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
-                }
+                    .backgroundColor = {77, 107, 226, 255},
+                    .cornerRadius = CLAY_CORNER_RADIUS(6),
+                }) { CLAY_TEXT(((Clay_String) { .length = items_sold_string.len, .chars = items_sold_string.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
             }
-            CLAY(CLAY_ID("PickItemsRight"), {
+            CLAY(CLAY_ID("PickItemsQuota"), {
                 .layout = {
+                    .childGap = 16,
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                     .sizing = {
                         .width = CLAY_SIZING_GROW(),
                         .height = CLAY_SIZING_PERCENT(1.0)
                     },
-                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 },
-                .backgroundColor = {0, 0, 200, 0},
+                .backgroundColor = {200, 0, 200, 0},
             }) {
-                CLAY(CLAY_ID("PickItemsStartDay"), {
+                CLAY_TEXT((CLAY_STRING("4 Day Item Quota")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                CLAY(CLAY_ID("PickItemsQuotaCount"), {
                     .layout = {
-                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-                        .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
+                        .padding = {10, 10, 0, 0},
                     },
-                    .backgroundColor = {200, 51, 0, 255},
-                    .custom = {
-                        .customData = Clay_Hovered() ?
-                            make_cool_background(.color1 = { 162, 32, 0, 255 }, .color2 = { 169, 33, 0, 255 }) :
-                            make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
-                    },
-                    .cornerRadius = CLAY_CORNER_RADIUS(40),
-                    .border = Clay_Hovered() ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {113, 24, 0, 255} } : (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} }, // TODO: Make this consistent for other parts of UI
-                }) {
-                    CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                    if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
-                        // TODO: Make sure that 4 items were selected
-                        game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
-                    }
+                    .backgroundColor = {77, 107, 226, 255},
+                    .cornerRadius = CLAY_CORNER_RADIUS(6),
+                }) { CLAY_TEXT((CLAY_STRING("12")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} })); };
+            }
+        }
+        CLAY(CLAY_ID("PickItemsRight"), {
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(),
+                    .height = CLAY_SIZING_PERCENT(1.0)
+                },
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+            },
+            .backgroundColor = {0, 0, 200, 0},
+        }) {
+            CLAY(CLAY_ID("PickItemsStartDay"), {
+                .layout = {
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                    .padding = { .left = 20, .right = 20, .top = 10, .bottom = 10 },
+                },
+                .backgroundColor = {200, 51, 0, 255},
+                .custom = {
+                    .customData = Clay_Hovered() ?
+                        make_cool_background(.color1 = { 162, 32, 0, 255 }, .color2 = { 169, 33, 0, 255 }) :
+                        make_cool_background(.color1 = { 244, 51, 0, 255 }, .color2 = { 252, 51, 0, 255 })
+                },
+                .cornerRadius = CLAY_CORNER_RADIUS(40),
+                .border = Clay_Hovered() ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {113, 24, 0, 255} } : (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} }, // TODO: Make this consistent for other parts of UI
+            }) {
+                CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
+                    // TODO: Make sure that 4 items were selected
+                    game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
                 }
             }
         }
-    // }
+    }
 
     /* Code to handle dragging and associated bs */
 
@@ -301,10 +301,10 @@ void pick_items_update() {
         }
     }
 
-    string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
-    string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) || selection_data.selected_index != -1) {
+        string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
+        string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
 
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && selection_data.is_selecting) {
         CLAY(CLAY_ID("PickItemsInfo"), {
             .floating = { .offset = {420, 210}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
             .layout = {

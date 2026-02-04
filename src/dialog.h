@@ -37,7 +37,7 @@ typedef struct Encounter {
 } Encounter;
 
 typedef struct {
-    Encounter* encounter;
+    Encounter_Fn encounter;
     jmp_buf jump_buf, jump_back_buf;
     void *stack, *old_stack;
     bool first_time;
