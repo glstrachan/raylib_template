@@ -52,29 +52,29 @@ bool encounter_is_done(void) {
 void sample_encounter(void) {
     encounter_begin();
 
-    dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
-    dialog_text("potato", "Good, you?");
+    // dialog_text("Old Lady", "Y'know back in my day you was either white or you was dead. You darn whippersnappers!!");
+    // dialog_text("potato", "Good, you?");
 
-    switch (dialog_selection("Choose a Fruit", "Potato", "Cherry", "Tomato", "Apple")) {
-        case 0: {
-            dialog_text("Old Lady", "Wowwwww! you chose potato!");
-        } break;
-        case 1: {
-            dialog_text("Old Lady", "Cherry's okay");
-        } break;
-        case 2: {
-            dialog_text("Old Lady", "Oh... you chose tomato");
-        } break;
-        case 3: {
-            dialog_text("Old Lady", "Apple? really?");
-        } break;
-    }
+    // switch (dialog_selection("Choose a Fruit", "Potato", "Cherry", "Tomato", "Apple")) {
+    //     case 0: {
+    //         dialog_text("Old Lady", "Wowwwww! you chose potato!");
+    //     } break;
+    //     case 1: {
+    //         dialog_text("Old Lady", "Cherry's okay");
+    //     } break;
+    //     case 2: {
+    //         dialog_text("Old Lady", "Oh... you chose tomato");
+    //     } break;
+    //     case 3: {
+    //         dialog_text("Old Lady", "Apple? really?");
+    //     } break;
+    // }
 
     extern Minigame memory_game, smile_game;
-    encounter_minigame(&memory_game);
+    // encounter_minigame(&memory_game);
 
-    dialog_text("Old Lady", "Wow impressive!");
-    dialog_text("Old Lady", "Now try this");
+    // dialog_text("Old Lady", "Wow impressive!");
+    // dialog_text("Old Lady", "Now try this");
 
     encounter_minigame(&smile_game);
 

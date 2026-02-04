@@ -337,6 +337,7 @@ void pick_items_update() {
                     Item_Type temp = PICKED_PICKABLE(i);
                     PICKED_PICKABLE(i) = PICKED_PICKABLE(selection_data.selected_index);
                     PICKED_PICKABLE(selection_data.selected_index) = temp;
+                    selection_data.selected_index = i;
                 }
             }
         }

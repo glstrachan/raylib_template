@@ -58,12 +58,12 @@ void smile_game_init(void) {
     acceleration = 0.08;
     acceleration1 = 0.0f;
 
-    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
+    // encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
 }
 
 bool smile_game_update(void) {
 
-    encounter_sequence_update(&dialog_sequence);
+    // encounter_sequence_update(&dialog_sequence);
 
     const int width = 100;
     const int padding_offset = 100;

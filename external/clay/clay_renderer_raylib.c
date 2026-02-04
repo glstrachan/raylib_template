@@ -365,6 +365,14 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                     };
                     SetShapesTexture(config->texture, rect);
                 } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_SPLINE_CATMULL_ROM: {
+                    // Rectangle rect = {
+                    //     config->point.x, config->point.y,
+                    //     config->size.x, config->size.y,
+                    // };
+                    // SetShapesTexture(config->texture, rect);
+                    DrawSplineCatmullRom(config->points, config->pointsCount, config->thickness, config->color);
+                } break;
                 default: {
                     printf("Error: unhandled render command.");
                     exit(1);
