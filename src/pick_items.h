@@ -15,13 +15,13 @@ typedef struct {
     X(ITEM_KNIVES,   "knives",   "Sharp")         \
     X(ITEM_LOLLIPOP, "lollipop", "Sweet treat")   \
     X(ITEM_COMPUTER, "computer", "Beep boop")     \
-    X(ITEM_A, "computer", "")                            \
-    X(ITEM_B, "computer", "")                            \
-    X(ITEM_C, "computer", "")                            \
-    X(ITEM_D, "computer", "")                            \
-    X(ITEM_E, "computer", "")                            \
-    X(ITEM_F, "computer", "")                            \
-    X(ITEM_G, "computer", "")                             
+    X(ITEM_A, "computer", "info about item")      \
+    X(ITEM_B, "computer", "info about item")      \
+    X(ITEM_C, "computer", "info about item")      \
+    X(ITEM_D, "computer", "info about item")      \
+    X(ITEM_E, "computer", "info about item")      \
+    X(ITEM_F, "computer", "info about item")      \
+    X(ITEM_G, "computer", "info about item")
 
 #define X(id, name, desc) id,
 Enum(Item_Type, uint32_t,
