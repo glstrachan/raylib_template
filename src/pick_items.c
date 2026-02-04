@@ -87,7 +87,7 @@ void choose_pickable() {
     }
 
     for(uint32_t i = 0; i < 4; i++) {
-        data.picked[i] = ITEM_COUNT;
+        data.picked[i] = ITEM_NONE;
     }
 }
 
@@ -231,7 +231,8 @@ void pick_items_update() {
                     .border = Clay_Hovered() ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {113, 24, 0, 255} } : (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} }, // TODO: Make this consistent for other parts of UI
                 }) {
                     CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                    if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
+                        // TODO: Make sure that 4 items were selected
                         game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
                     }
                 }
@@ -251,7 +252,8 @@ void pick_items_update() {
     }
 
     for(uint32_t i = 0; i < 6; i++) {
-        if(PICKED_PICKABLE(i) == ITEM_COUNT) continue;
+        if(PICKED_PICKABLE(i) == ITEM_NONE) continue;
+
         Texture2D texture = item_data[PICKED_PICKABLE(i)].texture;
         float x = item_locations[i].x - texture.width * 0.5;
         float y = item_locations[i].y - texture.height * 0.5;
@@ -259,7 +261,7 @@ void pick_items_update() {
     }
 
     for(uint32_t i = 0; i < 10; i++) {
-        if(PICKED_PICKABLE(i) == ITEM_COUNT) continue;
+        if(PICKED_PICKABLE(i) == ITEM_NONE) continue;
 
         Texture2D texture = item_data[PICKED_PICKABLE(i)].texture;
         float x = item_locations[i].x - texture.width * 0.5;
@@ -290,7 +292,7 @@ void pick_items_update() {
         for(uint32_t i = 0; i < 10; i++) {
             float dist = Vector2Distance(mouse, item_locations[i]);
 
-            if(dist < selection_radius) {
+            if(dist < selection_radius && PICKED_PICKABLE(i) != ITEM_NONE) {
                 selection_data.is_selecting = true;
                 selection_data.selected_index = i;
                 selection_data.initial_location = mouse;
@@ -298,7 +300,7 @@ void pick_items_update() {
             }
         }
     }
-    
+
     string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
     string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
 

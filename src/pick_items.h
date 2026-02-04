@@ -4,24 +4,24 @@
 
 typedef struct {
     string name;
-    string description;
+    string description; 
     Texture2D texture;
 } Item_Data;
 
 #define ITEM_LIST(X) \
-    X(ITEM_NONE,   NULL,   NULL) \
-    X(ITEM_VACUUM,   "vacuum",   "Sucks up dirt") \
-    X(ITEM_BOOKS,    "books",    "Knowledge")     \
-    X(ITEM_KNIVES,   "knives",   "Sharp")         \
-    X(ITEM_LOLLIPOP, "lollipop", "Sweet treat")   \
-    X(ITEM_COMPUTER, "computer", "Beep boop")     \
-    X(ITEM_A, "computer", "info about item")      \
-    X(ITEM_B, "computer", "info about item")      \
-    X(ITEM_C, "computer", "info about item")      \
-    X(ITEM_D, "computer", "info about item")      \
-    X(ITEM_E, "computer", "info about item")      \
-    X(ITEM_F, "computer", "info about item")      \
-    X(ITEM_G, "computer", "info about item")
+    X(ITEM_NONE,              NULL,               NULL)                \
+    X(ITEM_VACUUM,            "vacuum",           "Sucks up dirt")     \
+    X(ITEM_BOOKS,             "books",            "Knowledge")         \
+    X(ITEM_KNIVES,            "knives",           "Sharp")             \
+    X(ITEM_LOLLIPOP,          "lollipop",         "Sweet treat")       \
+    X(ITEM_COMPUTER,          "computer",         "Beep boop")         \
+    X(ITEM_VASE,              "vase",             "Holds flowers")     \
+    X(ITEM_COMIC_BOOK,        "comic book",       "Pow! Zap!")         \
+    X(ITEM_FOOTBALL,          "football",         "Throw it long")     \
+    X(ITEM_AK47,              "ak47",             "Fully automatic")   \
+    X(ITEM_GIRLSCOUT_COOKIES, "girlscout cookies", "Thin mints!")      \
+    X(ITEM_STEAK,             "steak",            "Medium rare")       \
+    X(ITEM_GAME_CONSOLE,      "game console",     "Press start")
 
 #define X(id, name, desc) id,
 Enum(Item_Type, uint32_t,
