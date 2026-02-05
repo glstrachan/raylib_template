@@ -113,3 +113,62 @@ extern Font_Manager* global_font_manager;
 #define FONT_ITIM   (2u)
 
 void day_summary_update(void);
+
+static inline void game_objective_widget(string objective) {
+    CLAY_AUTO_ID({
+        .floating = { .offset = { -16, 100 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_TOP, CLAY_ATTACH_POINT_LEFT_TOP } },
+        .layout = {
+            .childGap = 16,
+            .sizing = {
+                .width = CLAY_SIZING_PERCENT(0.14)
+            },
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+    }) {
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(),
+                },
+                .padding = {32, 16, 10, 10},
+            },
+            .cornerRadius = CLAY_CORNER_RADIUS(16),
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .custom = { .customData = make_cool_background() },
+        }) {
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = { .width = CLAY_SIZING_GROW(), },
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
+                },
+                .backgroundColor = { 100, 0, 100, 0 },
+            }) {
+                CLAY_TEXT(oc_format(&frame_arena, "Day {}/4", game.current_day), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = { 255, 255, 255, 255 } }));
+            }
+        }
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(),
+                },
+                .padding = {32, 16, 10, 20},
+            },
+            .cornerRadius = CLAY_CORNER_RADIUS(16),
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .custom = { .customData = make_cool_background() },
+        }) {
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = { .width = CLAY_SIZING_GROW(), },
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .childGap = 10,
+                },
+                .backgroundColor = { 100, 0, 100, 0 },
+            }) {
+                CLAY_TEXT(lit("Objective"), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = { 255, 255, 255, 255 } }));
+                CLAY_TEXT(objective, CLAY_TEXT_CONFIG({ .fontSize = 30, .fontId = FONT_ITIM, .textColor = { 255, 255, 255, 255 }, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
+            }
+        }
+    }
+}

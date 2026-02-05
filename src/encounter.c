@@ -19,13 +19,14 @@ void encounter_update(void) {
 }
 
 void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encounter) {
+    const int STACK_SIZE = 10 * 1024 * 1024;
     if (!sequence->stack) {
-        sequence->stack = malloc(10 * 1024);
+        sequence->stack = malloc(STACK_SIZE);
     }
     sequence->encounter = encounter;
     sequence->first_time = true;
 
-    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)sequence->stack) + 10 * 1024 - 16, 16);
+    uintptr_t top_of_stack = oc_align_forward(((uintptr_t)sequence->stack) + STACK_SIZE - 16, 16);
 
     static Encounter_Sequence* this_sequence;
     this_sequence = sequence; // needed since we modify rsp
@@ -38,11 +39,13 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encount
 }
 
 void encounter_sequence_update(Encounter_Sequence* sequence) {
-    asm volatile("mov %%rsp, %0" : "=r" (sequence->old_stack));
-    if (my_setjmp(sequence->jump_back_buf) == 0) {
-        my_longjmp(sequence->jump_buf, 1);
+    static Encounter_Sequence* static_sequence;
+    static_sequence = sequence;
+    asm volatile("mov %%rsp, %0" : "=r" (static_sequence->old_stack));
+    if (my_setjmp(static_sequence->jump_back_buf) == 0) {
+        my_longjmp1(static_sequence->jump_buf, 1);
     }
-    asm volatile("mov %0, %%rsp" :: "r" (sequence->old_stack));
+    asm volatile("mov %0, %%rsp" :: "r" (static_sequence->old_stack) : "rsp");
 }
 
 bool encounter_is_done(void) {

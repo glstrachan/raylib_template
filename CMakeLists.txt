@@ -31,6 +31,6 @@ target_link_libraries(${PROJECT_NAME} raylib)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-escape-codes -Wno-initializer-overrides)
 
-# add_compile_definitions(OC_ENABLE_ASAN_MALLOC)
-# add_compile_options(-fsanitize=address)
-# add_link_options(-fsanitize=address)
+add_compile_definitions(OC_ENABLE_ASAN_MALLOC)
+add_compile_options(-fno-omit-frame-pointer -fsanitize=address -static-libasan)
+add_link_options(-fno-omit-frame-pointer -fsanitize=address -static-libasan   -O1 -g -fsanitize=address -fno-omit-frame-pointer )
