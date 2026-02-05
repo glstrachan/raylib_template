@@ -232,8 +232,38 @@ void pick_items_update() {
                 .border = Clay_Hovered() ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {113, 24, 0, 255} } : (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} }, // TODO: Make this consistent for other parts of UI
             }) {
                 CLAY_TEXT((CLAY_STRING("Start Day")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
-                    // TODO: Make sure that 4 items were selected
+
+                bool haveFour = true;
+
+                for(uint32_t i = 0; i < 4; i++) {
+                    if(data.picked[i] == ITEM_NONE) {
+                        haveFour = false;
+                    }
+                }
+
+                if(Clay_Hovered() && !haveFour) {
+                    CLAY(CLAY_ID("PickItemsNotice"), {
+                        .floating = { .offset = {850, 210}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_TOP, CLAY_ATTACH_POINT_CENTER_TOP } },
+                        .layout = {
+                            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+                            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                            .sizing = {
+                                .width = CLAY_SIZING_FIXED(300),
+                                .height = CLAY_SIZING_FIT()
+                            },
+                            .padding = {20, 20, 10, 20}
+                        },
+                        .custom = { .customData = make_cool_background() },
+                        .backgroundColor = {255, 47, 47, 255},
+                        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+                        .cornerRadius = CLAY_CORNER_RADIUS(16)
+                    }) {
+                        CLAY_TEXT((CLAY_STRING("Notice!")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {252, 51, 0, 255} }));
+                        CLAY_TEXT((CLAY_STRING("Put 4 items in your briefcase before starting!")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                    }
+                }
+
+                if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && haveFour) { 
                     game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
                 }
             }
@@ -301,7 +331,7 @@ void pick_items_update() {
         }
     }
 
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) || selection_data.selected_index != -1) {
+    if((IsMouseButtonDown(MOUSE_BUTTON_LEFT) && selection_data.is_selecting) || selection_data.selected_index != -1) {
         string name = item_data[PICKED_PICKABLE(selection_data.selected_index)].name;
         string description = item_data[PICKED_PICKABLE(selection_data.selected_index)].description;
 
