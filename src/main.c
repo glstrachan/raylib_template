@@ -132,10 +132,12 @@ int main(void)
     Font_Manager font_manager = {
         .arena = &arena,
         .font_paths = (const char *[]) {
+            [0] = "",
             [FONT_ROBOTO] = "resources/Roboto-Light.ttf",
             [FONT_ITIM]   = "resources/Itim.ttf",
         },
     };
+    font_manager_get_font(&font_manager, 2, 25);
     global_font_manager = &font_manager;
     Clay_SetMeasureTextFunction(Raylib_MeasureText, global_font_manager);
 
