@@ -43,7 +43,7 @@ void encounter_sequence_update(Encounter_Sequence* sequence) {
     static_sequence = sequence;
     asm volatile("mov %%rsp, %0" : "=r" (static_sequence->old_stack));
     if (my_setjmp(static_sequence->jump_back_buf) == 0) {
-        my_longjmp1(static_sequence->jump_buf, 1);
+        my_longjmp(static_sequence->jump_buf, 1);
     }
     asm volatile("mov %0, %%rsp" :: "r" (static_sequence->old_stack) : "rsp");
 }

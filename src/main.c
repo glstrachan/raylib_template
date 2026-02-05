@@ -173,7 +173,7 @@ int main(void)
         .character = CHARACTERS_NERD,
     };
 
-    smile_game.init();
+    // smile_game.init();
 
 
     while (!WindowShouldClose()) {
@@ -193,8 +193,8 @@ int main(void)
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
                 // pick_items_update();
-                // game_update();
-                smile_game.update();
+                game_update();
+                // smile_game.update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();
