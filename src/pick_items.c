@@ -277,10 +277,14 @@ void pick_items_update() {
     float selection_radius = 65.0f;
     Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
 
-    for(int i = 0; i < 10; i++) {
-        DrawCircle(item_locations[i].x + 5, item_locations[i].y + 5, selection_radius, (Color) {235, 205, 54, 255});
-        DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {250, 220, 150, 255});
+    if(selection_data.is_selecting) {
+            for(int i = 0; i < 10; i++) {
+            if(PICKED_PICKABLE(i) == ITEM_NONE || i == selection_data.selected_index) {
+                DrawCircle(item_locations[i].x, item_locations[i].y, selection_radius, (Color) {77, 107, 226, 255 * (0.3 + 0.5 * (sin(GetTime() * 2.0) * 0.5 + 0.5))});
+            }
+        }
     }
+
 
     for(uint32_t i = 0; i < 6; i++) {
         if(PICKED_PICKABLE(i) == ITEM_NONE) continue;
