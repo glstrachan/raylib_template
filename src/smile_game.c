@@ -43,10 +43,22 @@ static float acceleration;
 static float acceleration1;
 Encounter_Sequence dialog_sequence = { 0 };
 
+static void place_bar(void) {
+    CLAY_AUTO_ID({
+        .layout = {
+            .sizing = {
+                .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_FIXED(100),
+            },
+        },
+        .backgroundColor = { 200, 10, 0, 255 },
+    }) { }
+}
+
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
-    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there");
-    dialog_text(CHARACTERS_OLDLADY, "my cat died");
+    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there", .place_above_dialog = place_bar);
+    dialog_text(CHARACTERS_OLDLADY, "my cat died", .place_above_dialog = place_bar);
     encounter_end();
 }
 
@@ -58,12 +70,11 @@ void smile_game_init(void) {
     acceleration = 0.08;
     acceleration1 = 0.0f;
 
-    // encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
+    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
 }
 
 bool smile_game_update(void) {
-
-    // encounter_sequence_update(&dialog_sequence);
+    encounter_sequence_update(&dialog_sequence);
 
     const int width = 100;
     const int padding_offset = 100;

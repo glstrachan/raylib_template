@@ -118,7 +118,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
     return result;
 }
 
-bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text) {
+bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters) {
 
     // draw the text
     if (sequence->first_time) {
@@ -150,67 +150,80 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
     DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
     textUserData->visible_chars = data.text.printed_chars;
 
-    CLAY(CLAY_ID("DialogBox"), {
+    CLAY_AUTO_ID({
         .floating = { .offset = {0, -100}, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
         .layout = {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
             .sizing = {
                 .width = CLAY_SIZING_PERCENT(0.5),
-                .height = CLAY_SIZING_PERCENT(0.18)
             },
-            .padding = {16, 16, 20, 10},
             .childGap = 16
         },
-        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-        .custom = { .customData = customBackgroundData },
-        .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY(CLAY_ID("DialogName"), {
-            .layout = {
-                .sizing = {
-                    .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_PERCENT(0.25)
-                },
-                .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
-            },
-            .backgroundColor = {200, 0, 0, 0},
-        }) {
-            CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        if (parameters.place_above_dialog) {
+            parameters.place_above_dialog();
         }
-        CLAY(CLAY_ID("DialogTextContainer"), {
+
+        CLAY(CLAY_ID("DialogBox"), {
             .layout = {
+                .layoutDirection = CLAY_TOP_TO_BOTTOM,
                 .sizing = {
-                    .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(),
+                    .height = CLAY_SIZING_FIXED(200)
                 },
-                .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
+                .padding = {16, 16, 20, 10},
             },
-            .backgroundColor = {0, 255, 0, 0},
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .custom = { .customData = customBackgroundData },
+            .cornerRadius = CLAY_CORNER_RADIUS(16)
         }) {
-            CLAY(CLAY_ID("DialogText"), {
+            CLAY(CLAY_ID("DialogName"), {
                 .layout = {
                     .sizing = {
-                        .width = CLAY_SIZING_PERCENT(0.95),
-                        .height = CLAY_SIZING_GROW(),
-                    }
+                        .width = CLAY_SIZING_PERCENT(1.0),
+                        .height = CLAY_SIZING_PERCENT(0.25)
+                    },
+                    .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
                 },
-                .backgroundColor = {0, 255, 255, 0},
+                .backgroundColor = {200, 0, 0, 0},
             }) {
-                CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
+                CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
             }
-        }
-        CLAY(CLAY_ID("DialogContinue"), {
-            .layout = {
-                .sizing = {
-                    .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_PERCENT(0.18)
+            CLAY(CLAY_ID("DialogTextContainer"), {
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_PERCENT(1.0),
+                        .height = CLAY_SIZING_GROW(),
+                    },
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
                 },
-                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
-            },
-            .backgroundColor = {200, 0, 0, 0},
-        }) {
-            if(data.text.total_chars == data.text.printed_chars) {
-                CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
+                .backgroundColor = {0, 255, 0, 0},
+            }) {
+                CLAY(CLAY_ID("DialogText"), {
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_PERCENT(0.95),
+                            .height = CLAY_SIZING_GROW(),
+                        }
+                    },
+                    .backgroundColor = {0, 255, 255, 0},
+                }) {
+                    CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
+                }
+            }
+            CLAY(CLAY_ID("DialogContinue"), {
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_PERCENT(1.0),
+                        .height = CLAY_SIZING_PERCENT(0.18)
+                    },
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
+                },
+                .backgroundColor = {200, 0, 0, 0},
+            }) {
+                if(data.text.total_chars == data.text.printed_chars) {
+                    CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
+                }
             }
         }
     }

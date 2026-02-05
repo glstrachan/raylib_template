@@ -790,6 +790,9 @@ void oc_arena_reset(Oc_Arena* arena) {
 }
 
 void* oc_arena_alloc_aligned(Oc_Arena* arena, uint64 size, uint64 alignment) {
+#ifdef OC_ENABLE_ASAN_MALLOC
+    return _aligned_malloc(size, alignment);
+#else
     if (size == 0) return NULL;
     alignment = max(8, alignment);
     // 1 -> 0 -> 0 -> 1
@@ -823,9 +826,13 @@ void* oc_arena_alloc_aligned(Oc_Arena* arena, uint64 size, uint64 alignment) {
     arena->current->used += words + (aligned_result - result) / sizeof(uword);
 
     return aligned_result;
+#endif
 }
 
 void* oc_arena_alloc(Oc_Arena* arena, uint64 size) {
+#ifdef OC_ENABLE_ASAN_MALLOC
+    return malloc(size);
+#else
     if (size == 0) return NULL;
     // 1 -> 0 -> 0 -> 1
     // 2 -> 1 -> 0 -> 1
@@ -851,9 +858,13 @@ void* oc_arena_alloc(Oc_Arena* arena, uint64 size) {
     void* result = arena->current->data + arena->current->used;
     arena->current->used += words;
     return result;
+#endif
 }
 
 void* oc_arena_aligned_realloc(Oc_Arena* arena, void* old_ptr, uint64 old_size, uint64 size, uint64 alignment) {
+#ifdef OC_ENABLE_ASAN_MALLOC
+    return _aligned_realloc(old_ptr, size, alignment);
+#else
     oc_assert(arena != NULL);
     // oc_assert(old_ptr != NULL);
     if (old_ptr == NULL)  return oc_arena_alloc_aligned(arena, size, alignment);
@@ -896,9 +907,13 @@ void* oc_arena_aligned_realloc(Oc_Arena* arena, void* old_ptr, uint64 old_size, 
         arena->current->used += new_words;
         return new_ptr;
     }
+#endif
 }
 
 void* oc_arena_realloc(Oc_Arena* arena, void* old_ptr, uint64 old_size, uint64 size) {
+#ifdef OC_ENABLE_ASAN_MALLOC
+    return realloc(old_ptr, size);
+#else
     oc_assert(arena != NULL);
     // oc_assert(old_ptr != NULL);
     if (old_ptr == NULL)  return oc_arena_alloc(arena, size);
@@ -941,6 +956,7 @@ void* oc_arena_realloc(Oc_Arena* arena, void* old_ptr, uint64 old_size, uint64 s
         arena->current->used += new_words;
         return new_ptr;
     }
+#endif
 }
 
 void* oc_arena_dup(Oc_Arena* arena, void* data, uword size) {

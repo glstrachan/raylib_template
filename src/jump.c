@@ -1,6 +1,7 @@
 #include "dialog.h"
 
 void __attribute__((naked)) my_longjmp(__jmp_buf buf, int value) {
+// asm volatile("lea (%%rip), %%rax\n push %%rax" ::: "rax", "memory");
 asm volatile (
 	"xor %eax,%eax\n"
 	"cmp $1,%rdx\n"       /* CF = val ? 0 : 1 */
@@ -11,7 +12,9 @@ asm volatile (
 	"mov 24(%rcx),%r13\n"
 	"mov 32(%rcx),%r14\n"
 	"mov 40(%rcx),%r15\n"
+    // "pop %rdx\n"
 	"mov 48(%rcx),%rsp\n"
+    // "push %rdx\n"
 	"jmp *56(%rcx)"       /* goto saved address without altering rsp */
 );
 }
