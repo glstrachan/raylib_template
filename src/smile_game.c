@@ -1,6 +1,6 @@
 #include "dialog.h"
 #include "encounter.h"
-/* 
+/*
 top_level_game_state:
     TUTORIAL
     SELECT_ITEMS
@@ -10,7 +10,7 @@ top_level_game_state:
     PLAYTHROUGH_SUMMARY
 
 encounter: (person, item)
-    
+
 */
 
 
@@ -23,7 +23,7 @@ encounter: (person, item)
 
 //     // do_minigame(smile_game);
 
-//     switch (dialog_selection("Choose a greeting", 
+//     switch (dialog_selection("Choose a greeting",
 //         "Hello", "Hi", "Howdy", "whats fuckin up?")) {
 //     case 0: dialogt(); break;
 //     }
@@ -34,6 +34,7 @@ encounter: (person, item)
 #include <raylib.h>
 #include "game.h"
 
+static Texture2D image_mad, image_sad, image_neutral, image_happy, image_max_happy;
 static Shader shader;
 static float sweetspot;
 static float smileness;
@@ -44,15 +45,76 @@ static float acceleration1;
 Encounter_Sequence dialog_sequence = { 0 };
 
 static void place_bar(void) {
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = shader };
+
     CLAY_AUTO_ID({
         .layout = {
             .sizing = {
                 .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_FIXED(100),
+                .height = CLAY_SIZING_FIXED(40),
             },
         },
-        .backgroundColor = { 200, 10, 0, 255 },
-    }) { }
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .cornerRadius = CLAY_CORNER_RADIUS(16),
+        .custom = { .customData = customBackgroundData },
+    }) {
+        Texture2D* texture;
+        if (smileness < 0.2f) {
+            texture = &image_mad;
+        } else if (smileness < 0.4f) {
+            texture = &image_sad;
+        } else if (smileness < 0.6f) {
+            texture = &image_neutral;
+        } else if (smileness < 0.8f) {
+            texture = &image_happy;
+        } else {
+            texture = &image_max_happy;
+        }
+
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(),
+                }
+            },
+            .floating = { .offset = {-54/2.0f, -60}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_LEFT_CENTER } },
+        }) {
+            CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_PERCENT(smileness), .height = CLAY_SIZING_FIXED(60) } } });
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_FIXED(54),
+                        .height = CLAY_SIZING_FIXED(53),
+                    },
+                },
+                .image = { .imageData = texture },
+            });
+        }
+
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(),
+                }
+            },
+            .floating = { .offset = {-10, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_LEFT_CENTER } },
+        }) {
+            CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_PERCENT(smileness), .height = CLAY_SIZING_FIXED(60) } } });
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_FIXED(20),
+                        .height = CLAY_SIZING_FIXED(60),
+                    },
+                },
+                .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+                .cornerRadius = CLAY_CORNER_RADIUS(10),
+                .backgroundColor = {20, 20, 20, 255},
+            });
+        }
+    }
 }
 
 void smile_dialog_sequence(void) {
@@ -63,11 +125,18 @@ void smile_dialog_sequence(void) {
 }
 
 void smile_game_init(void) {
+
+    image_mad = LoadTexture("resources/mad.png");
+    image_sad = LoadTexture("resources/sad.png");
+    image_neutral = LoadTexture("resources/neutral.png");
+    image_happy = LoadTexture("resources/happy.png");
+    image_max_happy = LoadTexture("resources/max_happy.png");
     shader = LoadShader(NULL, "resources/smile_shader.fs");
+
     smileness = GetRandomValue(0, 1000) / 1000.0f;
     sweetspot = GetRandomValue(100, 900) / 1000.0f;
     velocity = 0.0f;
-    acceleration = 0.08;
+    acceleration = -0.08;
     acceleration1 = 0.0f;
 
     encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
@@ -93,42 +162,12 @@ bool smile_game_update(void) {
     }
 
     if (IsKeyPressed(KEY_SPACE)) {
-        acceleration1 = -20.0f;
+        acceleration1 = 20.0f;
     } else {
         acceleration1 = dt * acceleration1;
         // acceleration1 = 0.0f;
     }
     // smileness = min(smileness + velocity * dt, 1.0f);
-
-    Rectangle rect = {
-        .x = game_parameters.screen_width - padding_offset - width,
-        .y = padding_offset,
-        .width = width,
-        .height = game_parameters.screen_height - padding_offset * 2,
-    };
-
-    // DrawRectangle(game_parameters.screen_width - padding_offset - width, padding_offset, width, game_parameters.screen_height - padding_offset * 2, (Color){ 0, 0, 0, 255 });
-    // DrawRectangleRec(rect, (Color) { 0, 0, 0, 255 });
-
-    Color red = {255, 0, 0, 255};
-    Color green = {0, 255, 0, 255};
-    BeginShaderMode(shader);
-        static Vector2 resolution;
-        resolution = (Vector2) {rect.width, rect.height};
-        SetShaderValue(shader, GetShaderLocation(shader, "resolution"), &resolution, SHADER_UNIFORM_VEC2);
-        SetShaderValue(shader, GetShaderLocation(shader, "smile_0to1"), &sweetspot, SHADER_UNIFORM_FLOAT);
-
-        SetShapesTexture((Texture2D){1, rect.width, rect.height, 1, 7}, (Rectangle){0, 0, rect.width, rect.height});
-        DrawRectangleRec(rect, WHITE);
-    EndShaderMode();
-
-    const int height = 10;
-    const int margin = 4;
-    Rectangle lines_rect = {
-        rect.x - margin, rect.y + smileness * rect.height - height / 2, width + margin * 2, height,
-    };
-    DrawRectangleLinesEx(lines_rect, 2.0f, (Color) { 255, 255, 255, 255 });
-
 
 
     {
@@ -163,6 +202,8 @@ bool smile_game_update(void) {
         DrawSplineCatmullRom(points, oc_len(points), 4.0f, color);
         DrawSplineCatmullRom(points1, oc_len(points1), 4.0f, color);
     }
+
+    game_objective_widget(lit("Smile the right amount based on what the Old Lady is saying!"));
 
     return false;
 }

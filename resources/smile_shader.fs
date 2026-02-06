@@ -5,27 +5,18 @@ in vec4 fragColor;
 
 out vec4 out_color;
 
-uniform float smile_0to1;
-uniform vec2 resolution;
+uniform vec2 screenResolution;
+uniform vec2 elementResolution;
+uniform vec2 elementPosition;
 
 void main() {
-    // out_color = vec4(1, 0, 0, 1);
+    vec2 uv = (gl_FragCoord.xy - elementPosition) / elementResolution;
+
     vec4 red = vec4(1, 0, 0, 1);
     vec4 green = vec4(0, 1, 0, 1);
 
-    float i = abs(fragTexCoord.y - smile_0to1);
-    // out_color = mix(green, red, i * 4.0);
+    float t = 1.0 - uv.x;
 
-    // float t = pow(i * 8.0, 0.3) * pow(i * 5, 0.5);
-    float t = pow(i, 0.7)  * 4.0;
-    // float t = i * 8.0;
-
-    out_color = (1.5 - t) * green + t * red;
-    // out_color = mix(green, red, );
-    // out_color = mix(red, green, pow(0.005, i));
-
-    // out_color.g += fragTexCoord.x * 0.1;
-
-    // out_color = vec4(0.0, fragTexCoord.y, 0, 1);
-    // out_color = vec4(gl_FragCoord.xy / resolution.x, 0, 1);
+    vec2 a = normalize(vec2(1 - t, t));
+    out_color = a.x * green + a.y * red;
 }

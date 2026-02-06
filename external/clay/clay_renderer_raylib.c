@@ -291,8 +291,14 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                         
                         float time = GetTime();
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "time"), &time, SHADER_UNIFORM_FLOAT);
+
                         Vector2 resolution = {GetScreenWidth(), GetScreenHeight()};
-                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "resolution"), &resolution, SHADER_UNIFORM_VEC2);
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "screenResolution"), &resolution, SHADER_UNIFORM_VEC2);
+                        Vector2 elementResolution = {boundingBox.width, boundingBox.height};
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "elementResolution"), &elementResolution, SHADER_UNIFORM_VEC2);
+                        Vector2 elementPosition = {boundingBox.x, boundingBox.y};
+                        SetShaderValue(data->shader, GetShaderLocation(data->shader, "elementPosition"), &elementPosition, SHADER_UNIFORM_VEC2);
+
                         float color1[] = {data->color1.r / 255.0f, data->color1.g / 255.0f, data->color1.b / 255.0f, data->color1.a / 255.0f};
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "color1"), color1, SHADER_UNIFORM_VEC4);
                         float color2[] = {data->color2.r / 255.0f, data->color2.g / 255.0f, data->color2.b / 255.0f, data->color2.a / 255.0f};
