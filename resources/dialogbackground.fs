@@ -3,12 +3,12 @@
 out vec4 finalColor;
 
 uniform float time;
-uniform vec2 resolution;
+uniform vec2 screenResolution;
 uniform vec4 color1;
 uniform vec4 color2;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / resolution.x;
+    vec2 uv = gl_FragCoord.xy / screenResolution.x;
     uv += time / 40;
     
     float scale = 48.0;
