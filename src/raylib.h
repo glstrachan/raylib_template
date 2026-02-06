@@ -1,6 +1,6 @@
 #pragma once
 #ifndef DONT_INCLUDE_RAYLIB_STUB
-#include "../external/raylib/raylib/include/raylib.h"
+#include "../external/raylib/src/raylib.h"
 #include "../external/clay/clay.h"
 
 static inline void ClayDrawRectangleV(Vector2 point, Vector2 size, Color color) {
