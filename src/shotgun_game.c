@@ -152,6 +152,8 @@ bool shotgun_game_update() {
     DrawCircle(mouse.x, mouse.y, 5, (Color) {255, 0, 0, 255});
     DrawRing(mouse, 25, 30, 0, 360, 100, ((Color) {255, 0, 0, 255}));
 
+    game_objective_widget(lit("Shoot the right items!"));
+
     return false;
 }
 
