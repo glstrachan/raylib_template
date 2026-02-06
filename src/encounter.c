@@ -52,43 +52,7 @@ bool encounter_is_done(void) {
     return encounter_top_sequence.is_done;
 }
 
-void sample_encounter(void) {
-    encounter_begin();
-
-    // dialog_text("Old Lady", "You darn whippersnappers!!");
-    // dialog_text("potato", "Good, you?");
-
-    // switch (dialog_selection("Choose a Fruit", "Potato", "Cherry", "Tomato", "Apple")) {
-    //     case 0: {
-    //         dialog_text("Old Lady", "Wowwwww! you chose potato!");
-    //     } break;
-    //     case 1: {
-    //         dialog_text("Old Lady", "Cherry's okay");
-    //     } break;
-    //     case 2: {
-    //         dialog_text("Old Lady", "Oh... you chose tomato");
-    //     } break;
-    //     case 3: {
-    //         dialog_text("Old Lady", "Apple? really?");
-    //     } break;
-    // }
-
-    extern Minigame memory_game, smile_game;
-    // encounter_minigame(&memory_game);
-
-    // dialog_text("Old Lady", "Wow impressive!");
-    // dialog_text("Old Lady", "Now try this");
-
-    encounter_minigame(&smile_game);
-
-    encounter_end();
-}
-
 extern Minigame memory_game, smile_game, shotgun_game;
-Encounter sample_encounter_ = {
-    .fn = sample_encounter,
-    .name = lit("Old Lady"),
-};
 
 static int selected_item;
 
@@ -105,6 +69,7 @@ void pick_encounter_init(void) {
 void pick_encounter(void) {
     game.current_character = CHARACTERS_OLDLADY;
     // game.encounter = &sample_encounter_;
+    game.briefcase.items[0] = ITEM_LOLLIPOP;
     selected_item = -1;
 }
 
@@ -276,7 +241,7 @@ void day_summary_update(void) {
         }
 
         CLAY_AUTO_ID({
-            .layout = { .sizing = { .height = CLAY_SIZING_GROW() } }
+            .layout = { .sizing = { .height = CLAY_SIZING_GROW(0) } }
         });
         CLAY(CLAY_ID("DialogContinue"), {
             .layout = {

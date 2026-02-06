@@ -48,7 +48,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
             .sizing = {
                 .width = CLAY_SIZING_PERCENT(0.5),
-                .height = CLAY_SIZING_PERCENT(0.16)
+                .height = CLAY_SIZING_FIT(.min = 200, .max = 800)
             },
             .padding = {16, 16, 20, 10},
             .childGap = 16
@@ -61,7 +61,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_PERCENT(0.25)
+                    .height = CLAY_SIZING_FIT()
                 },
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
             },
@@ -73,7 +73,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_GROW(),
+                    .height = CLAY_SIZING_FIT(),
                 },
                 .childGap = 20,
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
@@ -88,11 +88,12 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
                     color = (Clay_Color) { 0, 0, 0, 0 };
                 }
                 CLAY(CLAY_IDI("SelectionItem", i), {
-                    .layout = { .padding = {16, 16, 2, 2} },
+                    .layout = { .padding = {16, 16, 2, 2}, .sizing = { .height = CLAY_SIZING_GROW(0) }, .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
                     .backgroundColor = Clay_Hovered() ? (Clay_Color) { 180, 180, 180, 40 } : color,
-                    .cornerRadius = CLAY_CORNER_RADIUS(4)
+                    .cornerRadius = CLAY_CORNER_RADIUS(4),
+                    .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 100} },
                 }) {
-                    CLAY_TEXT(((Clay_String) { .length = strlen(items[i]), .chars = items[i] }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                    CLAY_TEXT(((Clay_String) { .length = strlen(items[i]), .chars = items[i] }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
                 }
 
                 bool buttonIsHovered = Clay_PointerOver(CLAY_IDI("SelectionItem", i));
@@ -101,11 +102,22 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
                 }
             }
         }
-        CLAY(CLAY_ID("DialogContinue"), {
+        CLAY_AUTO_ID({
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_PERCENT(0.18)
+                    .height = CLAY_SIZING_FIXED(40)
+                },
+            },
+            .backgroundColor = {200, 0, 0, 0},
+        });
+
+        CLAY(CLAY_ID("DialogContinue"), {
+            .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_PERCENT(1.0),
+                .height = CLAY_SIZING_FIXED(40)
                 },
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
             },
@@ -185,7 +197,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             .layout = {
                 .layoutDirection = CLAY_LEFT_TO_RIGHT,
                 .sizing = {
-                    .width = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(0),
                     // .height = CLAY_SIZING_FIXED(250)
                     .height = CLAY_SIZING_FIT(.min = 200, .max = 800)
                 },
@@ -199,7 +211,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                 .layout = {
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .sizing = {
-                        .width = CLAY_SIZING_GROW(),
+                        .width = CLAY_SIZING_GROW(0),
                         .height = CLAY_SIZING_FIT(),
                     },
                 },

@@ -147,7 +147,8 @@ int main(void)
     Font_Manager font_manager = {
         .arena = &arena,
         .font_paths = (const char *[]) {
-            [0] = "",
+            // [0] = "",
+            [0] = "resources/Roboto-Light.ttf",
             [FONT_ROBOTO] = "resources/Roboto-Light.ttf",
             [FONT_ITIM]   = "resources/Itim.ttf",
         },

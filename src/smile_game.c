@@ -57,7 +57,7 @@ static void place_bar(void) {
     CLAY_AUTO_ID({
         .layout = {
             .sizing = {
-                .width = CLAY_SIZING_GROW(),
+                .width = CLAY_SIZING_GROW(0),
                 .height = CLAY_SIZING_FIXED(40),
             },
         },
@@ -81,7 +81,7 @@ static void place_bar(void) {
         CLAY_AUTO_ID({
             .layout = {
                 .sizing = {
-                    .width = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(0),
                 }
             },
             .floating = { .offset = {-54/2.0f, -60}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_LEFT_CENTER } },
@@ -101,7 +101,7 @@ static void place_bar(void) {
         CLAY_AUTO_ID({
             .layout = {
                 .sizing = {
-                    .width = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(0),
                 }
             },
             .floating = { .offset = {-10, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_LEFT_CENTER } },

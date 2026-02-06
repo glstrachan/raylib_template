@@ -142,7 +142,7 @@ static inline void game_objective_widget(string objective) {
         CLAY_AUTO_ID({
             .layout = {
                 .sizing = {
-                    .width = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(0),
                 },
                 .padding = {32, 16, 10, 10},
             },
@@ -152,7 +152,7 @@ static inline void game_objective_widget(string objective) {
         }) {
             CLAY_AUTO_ID({
                 .layout = {
-                    .sizing = { .width = CLAY_SIZING_GROW(), },
+                    .sizing = { .width = CLAY_SIZING_GROW(0), },
                     .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
                 },
                 .backgroundColor = { 100, 0, 100, 0 },
@@ -163,7 +163,7 @@ static inline void game_objective_widget(string objective) {
         CLAY_AUTO_ID({
             .layout = {
                 .sizing = {
-                    .width = CLAY_SIZING_GROW(),
+                    .width = CLAY_SIZING_GROW(0),
                 },
                 .padding = {32, 16, 10, 20},
             },
@@ -173,7 +173,7 @@ static inline void game_objective_widget(string objective) {
         }) {
             CLAY_AUTO_ID({
                 .layout = {
-                    .sizing = { .width = CLAY_SIZING_GROW(), },
+                    .sizing = { .width = CLAY_SIZING_GROW(0), },
                     .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .childGap = 10,
