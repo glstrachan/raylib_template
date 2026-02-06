@@ -20,15 +20,16 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
 
 #define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 
-#define dialog_selection(prompt, ...) ({                                             \
+#define dialog_options(...) ((const char *[]){ __VA_ARGS__ })
+#define dialog_selection(prompt, elements, ...) ({                                             \
     int selection;                                                                   \
     if (my_setjmp(__current_sequence->jump_buf) == 0) {                                        \
         __current_sequence->first_time = true;                                                 \
         my_longjmp(__current_sequence->jump_back_buf, 1);                                      \
     }                                                                                \
     {                                                                                \
-        const char* items[] = { __VA_ARGS__ };                                       \
-        selection = _dialog_selection(__current_sequence, CSTR_TO_STRING(prompt), oc_len(items), items); \
+        const char* items[] = (elements);                                       \
+        selection = _dialog_selection(__current_sequence, CSTR_TO_STRING(prompt), oc_len(items), items, ((Dialog_Parameter) { .place_above_dialog = NULL, __VA_ARGS__ })); \
         if (selection < 0) {                                                         \
             my_longjmp(__current_sequence->jump_back_buf, 1);                                  \
         }                                                                            \

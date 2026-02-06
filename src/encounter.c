@@ -331,10 +331,10 @@ void encounter_oldlady_vacuum(void) {
     dialog_text(CHARACTERS_SALESMAN, "I'm going to pretend I didn't hear that.");
     
     switch (dialog_selection("How do you respond?", 
-        "Show her the attachments", 
+        dialog_options("Show her the attachments", 
         "Demonstrate the suction", 
         "Talk about the warranty",
-        "Compliment her carpet")) {
+        "Compliment her carpet"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Let me show you these attachments. This one's for corners, this one's for upholstery...");
         dialog_text(CHARACTERS_OLDLADY, "My grandson has attachments too. To his computer. Never calls me.");
@@ -382,10 +382,10 @@ void encounter_oldlady_books(void) {
     dialog_text(CHARACTERS_OLDLADY, "Then what good are they?");
     
     switch (dialog_selection("Make your pitch:", 
-        "Appeal to her grandchildren", 
+        dialog_options("Appeal to her grandchildren", 
         "Emphasize the leather binding", 
         "Mention the large print edition",
-        "Talk about the history sections")) {
+        "Talk about the history sections"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Think of your grandchildren! They could use these for school projects!");
         dialog_text(CHARACTERS_OLDLADY, "My grandchildren use their phones for everything. Last Christmas, little Timmy didn't look up once. Not once!");
@@ -441,10 +441,10 @@ void encounter_oldlady_knives(void) {
     dialog_text(CHARACTERS_OLDLADY, "The government is always watching. I don't trust them.");
     
     switch (dialog_selection("Redirect the conversation:", 
-        "Show the bread knife", 
+        dialog_options("Show the bread knife", 
         "Demonstrate on vegetables", 
         "Talk about kitchen safety",
-        "Mention the storage block")) {
+        "Mention the storage block"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "This bread knife cuts through crusty loaves like butter!");
         dialog_text(CHARACTERS_OLDLADY, "I do love a good sourdough. My doctor says I shouldn't have bread. I say my doctor should mind his business.");
@@ -500,10 +500,10 @@ void encounter_oldlady_lollipop(void) {
     dialog_text(CHARACTERS_OLDLADY, "I would hope so. What flavors do you have?");
     
     switch (dialog_selection("Offer a flavor:", 
-        "Classic cherry", 
+        dialog_options("Classic cherry", 
         "Lavender honey", 
         "Bourbon vanilla",
-        "Green apple")) {
+        "Green apple"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Classic cherry! A timeless favorite!");
         dialog_text(CHARACTERS_OLDLADY, "Cherry reminds me of Harold's cough syrup. He coughed a lot near the end.");
@@ -557,10 +557,10 @@ void encounter_oldlady_computer(void) {
     dialog_text(CHARACTERS_OLDLADY, "And everyone wants me to subscribe. Subscribe to what? I already have magazines I don't read.");
     
     switch (dialog_selection("Try a different angle:", 
-        "Emphasize family video calls", 
+        dialog_options("Emphasize family video calls", 
         "Talk about online shopping", 
         "Mention digital photo albums",
-        "Discuss medical resources")) {
+        "Discuss medical resources"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "You could see your grandchildren's faces, even if they're far away!");
         dialog_text(CHARACTERS_OLDLADY, "They're in the next town over. They're not far, they're just neglectful.");
@@ -622,10 +622,10 @@ void encounter_nerd_vacuum(void) {
     dialog_text(CHARACTERS_NERD, "That's like saying a computer 'does computer things.' I need specifications.");
     
     switch (dialog_selection("How do you respond?", 
-        "Show the spec sheet", 
+        dialog_options("Show the spec sheet", 
         "Challenge his vacuum knowledge", 
         "Appeal to the aesthetic design",
-        "Mention the smart home features")) {
+        "Mention the smart home features"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Here's the spec sheet. Knock yourself out.");
         dialog_text(CHARACTERS_NERD, "Finally. Someone who speaks my language. Let me see... hm, interesting motor design. German?");
@@ -683,10 +683,10 @@ void encounter_nerd_books(void) {
     dialog_text(CHARACTERS_NERD, "I don't go to parties. Too loud. Poor signal-to-noise ratio of conversation.");
     
     switch (dialog_selection("Try a different approach:", 
-        "Mention the collectors' value", 
+        dialog_options("Mention the collectors' value", 
         "Talk about the illustrations", 
         "Emphasize offline access",
-        "Bring up the bibliography sections")) {
+        "Bring up the bibliography sections"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "These could be collectors' items someday!");
         dialog_text(CHARACTERS_NERD, "I collect things too. But useful things. Vintage computer hardware. First edition programming manuals.");
@@ -740,10 +740,10 @@ void encounter_nerd_knives(void) {
     dialog_text(CHARACTERS_NERD, "You think? You're selling these and you don't know the construction?");
     
     switch (dialog_selection("Respond to his skepticism:", 
-        "Show him the blade up close", 
+        dialog_options("Show him the blade up close", 
         "Mention the forging process", 
         "Talk about the handle material",
-        "Discuss the edge angle")) {
+        "Discuss the edge angle"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Here, look at the blade. You can see the quality.");
         dialog_text(CHARACTERS_NERD, "Hmm. The grain structure is decent. Not Damascus, but not stamped either. Forged?");
@@ -799,10 +799,10 @@ void encounter_nerd_lollipop(void) {
     dialog_text(CHARACTERS_NERD, "What's the sugar source? Cane, beet, or corn syrup?");
     
     switch (dialog_selection("Answer the sugar question:", 
-        "Organic cane sugar", 
+        dialog_options("Organic cane sugar", 
         "Check the ingredients list", 
         "Offer a sugar-free option",
-        "Deflect with flavor talk")) {
+        "Deflect with flavor talk"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "One hundred percent organic cane sugar!");
         dialog_text(CHARACTERS_NERD, "Organic is mostly marketing, but cane sugar does have a better flavor profile than beet. The molasses content varies.");
@@ -857,10 +857,10 @@ void encounter_nerd_computer(void) {
     dialog_text(CHARACTERS_NERD, "Airflow matters. And aesthetics. Even if no one sees it, I know it's perfect.");
     
     switch (dialog_selection("Make your pitch:", 
-        "Focus on pre-built convenience", 
+        dialog_options("Focus on pre-built convenience", 
         "Highlight the warranty", 
         "Mention specific components",
-        "Talk about software included")) {
+        "Talk about software included"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Don't you want something that just works? No building, no troubleshooting?");
         dialog_text(CHARACTERS_NERD, "Building IS the fun. Troubleshooting is where you learn things. Pre-built is for people who don't want to understand their machine.");
@@ -922,10 +922,10 @@ void encounter_shotgunner_vacuum(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Huh. That's actually a fair point. Go on.");
     
     switch (dialog_selection("Continue the pitch:", 
-        "Emphasize noise level", 
+        dialog_options("Emphasize noise level", 
         "Talk about durability", 
         "Mention intruder detection",
-        "Discuss debris removal")) {
+        "Discuss debris removal"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "This vacuum is extremely quiet. Won't alert anyone to your position.");
         dialog_text(CHARACTERS_SHOTGUNNER, "Tactical vacuuming. I like your thinking.");
@@ -981,10 +981,10 @@ void encounter_shotgunner_books(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Now that's interesting. Go on.");
     
     switch (dialog_selection("Expand on the pitch:", 
-        "Discuss tactical placement", 
+        dialog_options("Discuss tactical placement", 
         "Mention historical warfare", 
         "Talk about survivalism sections",
-        "Emphasize weight and thickness")) {
+        "Emphasize weight and thickness"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "You could strategically place these around the house. Cover behind every corner.");
         dialog_text(CHARACTERS_SHOTGUNNER, "A literate killbox. I like your creativity.");
@@ -1040,10 +1040,10 @@ void encounter_shotgunner_knives(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Germans know metallurgy. What's the blade length?");
     
     switch (dialog_selection("Discuss the knives:", 
-        "Show the chef's knife", 
+        dialog_options("Show the chef's knife", 
         "Present the hunting knife", 
         "Display the cleaver",
-        "Reveal the throwing knives")) {
+        "Reveal the throwing knives"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Eight-inch chef's knife. Versatile. Good for everything.");
         dialog_text(CHARACTERS_SHOTGUNNER, "Everything including self-defense?");
@@ -1102,10 +1102,10 @@ void encounter_shotgunner_lollipop(void) {
     dialog_text(CHARACTERS_SALESMAN, "Yes sir. Very masculine flavors, if I may say.");
     
     switch (dialog_selection("Offer a sample:", 
-        "Bourbon vanilla", 
+        dialog_options("Bourbon vanilla", 
         "Whiskey caramel", 
         "Smoked maple",
-        "Black coffee")) {
+        "Black coffee"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "The bourbon vanilla is our bestseller. Hint of oak, touch of sweetness.");
         dialog_text(CHARACTERS_SHOTGUNNER, "I do appreciate bourbon. Just the flavor though, right? I don't drink on duty.");
@@ -1161,10 +1161,10 @@ void encounter_shotgunner_computer(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Obviously. I'm not an amateur. What about the microphone?");
     
     switch (dialog_selection("Address his concerns:", 
-        "Mention the mute switch", 
+        dialog_options("Mention the mute switch", 
         "Talk about air-gapped systems", 
         "Suggest offline use only",
-        "Discuss encryption options")) {
+        "Discuss encryption options"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "There's a hardware mute switch. Physically disconnects the mic.");
         dialog_text(CHARACTERS_SHOTGUNNER, "Hardware switch. That's better than software. Can't hack hardware.");
@@ -1223,10 +1223,10 @@ void encounter_fatman_vacuum(void) {
     dialog_text(CHARACTERS_FATMAN, "The crumbs remind me of good times. Each one is a memory.");
     
     switch (dialog_selection("Appeal to his interests:", 
-        "Mention snack preservation", 
+        dialog_options("Mention snack preservation", 
         "Talk about comfort features", 
         "Emphasize minimal effort",
-        "Discuss remote control option")) {
+        "Discuss remote control option"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "If you keep the floor clean, snacks don't get stale from floor humidity!");
         dialog_text(CHARACTERS_FATMAN, "Wait, is that a real thing?");
@@ -1280,10 +1280,10 @@ void encounter_fatman_books(void) {
     dialog_text(CHARACTERS_FATMAN, "That's true. I hate getting up to plug things in.");
     
     switch (dialog_selection("Find an angle:", 
-        "Mention food-related entries", 
+        dialog_options("Mention food-related entries", 
         "Talk about comfortable reading", 
         "Emphasize food history sections",
-        "Discuss cookbook supplements")) {
+        "Discuss cookbook supplements"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "These encyclopedias have entries on every food in existence!");
         dialog_text(CHARACTERS_FATMAN, "Every food? Even regional specialties?");
@@ -1338,10 +1338,10 @@ void encounter_fatman_knives(void) {
     dialog_text(CHARACTERS_FATMAN, "Half? That means I can cook twice as much in the same time.");
     
     switch (dialog_selection("Highlight cooking benefits:", 
-        "Show the vegetable knife", 
+        dialog_options("Show the vegetable knife", 
         "Present the meat carving knife", 
         "Display the bread knife",
-        "Reveal the pizza cutter")) {
+        "Reveal the pizza cutter"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "This vegetable knife glides through anything. Onions, peppers, you name it.");
         dialog_text(CHARACTERS_FATMAN, "Does it work on potatoes? I eat a lot of potatoes.");
@@ -1395,10 +1395,10 @@ void encounter_fatman_lollipop(void) {
     dialog_text(CHARACTERS_FATMAN, "Quality and quantity. Why choose?");
     
     switch (dialog_selection("Offer flavors:", 
-        "Salted caramel", 
+        dialog_options("Salted caramel", 
         "Chocolate truffle", 
         "Maple bacon",
-        "Butter pecan")) {
+        "Butter pecan"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "Salted caramel! Sweet and savory perfection!");
         dialog_text(CHARACTERS_FATMAN, "Salted caramel is the greatest invention of our generation.");
@@ -1452,10 +1452,10 @@ void encounter_fatman_computer(void) {
     dialog_text(CHARACTERS_FATMAN, "Not getting up is my favorite activity.");
     
     switch (dialog_selection("Highlight features:", 
-        "Streaming capabilities", 
+        dialog_options("Streaming capabilities", 
         "Food delivery convenience", 
         "Large screen for recipes",
-        "Gaming potential")) {
+        "Gaming potential"))) {
     case 0:
         dialog_text(CHARACTERS_SALESMAN, "All the streaming services! Endless shows and movies!");
         dialog_text(CHARACTERS_FATMAN, "Endless? That's a lot of couch time. I'm interested.");
@@ -1523,9 +1523,9 @@ void encounter_oldlady_vase(void) {
     dialog_text(CHARACTERS_OLDLADY, "Harold isn't dead, dear. He's in the kitchen.");
 
     switch (dialog_selection("Respond to the cat situation",
-        "That's one old cat!",
+        dialog_options("That's one old cat!",
         "A different Harold?",
-        "Cats and vases don't mix...")) {
+        "Cats and vases don't mix..."))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "That is one impressively old cat!");
             dialog_text(CHARACTERS_OLDLADY, "Oh, it's a different Harold. I name all my cats Harold. I'm on Harold the sixth now.");
@@ -1566,9 +1566,9 @@ void encounter_oldlady_comicbook(void) {
     dialog_text(CHARACTERS_OLDLADY, "So does my hip replacement, but I wouldn't call that exciting.");
 
     switch (dialog_selection("Pitch angle",
-        "It's a great investment",
+        dialog_options("It's a great investment",
         "Your grandkids would love it",
-        "It's a piece of history")) {
+        "It's a piece of history"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Think of it as an investment, ma'am. This comic could be worth ten times what you pay today.");
             dialog_text(CHARACTERS_OLDLADY, "That's what my financial advisor said about Enron.");
@@ -1610,9 +1610,9 @@ void encounter_oldlady_football(void) {
     dialog_text(CHARACTERS_OLDLADY, "The last time I threw something, it was a shoe at a raccoon in my garbage.");
 
     switch (dialog_selection("Selling strategy",
-        "Perfect arm for football!",
+        dialog_options("Perfect arm for football!",
         "It's decorative too",
-        "Great gift for someone")) {
+        "Great gift for someone"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "See? You've already got the arm for it! Shoe, football, same throwing motion.");
             dialog_text(CHARACTERS_OLDLADY, "I missed the raccoon.");
@@ -1659,9 +1659,9 @@ void encounter_nerd_vase(void) {
     dialog_text(CHARACTERS_NERD, "I've got an eye for polygon meshes, which is a completely different thing.");
 
     switch (dialog_selection("Appeal to the nerd",
-        "It's like a rare drop",
+        dialog_options("It's like a rare drop",
         "Great for your setup",
-        "It's a limited edition")) {
+        "It's a limited edition"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Think of it like a legendary drop. You wouldn't pass up a legendary drop, would you?");
             dialog_text(CHARACTERS_NERD, "That depends entirely on the stat distribution. What are the stats on this vase?");
@@ -1706,9 +1706,9 @@ void encounter_nerd_comicbook(void) {
     dialog_text(CHARACTERS_NERD, "A 'very nice comic book.' That's like calling the Mona Lisa a 'pretty okay painting.'");
 
     switch (dialog_selection("Handle the nerd's expertise",
-        "Enlighten me then",
+        dialog_options("Enlighten me then",
         "I know exactly what it is",
-        "Does that mean you want it?")) {
+        "Does that mean you want it?"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Alright, I can see you're the expert here. Enlighten me.");
             dialog_text(CHARACTERS_NERD, "This is a first print from the original run. The coloring on the cover alone suggests it's been stored properly, away from UV light. The spine isn't rolled. You could probably get a 9.2 grade on this. Maybe higher.");
@@ -1756,9 +1756,9 @@ void encounter_nerd_football(void) {
     dialog_text(CHARACTERS_NERD, "The last time I was involved with a football, it hit me in the face during gym class. In 2007. I still flinch when I hear a whistle.");
 
     switch (dialog_selection("Try to connect football to nerd culture",
-        "Football is basically strategy gaming",
+        dialog_options("Football is basically strategy gaming",
         "Athletes are basically real-life RPG characters",
-        "You could study the physics")) {
+        "You could study the physics"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Think about it. Football is just real-time strategy with a bigger budget. Formations, play-calling, countering the opponent's moves...");
             dialog_text(CHARACTERS_NERD, "Huh. I never thought of the quarterback as a raid leader before, but you might be onto something.");
@@ -1811,9 +1811,9 @@ void encounter_shotgunner_vase(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "I don't have conversations. I have confrontations.");
 
     switch (dialog_selection("Try to find an angle",
-        "Every home needs some class",
+        dialog_options("Every home needs some class",
         "It could hold your ammo",
-        "Your wife would love it")) {
+        "Your wife would love it"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Every home needs a touch of class, sir. Even a... fortified one.");
             dialog_text(CHARACTERS_SHOTGUNNER, "My home has plenty of class. I've got a mounted bass over the fireplace and a flag on the porch.");
@@ -1860,9 +1860,9 @@ void encounter_shotgunner_comicbook(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "I haven't read a comic book since I was in the service. We used to trade them around on base.");
 
     switch (dialog_selection("Explore his military connection",
-        "Which branch?",
+        dialog_options("Which branch?",
         "Comics and military go way back",
-        "This one has a soldier in it")) {
+        "This one has a soldier in it"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "You served? Which branch, if you don't mind me asking?");
             dialog_text(CHARACTERS_SHOTGUNNER, "Marines. Two tours. You?");
@@ -1910,9 +1910,9 @@ void encounter_shotgunner_football(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Best four years of my life. Before the government started putting fluoride in the water.");
 
     switch (dialog_selection("Keep the football talk going",
-        "You've still got the arm, I bet",
+        dialog_options("You've still got the arm, I bet",
         "This is game-quality leather",
-        "Perfect for the backyard")) {
+        "Perfect for the backyard"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "A guy like you? I bet you've still got the arm.");
             dialog_text(CHARACTERS_SHOTGUNNER, "Threw a trespasser's briefcase over my fence last month. Clean spiral. Forty yards easy.");
@@ -1963,9 +1963,9 @@ void encounter_fatman_vase(void) {
     dialog_text(CHARACTERS_FATMAN, "My coffee table ties my room together. It's where I put my food. Everything revolves around the food.");
 
     switch (dialog_selection("Appeal to his lifestyle",
-        "Put snacks in it",
+        dialog_options("Put snacks in it",
         "It'll impress your friends",
-        "It's a conversation starter")) {
+        "It's a conversation starter"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "You could use it to hold snacks. Breadsticks, pretzel rods, those long wafer cookies...");
             dialog_text(CHARACTERS_FATMAN, "Wait. You can put food in a vase?");
@@ -2012,9 +2012,9 @@ void encounter_fatman_comicbook(void) {
     dialog_text(CHARACTERS_FATMAN, "Does the superhero in this one eat? I find it hard to relate to characters who don't eat.");
 
     switch (dialog_selection("Address his food concern",
-        "There's definitely a diner scene",
+        dialog_options("There's definitely a diner scene",
         "Heroes need fuel too",
-        "You could eat while you read")) {
+        "You could eat while you read"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Oh absolutely. There's a scene in a diner. Very atmospheric. I think there's pie involved.");
             dialog_text(CHARACTERS_FATMAN, "What kind of pie?");
@@ -2059,9 +2059,9 @@ void encounter_fatman_football(void) {
     dialog_text(CHARACTERS_FATMAN, "It still keeps me up at night.");
 
     switch (dialog_selection("Find the right angle",
-        "You can be an armchair quarterback",
+        dialog_options("You can be an armchair quarterback",
         "Football watching is better with one",
-        "Toss it around casually")) {
+        "Toss it around casually"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "You don't need to play to be a football guy. Armchair quarterbacking is a proud American tradition.");
             dialog_text(CHARACTERS_FATMAN, "I do yell at the TV a lot. My neighbors have complained.");
@@ -2119,7 +2119,7 @@ void encounter_oldlady_ak47(void) {
     dialog_text(CHARACTERS_OLDLADY, "Oh heavens! That's a... that's a machine gun!");
     dialog_text(CHARACTERS_SALESMAN, "Assault rifle, technically. Very reliable. You could leave it in your garden for a year and it would still fire.");
 
-    switch (dialog_selection("Choose your pitch angle", "Home defense", "Gardening tool", "Raccoon deterrent", "Collector's item")) {
+    switch (dialog_selection("Choose your pitch angle", dialog_options("Home defense", "Gardening tool", "Raccoon deterrent", "Collector's item"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Think about it. You hear a noise at 2 AM. Instead of calling the police and waiting twenty minutes, you've got instant protection.");
             dialog_text(CHARACTERS_OLDLADY, "Well, I DO have trouble sleeping anyway...");
@@ -2157,7 +2157,7 @@ void encounter_oldlady_cookies(void) {
     dialog_text(CHARACTERS_SALESMAN, "No kidding! Then you know these are the real deal. Thin Mints, Samoas, Tagalongs... the whole lineup.");
     dialog_text(CHARACTERS_OLDLADY, "Now hold on. Where's the little girl? Aren't these usually sold by the scouts themselves?");
 
-    switch (dialog_selection("Explain the situation", "I'm filling in for my daughter", "The scouts outsourced", "She's in the car", "Dodge the question")) {
+    switch (dialog_selection("Explain the situation", dialog_options("I'm filling in for my daughter", "The scouts outsourced", "She's in the car", "Dodge the question"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "My daughter's home sick, and she was SO close to earning her cookie badge. I couldn't let her down.");
             dialog_text(CHARACTERS_OLDLADY, "Oh, what a devoted father! That's so sweet.");
@@ -2199,7 +2199,7 @@ void encounter_oldlady_steak(void) {
     dialog_text(CHARACTERS_OLDLADY, "That IS beautiful. But I don't really cook for just myself anymore. It feels like too much trouble.");
     dialog_text(CHARACTERS_SALESMAN, "Ma'am, cooking a steak this good isn't trouble. It's therapy.");
 
-    switch (dialog_selection("Appeal to her", "Nostalgia angle", "Health benefits", "Invite the neighbors", "Simple recipe")) {
+    switch (dialog_selection("Appeal to her", dialog_options("Nostalgia angle", "Health benefits", "Invite the neighbors", "Simple recipe"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Close your eyes. Imagine the smell of that grill on a Sunday afternoon. Harold would want you to keep that tradition alive.");
             dialog_text(CHARACTERS_OLDLADY, "Don't you go making me cry on my own porch, young man.");
@@ -2238,7 +2238,7 @@ void encounter_oldlady_console(void) {
     dialog_text(CHARACTERS_SALESMAN, "And did you enjoy it?");
     dialog_text(CHARACTERS_OLDLADY, "Actually, yes. It was quite romantic.");
 
-    switch (dialog_selection("Sell her on it", "Grandkids will visit more", "Brain training games", "It plays movies too", "It's very simple")) {
+    switch (dialog_selection("Sell her on it", dialog_options("Grandkids will visit more", "Brain training games", "It plays movies too", "It's very simple"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Imagine this. You get this console, and suddenly your grandkids are BEGGING to come over every weekend.");
             dialog_text(CHARACTERS_OLDLADY, "They do usually only come when I bribe them with cookies...");
@@ -2283,7 +2283,7 @@ void encounter_nerd_ak47(void) {
     dialog_text(CHARACTERS_NERD, "I've held a replica at Comic-Con. Does that count?");
     dialog_text(CHARACTERS_SALESMAN, "Again, absolutely not.");
 
-    switch (dialog_selection("Pick your angle", "Zombie apocalypse prep", "It's like a real-life loot drop", "Historical significance", "Home defense stats")) {
+    switch (dialog_selection("Pick your angle", dialog_options("Zombie apocalypse prep", "It's like a real-life loot drop", "Historical significance", "Home defense stats"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Let me ask you something. When the zombie apocalypse hits, and we both know it's a matter of WHEN, what's your plan?");
             dialog_text(CHARACTERS_NERD, "I have a detailed spreadsheet, actually. But the weapons column is mostly baseball bats and kitchen knives.");
@@ -2324,7 +2324,7 @@ void encounter_nerd_cookies(void) {
     dialog_text(CHARACTERS_NERD, "Early access. So they're in beta?");
     dialog_text(CHARACTERS_SALESMAN, "Sure. Yeah. The cookies are in beta. And I need taste testers. Interested?");
 
-    switch (dialog_selection("Pitch the cookies", "Limited edition flavors", "Perfect gaming fuel", "Support a good cause", "Ingredient stats")) {
+    switch (dialog_selection("Pitch the cookies", dialog_options("Limited edition flavors", "Perfect gaming fuel", "Support a good cause", "Ingredient stats"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "These are limited edition. Once they're gone, they're gone. Like a rare drop.");
             dialog_text(CHARACTERS_NERD, "FOMO is a well-documented psychological manipulation tactic and I am fully susceptible to it. Go on.");
@@ -2363,7 +2363,7 @@ void encounter_nerd_steak(void) {
     dialog_text(CHARACTERS_NERD, "Peer-to-peer steak distribution. That's either genius or deeply concerning.");
     dialog_text(CHARACTERS_SALESMAN, "It's genius. Look at that marbling. That's not just fat. That's flavor architecture.");
 
-    switch (dialog_selection("Win him over", "Maillard reaction science", "Protein for brain power", "It's organic and ethical", "Cooking is like chemistry")) {
+    switch (dialog_selection("Win him over", dialog_options("Maillard reaction science", "Protein for brain power", "It's organic and ethical", "Cooking is like chemistry"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "You know about the Maillard reaction, right? When you sear this at exactly 375 degrees, the amino acids and sugars undergo a non-enzymatic browning reaction that creates over 600 distinct flavor compounds.");
             dialog_text(CHARACTERS_NERD, "I... actually didn't know the exact number. Six hundred? That's a significant flavor vector.");
@@ -2402,7 +2402,7 @@ void encounter_nerd_console(void) {
     dialog_text(CHARACTERS_NERD, "Familiar? I've watched every teardown video. I know the specs better than the engineers who built it. Custom 8-core processor, 16 teraflops, ray tracing, SSD with 9.8 gigabytes per second read speed. Where did you even GET one?");
     dialog_text(CHARACTERS_SALESMAN, "I have my sources. The question is, do you want it?");
 
-    switch (dialog_selection("Seal the deal", "Below retail price", "Exclusive launch title included", "VR compatible", "Last one in stock")) {
+    switch (dialog_selection("Seal the deal", dialog_options("Below retail price", "Exclusive launch title included", "VR compatible", "Last one in stock"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "I can do this below retail. Consider it a fellow-enthusiast discount.");
             dialog_text(CHARACTERS_NERD, "Below retail for a sold-out console? What's the catch? Is it stolen? I won't judge, I just need to know.");
@@ -2447,7 +2447,7 @@ void encounter_shotgunner_ak47(void) {
     dialog_text(CHARACTERS_SALESMAN, "Thought that might get your attention. Genuine AK-47. Factory fresh.");
     dialog_text(CHARACTERS_SHOTGUNNER, "I know what an AK is, boy. Got a gun safe with thirty-seven firearms in it. Why would I need a Russian one?");
 
-    switch (dialog_selection("Convince him", "Compliment his collection", "Reliability argument", "It's a patriotic duty", "Trade-up offer")) {
+    switch (dialog_selection("Convince him", dialog_options("Compliment his collection", "Reliability argument", "It's a patriotic duty", "Trade-up offer"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Thirty-seven? That's impressive. But a collection that fine? It NEEDS an AK. It's like a museum without a Picasso.");
             dialog_text(CHARACTERS_SHOTGUNNER, "Don't compare my guns to some fancy art. But... I see your point. There IS a gap on the wall.");
@@ -2486,7 +2486,7 @@ void encounter_shotgunner_cookies(void) {
     dialog_text(CHARACTERS_SALESMAN, "I didn't make the uniform cutoff. But the cookies are the real deal, I promise.");
     dialog_text(CHARACTERS_SHOTGUNNER, "Hmph. My ex-wife used to buy those. Only good decision she ever made.");
 
-    switch (dialog_selection("Approach carefully", "Bond over the cookies", "Man's man approach", "Limited supply urgency", "Challenge his toughness")) {
+    switch (dialog_selection("Approach carefully", dialog_options("Bond over the cookies", "Man's man approach", "Limited supply urgency", "Challenge his toughness"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "See? Even in the darkest times, cookies bring light. These could be a fresh start.");
             dialog_text(CHARACTERS_SHOTGUNNER, "Don't get philosophical on my porch. But... she always got the Tagalongs. Those were decent.");
@@ -2528,7 +2528,7 @@ void encounter_shotgunner_steak(void) {
     dialog_text(CHARACTERS_SALESMAN, "Because Dale's steaks are good. These are GREAT. Look at this marbling. Go ahead. I'll wait.");
     dialog_text(CHARACTERS_SHOTGUNNER, "... That is some serious marbling. Where'd you source these?");
 
-    switch (dialog_selection("Win his trust", "Small ranch, free range", "Challenge his grilling", "Bulk deal for the smoker", "Competition quality")) {
+    switch (dialog_selection("Win his trust", dialog_options("Small ranch, free range", "Challenge his grilling", "Bulk deal for the smoker", "Competition quality"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Small family ranch up north. Grass-fed, pasture-raised, no hormones. These cows lived better than most people.");
             dialog_text(CHARACTERS_SHOTGUNNER, "That's how it should be. I respect a man who raises cattle right.");
@@ -2568,7 +2568,7 @@ void encounter_shotgunner_console(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Hunting simulators? Why would I simulate hunting when I can just... go hunting?");
     dialog_text(CHARACTERS_SALESMAN, "Because it's February, deer season's over, and I can see from here that your trigger finger is getting restless.");
 
-    switch (dialog_selection("Reel him in", "Hunting game demo", "It has fishing games too", "Online multiplayer competition", "It's also a DVD player")) {
+    switch (dialog_selection("Reel him in", dialog_options("Hunting game demo", "It has fishing games too", "Online multiplayer competition", "It's also a DVD player"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "They've got elk, moose, bear, even African big game. Stuff you can't hunt legally in this state.");
             dialog_text(CHARACTERS_SHOTGUNNER, "African big game? From my living room? That's... not the worst idea.");
@@ -2613,7 +2613,7 @@ void encounter_fatman_ak47(void) {
     dialog_text(CHARACTERS_SALESMAN, "Protect yourself! Defend your home! Look cool!");
     dialog_text(CHARACTERS_FATMAN, "The only thing I need to defend is the last slice of pizza from my roommate. And I do that just fine with a fork.");
 
-    switch (dialog_selection("Convince him", "Home delivery protection", "It's lighter than you think", "Impress the neighbors", "It's an investment")) {
+    switch (dialog_selection("Convince him", dialog_options("Home delivery protection", "It's lighter than you think", "Impress the neighbors", "It's an investment"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "What about delivery drivers? They bring you food, but what if one day they try to TAKE your food?");
             dialog_text(CHARACTERS_FATMAN, "That's... I never thought about that. That's terrifying.");
@@ -2653,7 +2653,7 @@ void encounter_fatman_cookies(void) {
     dialog_text(CHARACTERS_SALESMAN, "How many do you want?");
     dialog_text(CHARACTERS_FATMAN, "That's a dangerous question to ask me.");
 
-    switch (dialog_selection("Close the deal", "Bulk discount", "New flavors available", "Suggest a sampler", "All-you-can-eat pitch")) {
+    switch (dialog_selection("Close the deal", dialog_options("Bulk discount", "New flavors available", "Suggest a sampler", "All-you-can-eat pitch"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "I'll do a bulk rate. Buy ten boxes, I'll throw in two free. Can't beat that math.");
             dialog_text(CHARACTERS_FATMAN, "Free cookies? That's the most beautiful phrase in the English language.");
@@ -2690,7 +2690,7 @@ void encounter_fatman_steak(void) {
     dialog_text(CHARACTERS_SALESMAN, "Look at this. Two inches thick. Perfect marbling. You could cut this with a stern look.");
     dialog_text(CHARACTERS_FATMAN, "Oh, that's gorgeous. That right there is a work of art. I want to frame it. And then eat the frame.");
 
-    switch (dialog_selection("Seal the deal", "Pairs great with sides", "Suggest deep-frying it", "Premium butter-baste method", "Go for quantity")) {
+    switch (dialog_selection("Seal the deal", dialog_options("Pairs great with sides", "Suggest deep-frying it", "Premium butter-baste method", "Go for quantity"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "Imagine this with a loaded baked potato, garlic bread, maybe some mac and cheese on the side...");
             dialog_text(CHARACTERS_FATMAN, "Stop. You're making me emotional. Keep going.");
@@ -2730,7 +2730,7 @@ void encounter_fatman_console(void) {
     dialog_text(CHARACTERS_FATMAN, "Two seconds? I currently use loading screens as bathroom breaks. What would I even do with all that free time?");
     dialog_text(CHARACTERS_SALESMAN, "Play more games. Eat more snacks. Live your best life.");
 
-    switch (dialog_selection("Win him over", "Couch co-op games", "Food delivery apps built in", "4K on his 75-inch TV", "Voice controlled")) {
+    switch (dialog_selection("Win him over", dialog_options("Couch co-op games", "Food delivery apps built in", "4K on his 75-inch TV", "Voice controlled"))) {
         case 0: {
             dialog_text(CHARACTERS_SALESMAN, "This has the best couch co-op library on the market. You don't even have to get up to have a social life.");
             dialog_text(CHARACTERS_FATMAN, "A social life from my couch? Technology has finally caught up to my lifestyle.");

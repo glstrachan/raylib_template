@@ -19,7 +19,7 @@ static union {
     Dialog_Selection_Data selection;
 } data;
 
-int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[]) {
+int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[], Dialog_Parameter parameters) {
     int result = -1;
 
     if (sequence->first_time) {
@@ -186,7 +186,8 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                 .layoutDirection = CLAY_LEFT_TO_RIGHT,
                 .sizing = {
                     .width = CLAY_SIZING_GROW(),
-                    .height = CLAY_SIZING_FIXED(200)
+                    // .height = CLAY_SIZING_FIXED(250)
+                    .height = CLAY_SIZING_FIT(.min = 200, .max = 800)
                 },
                 .padding = {16, 20, 20, 10},
             },
@@ -199,7 +200,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .sizing = {
                         .width = CLAY_SIZING_GROW(),
-                        .height = CLAY_SIZING_GROW(),
+                        .height = CLAY_SIZING_FIT(),
                     },
                 },
             }) {
@@ -207,7 +208,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layout = {
                         .sizing = {
                             .width = CLAY_SIZING_PERCENT(1.0),
-                            .height = CLAY_SIZING_PERCENT(0.25)
+                            .height = CLAY_SIZING_FIT(),
                         },
                         .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
                     },
@@ -219,41 +220,44 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layout = {
                         .sizing = {
                             .width = CLAY_SIZING_PERCENT(1.0),
-                            .height = CLAY_SIZING_GROW(),
+                            .height = CLAY_SIZING_FIT(),
                         },
-                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
+                        // .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
+                        .padding = { 16, 16, 8, 8 },
                     },
                     .backgroundColor = {0, 255, 0, 0},
                 }) {
-                    CLAY(CLAY_ID("DialogText"), {
-                        .layout = {
-                            .sizing = {
-                                .width = CLAY_SIZING_PERCENT(0.95),
-                                .height = CLAY_SIZING_GROW(),
-                            }
-                        },
-                        .backgroundColor = {0, 255, 255, 0},
-                    }) {
-                        CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
-                    }
+                    CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
                 }
-                CLAY(CLAY_ID("DialogContinue"), {
+
+                CLAY_AUTO_ID({
                     .layout = {
                         .sizing = {
                             .width = CLAY_SIZING_PERCENT(1.0),
-                            .height = CLAY_SIZING_PERCENT(0.18)
+                            .height = CLAY_SIZING_FIXED(20)
                         },
                         .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
                     },
                     .backgroundColor = {200, 0, 0, 0},
-                }) {
-                    if(data.text.total_chars == data.text.printed_chars && parameters.timeout == 0.0f) {
-                        CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
-                    }
+                });
+            }
+
+            CLAY_AUTO_ID({
+                .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_PERCENT(1.0),
+                        .height = CLAY_SIZING_FIXED(40)
+                    },
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
+                },
+                .backgroundColor = {200, 0, 0, 0},
+            }) {
+                if(data.text.total_chars == data.text.printed_chars && parameters.timeout == 0.0f) {
+                    CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
                 }
             }
 
-            // CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_GROW() } } });
 
             if (parameters.timeout > 0.0f) {
                 CLAY_AUTO_ID({}) {

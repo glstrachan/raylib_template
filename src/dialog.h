@@ -52,4 +52,4 @@ typedef struct {
 } Dialog_Parameter;
 
 bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters);
-int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[]);
+int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[], Dialog_Parameter parameters);
