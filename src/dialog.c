@@ -61,7 +61,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_FIT()
+                    .height = CLAY_SIZING_FIT(0)
                 },
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
             },
@@ -73,7 +73,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
             .layout = {
                 .sizing = {
                     .width = CLAY_SIZING_PERCENT(1.0),
-                    .height = CLAY_SIZING_FIT(),
+                    .height = CLAY_SIZING_FIT(0),
                 },
                 .childGap = 20,
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
@@ -89,7 +89,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
                 }
                 CLAY(CLAY_IDI("SelectionItem", i), {
                     .layout = { .padding = {16, 16, 2, 2}, .sizing = { .height = CLAY_SIZING_GROW(0) }, .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
-                    .backgroundColor = Clay_Hovered() ? (Clay_Color) { 180, 180, 180, 40 } : color,
+                    .backgroundColor = Clay_Hovered() ? i == data.selection.index ? (Clay_Color) { 230, 230, 230, 80 } : (Clay_Color) { 180, 180, 180, 40 } : color,
                     .cornerRadius = CLAY_CORNER_RADIUS(4),
                     .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 100} },
                 }) {
@@ -212,7 +212,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .sizing = {
                         .width = CLAY_SIZING_GROW(0),
-                        .height = CLAY_SIZING_FIT(),
+                        .height = CLAY_SIZING_FIT(0),
                     },
                 },
             }) {
@@ -220,7 +220,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layout = {
                         .sizing = {
                             .width = CLAY_SIZING_PERCENT(1.0),
-                            .height = CLAY_SIZING_FIT(),
+                            .height = CLAY_SIZING_FIT(0),
                         },
                         .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
                     },
@@ -232,7 +232,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layout = {
                         .sizing = {
                             .width = CLAY_SIZING_PERCENT(1.0),
-                            .height = CLAY_SIZING_FIT(),
+                            .height = CLAY_SIZING_FIT(0),
                         },
                         // .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
                         .padding = { 16, 16, 8, 8 },
