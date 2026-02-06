@@ -388,10 +388,20 @@ void pick_items_update() {
         selection_data.is_selecting = false;
     }
 
+#ifndef _NDEBUG
     if (IsKeyPressed(KEY_R)) {
-        for (int i = 0; i < 4; ++i) {
-            data.picked[i] = data.pickable[i];
-            data.pickable[i] = ITEM_NONE;
+        for (int d = 0; d < 4; d++) {
+            if (data.picked[d] != ITEM_NONE) continue;
+
+            for (int i = 0; i < 6; i++) {
+                if (data.pickable[i] != ITEM_NONE) {
+                    data.picked[d] = data.pickable[i];
+                    data.pickable[i] = ITEM_NONE;
+                    if (selection_data.selected_index == i) selection_data.selected_index = d + 6;
+                    break;
+                }
+            }
         }
     }
+#endif
 }

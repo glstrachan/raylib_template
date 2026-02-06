@@ -89,7 +89,7 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
                 }
                 CLAY(CLAY_IDI("SelectionItem", i), {
                     .layout = { .padding = {16, 16, 2, 2}, .sizing = { .height = CLAY_SIZING_GROW(0) }, .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
-                    .backgroundColor = Clay_Hovered() ? (Clay_Color) { 180, 180, 180, 40 } : color,
+                    .backgroundColor = Clay_Hovered() ? i == data.selection.index ? (Clay_Color) { 230, 230, 230, 80 } : (Clay_Color) { 180, 180, 180, 40 } : color,
                     .cornerRadius = CLAY_CORNER_RADIUS(4),
                     .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 100} },
                 }) {
