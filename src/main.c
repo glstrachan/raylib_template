@@ -30,6 +30,7 @@ void HandleClayErrors(Clay_ErrorData errorData) {
     }
 }
 
+static Game_Timer show_fail_timer;
 static Texture2D bg_tex;
 Game_Parameters game_parameters;
 
@@ -55,7 +56,16 @@ void game_go_to_state(uint32_t next_state) {
     } break;
     case GAME_STATE_IN_ENCOUNTER: {
         memset(&game.items_sold_today, 0, sizeof(game.items_sold_today));
+        game.minigame_scores = 0.0f;
+        game.minigame_count = 0;
         encounter_start(game.encounter);
+    } break;
+    case GAME_STATE_DONE_ENCOUNTER: {
+        if (game.minigame_scores < (float)game.minigame_count * 0.5f) {
+            timer_init(&show_fail_timer, 4000);
+        } else {
+            game_go_to_state(GAME_STATE_SELECT_ITEMS);
+        }
     } break;
     case GAME_STATE_DAY_SUMMARY: break;
     default: oc_assert(false);
@@ -80,11 +90,31 @@ void game_update() {
 
         encounter_update();
         if (encounter_is_done()) {
-            game_go_to_state(GAME_STATE_DAY_SUMMARY);
+            game_go_to_state(GAME_STATE_DONE_ENCOUNTER);
         }
     } break;
     case GAME_STATE_DAY_SUMMARY: {
         day_summary_update();
+    } break;
+    case GAME_STATE_DONE_ENCOUNTER: {
+        if (game.minigame_scores < (float)game.minigame_count * 0.5f) {
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_PERCENT(1),
+                        .height = CLAY_SIZING_PERCENT(1),
+                    },
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                },
+            }) {
+                CLAY_TEXT(lit("They did not buy the item"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 80, .textColor = {200, 30, 0, 255} }));
+                CLAY_TEXT(lit("FAIL"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 60, .textColor = {200, 30, 0, 255} }));
+            }
+            if (timer_update(&show_fail_timer)) {
+                // TODO: reset game
+            }
+        }
     } break;
     default: oc_assert(false);
     }
@@ -158,8 +188,8 @@ int main(void)
         .character = CHARACTERS_NERD,
     };
 
-    // smile_game.init();
-    shotgun_game.init();
+    smile_game.init();
+    // shotgun_game.init();
 
 
     while (!WindowShouldClose()) {
@@ -180,8 +210,8 @@ int main(void)
             BeginMode2D(camera);
                 // pick_items_update();
                 // game_update();
-                // smile_game.update();
-                shotgun_game.update();
+                smile_game.update();
+                // shotgun_game.update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();

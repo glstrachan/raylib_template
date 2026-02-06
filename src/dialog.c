@@ -131,6 +131,8 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
         sequence->first_time = false;
     }
 
+    sequence->current_mood = parameters.mood;
+
     bool result = false;
 
     if(data.text.printed_chars < data.text.total_chars) {

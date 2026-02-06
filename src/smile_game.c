@@ -39,9 +39,14 @@ static Shader shader;
 static float sweetspot;
 static float smileness;
 
+static float mood_matching;
+static float mood_expected;
+static Game_Timer mood_sampler;
+
 static float velocity;
 static float acceleration;
 static float acceleration1;
+
 Encounter_Sequence dialog_sequence = { 0 };
 
 static void place_bar(void) {
@@ -117,10 +122,13 @@ static void place_bar(void) {
     }
 }
 
+#define SMILE_DIALOG_PARAMS() .place_above_dialog = place_bar, .timeout = 5000.0f
+#define old_lady_dialog(text, ...) dialog_text(CHARACTERS_OLDLADY, (text), SMILE_DIALOG_PARAMS(), __VA_ARGS__);
+
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
-    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there", .place_above_dialog = place_bar, .timeout = 5000.0f);
-    dialog_text(CHARACTERS_OLDLADY, "my cat died", .place_above_dialog = place_bar, .timeout = 5000.0f);
+    old_lady_dialog("soo nice smile u have there", .mood = 1.0f);
+    old_lady_dialog("my cat died", .mood = 0.0f);
     encounter_end();
 }
 
@@ -136,14 +144,27 @@ void smile_game_init(void) {
     smileness = GetRandomValue(0, 1000) / 1000.0f;
     sweetspot = GetRandomValue(100, 900) / 1000.0f;
     velocity = 0.0f;
-    acceleration = -0.08;
+    acceleration = -0.8;
     acceleration1 = 0.0f;
+    mood_matching = 0.0f;
 
     encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
+    timer_init(&mood_sampler, 1000);
 }
 
 bool smile_game_update(void) {
     encounter_sequence_update(&dialog_sequence);
+    if (dialog_sequence.is_done) {
+        float well_done = Clamp(mood_matching / mood_expected * 0.8314, 0.0f, 1.0f);
+        print("{} {}\n", mood_matching, mood_expected);
+        return true;
+    }
+
+    if (timer_update(&mood_sampler)) {
+        mood_matching += 1.0f - fabsf(dialog_sequence.current_mood - smileness);
+        mood_expected += 1.0f;
+        timer_reset(&mood_sampler);
+    }
 
     const int width = 100;
     const int padding_offset = 100;
@@ -162,7 +183,7 @@ bool smile_game_update(void) {
     }
 
     if (IsKeyPressed(KEY_SPACE)) {
-        acceleration1 = 20.0f;
+        acceleration1 = 200.0f;
     } else {
         acceleration1 = dt * acceleration1;
         // acceleration1 = 0.0f;
