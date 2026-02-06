@@ -199,6 +199,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .sizing = {
                         .width = CLAY_SIZING_GROW(),
+                        .height = CLAY_SIZING_GROW(),
                     },
                 },
             }) {
@@ -253,26 +254,27 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             }
 
             // CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_GROW() } } });
-            CLAY_AUTO_ID({}) {
-                float f = timer_interpolate(&data.text.timeout_timer);
-                SetShaderValue(timer_shader, GetShaderLocation(timer_shader, "completion"), &f, SHADER_UNIFORM_FLOAT);
-                CLAY_AUTO_ID({
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(50), .height = CLAY_SIZING_FIXED(50) } },
-                    .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 255} },
-                    .cornerRadius = CLAY_CORNER_RADIUS(1000),
-                    .custom = { .customData = customBackgroundData },
-                    // .backgroundColor = { 0, 0, 255, 255 },
-                });
 
-                CLAY_AUTO_ID({
-                    .floating = { .offset = {-10, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
-                }) {
-                    CLAY_TEXT(oc_format(&frame_arena, "{1}", timer_time_left(&data.text.timeout_timer) / 1000.0f), CLAY_TEXT_CONFIG({ .fontId = FONT_ITIM, .fontSize = 20, .textColor = {255, 255, 255, 255} }));
+            if (parameters.timeout > 0.0f) {
+                CLAY_AUTO_ID({}) {
+                    float f = timer_interpolate(&data.text.timeout_timer);
+                    SetShaderValue(timer_shader, GetShaderLocation(timer_shader, "completion"), &f, SHADER_UNIFORM_FLOAT);
+                    CLAY_AUTO_ID({
+                        .layout = { .sizing = { .width = CLAY_SIZING_FIXED(50), .height = CLAY_SIZING_FIXED(50) } },
+                        .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 255} },
+                        .cornerRadius = CLAY_CORNER_RADIUS(1000),
+                        .custom = { .customData = customBackgroundData },
+                        // .backgroundColor = { 0, 0, 255, 255 },
+                    });
+
+                    CLAY_AUTO_ID({
+                        .floating = { .offset = {-10, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+                    }) {
+                        CLAY_TEXT(oc_format(&frame_arena, "{1}", timer_time_left(&data.text.timeout_timer) / 1000.0f), CLAY_TEXT_CONFIG({ .fontId = FONT_ITIM, .fontSize = 20, .textColor = {255, 255, 255, 255} }));
+                    }
                 }
             }
         }
-
-
     }
 
     return result;

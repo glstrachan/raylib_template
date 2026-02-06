@@ -8,7 +8,7 @@ uniform sampler2D myTexture;
 
 void main() {
     vec2 size = 1.0 / textureSize(myTexture, 0);
-    int thickness = 1;
+    int thickness = 2;
 
     vec4 aC = texture(myTexture, fragTexCoord);
     if (aC.a > 0.1) {

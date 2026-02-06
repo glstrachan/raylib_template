@@ -84,7 +84,7 @@ void sample_encounter(void) {
     encounter_end();
 }
 
-extern Minigame memory_game, smile_game;
+extern Minigame memory_game, smile_game, shotgun_game;
 Encounter sample_encounter_ = {
     .fn = sample_encounter,
     .name = lit("Old Lady"),
@@ -100,11 +100,6 @@ void pick_encounter_init(void) {
     if (!house_bg.id) house_bg = LoadTexture("resources/background.png");
     if (!briefcase_tex.id) briefcase_tex = LoadTexture("resources/briefcase.png");
     if (!item_bg_shader.id) item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
-
-    game.briefcase.items[0] = ITEM_VACUUM;
-    game.briefcase.items[1] = ITEM_COMPUTER;
-    game.briefcase.items[2] = ITEM_BOOKS;
-    game.briefcase.items[3] = ITEM_KNIVES;
 }
 
 void pick_encounter(void) {
@@ -665,7 +660,7 @@ void encounter_nerd_vacuum(void) {
     dialog_text(CHARACTERS_NERD, "Okay, I'll give you a chance to prove this thing works. But I'm timing you.");
     dialog_text(CHARACTERS_SALESMAN, "Of course you are.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&memory_game);
     
     dialog_text(CHARACTERS_NERD, "Not bad. Not as good as my custom build, but respectable.");
     dialog_text(CHARACTERS_SALESMAN, "So... are you interested?");
@@ -722,7 +717,7 @@ void encounter_nerd_books(void) {
     dialog_text(CHARACTERS_NERD, "Alright. Give me your best pitch on why I should buy these instead of just using Scholar or Arxiv.");
     dialog_text(CHARACTERS_SALESMAN, "Because sometimes it's nice to read without a screen giving you eye strain?");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&memory_game);
     
     dialog_text(CHARACTERS_NERD, "Okay. That was a surprisingly coherent argument.");
     dialog_text(CHARACTERS_SALESMAN, "So you'll take a set?");
@@ -781,7 +776,7 @@ void encounter_nerd_knives(void) {
     dialog_text(CHARACTERS_SALESMAN, "Paper?");
     dialog_text(CHARACTERS_NERD, "Phone book paper. Thin. It reveals imperfections in the edge. This is how you test a knife.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&memory_game);
     
     dialog_text(CHARACTERS_NERD, "Clean cut. No tearing. The edge is better than I expected.");
     dialog_text(CHARACTERS_SALESMAN, "Does that mean I made a sale?");
@@ -838,7 +833,7 @@ void encounter_nerd_lollipop(void) {
     dialog_text(CHARACTERS_SALESMAN, "You have a scoring system for lollipops?");
     dialog_text(CHARACTERS_NERD, "I have a scoring system for everything.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&memory_game);
     
     dialog_text(CHARACTERS_NERD, "Seven point four. Above average. The flavor release timing was good, and the texture was consistent.");
     dialog_text(CHARACTERS_SALESMAN, "I'll take it! So you want some?");
@@ -897,7 +892,7 @@ void encounter_nerd_computer(void) {
     dialog_text(CHARACTERS_SALESMAN, "You carry benchmark software with you?");
     dialog_text(CHARACTERS_NERD, "On a USB drive. Always. You never know when you need to test hardware.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&memory_game);
     
     dialog_text(CHARACTERS_NERD, "Acceptable scores. Not as good as my custom build, but within ten percent.");
     dialog_text(CHARACTERS_SALESMAN, "Is that good?");
@@ -961,7 +956,7 @@ void encounter_shotgunner_vacuum(void) {
     dialog_text(CHARACTERS_SALESMAN, "What happened in ninety-four?");
     dialog_text(CHARACTERS_SHOTGUNNER, "None of your business. Get to work.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&shotgun_game);
     
     dialog_text(CHARACTERS_SHOTGUNNER, "Well I'll be damned. It actually works.");
     dialog_text(CHARACTERS_SALESMAN, "Modern suction technology!");
@@ -1021,7 +1016,7 @@ void encounter_shotgunner_books(void) {
     dialog_text(CHARACTERS_SALESMAN, "Here you go. Volume A through B.");
     dialog_text(CHARACTERS_SHOTGUNNER, "Hmm. Good weight. Dense pages.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&shotgun_game);
     
     dialog_text(CHARACTERS_SHOTGUNNER, "Quality construction. These will serve me well.");
     dialog_text(CHARACTERS_SALESMAN, "For reading, right?");
@@ -1081,7 +1076,7 @@ void encounter_shotgunner_knives(void) {
     dialog_text(CHARACTERS_SALESMAN, "The one at twenty yards?");
     dialog_text(CHARACTERS_SHOTGUNNER, "That's the one.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&shotgun_game);
     
     dialog_text(CHARACTERS_SHOTGUNNER, "Good blade. Good balance. Acceptable accuracy.");
     dialog_text(CHARACTERS_SALESMAN, "So you're interested?");
@@ -1140,7 +1135,7 @@ void encounter_shotgunner_lollipop(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Alright. I'll try one. But if it's too sweet, you're leaving immediately.");
     dialog_text(CHARACTERS_SALESMAN, "Understood. Here you go.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&shotgun_game);
     
     dialog_text(CHARACTERS_SHOTGUNNER, "Huh. That's not bad. Not bad at all.");
     dialog_text(CHARACTERS_SALESMAN, "Manly, right?");
@@ -1199,7 +1194,7 @@ void encounter_shotgunner_computer(void) {
     dialog_text(CHARACTERS_SHOTGUNNER, "Show me this machine works without any internet connection.");
     dialog_text(CHARACTERS_SALESMAN, "No problem. Watch this offline demo.");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&shotgun_game);
     
     dialog_text(CHARACTERS_SHOTGUNNER, "Alright. It runs offline. That's acceptable.");
     dialog_text(CHARACTERS_SALESMAN, "So you'll take one?");
@@ -1503,6 +1498,1268 @@ void encounter_fatman_computer(void) {
     encounter_end();
 }
 
+
+// ============================================================================
+// DOOR-TO-DOOR SALESMAN - DIALOG ENCOUNTERS
+// 12 Unique Encounters (4 Characters x 3 Items)
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// OLD LADY ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_oldlady_vase(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon, ma'am! Lovely garden you have out front.");
+    dialog_text(CHARACTERS_OLDLADY, "Oh, thank you, dear. My Herbert planted those roses before he passed. That was... goodness, thirty years ago now.");
+    dialog_text(CHARACTERS_SALESMAN, "Well, he had wonderful taste. And speaking of taste, I couldn't help but notice your mantle looks a little bare.");
+    dialog_text(CHARACTERS_OLDLADY, "My mantle?");
+    dialog_text(CHARACTERS_SALESMAN, "Yes, ma'am. What if I told you I had the perfect thing to fill that space? A hand-crafted porcelain vase, imported all the way from the finest kilns in Europe.");
+    dialog_text(CHARACTERS_OLDLADY, "Oh my. Let me get my glasses.");
+    dialog_text(CHARACTERS_SALESMAN, "Take your time.");
+    dialog_text(CHARACTERS_OLDLADY, "Oh, that IS lovely. You know, I had a vase just like this once. My cat Harold knocked it off the shelf in 1987. I cried for a week.");
+    dialog_text(CHARACTERS_SALESMAN, "Well, this could be Harold's way of making amends from beyond the grave.");
+    dialog_text(CHARACTERS_OLDLADY, "Harold isn't dead, dear. He's in the kitchen.");
+
+    switch (dialog_selection("Respond to the cat situation",
+        "That's one old cat!",
+        "A different Harold?",
+        "Cats and vases don't mix...")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "That is one impressively old cat!");
+            dialog_text(CHARACTERS_OLDLADY, "Oh, it's a different Harold. I name all my cats Harold. I'm on Harold the sixth now.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Wait, a different Harold?");
+            dialog_text(CHARACTERS_OLDLADY, "Of course, dear. Cats don't live that long. This is Harold the sixth. Very well behaved compared to the third one.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "Well, you know, cats and vases have a bit of a complicated history...");
+            dialog_text(CHARACTERS_OLDLADY, "Oh, don't worry about Harold. He mostly just sleeps on the heating vent these days. Hasn't knocked anything over in months.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Well then, this vase deserves a good home. And I think your mantle deserves this vase. What do you say we work out a deal?");
+    dialog_text(CHARACTERS_OLDLADY, "Hmm, I don't know. Let me think about it. Can you do something to convince me?");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_OLDLADY, "Oh, well isn't that something! You remind me of my nephew. He's very persuasive too. Talked me into buying a timeshare in 2003.");
+    dialog_text(CHARACTERS_SALESMAN, "I promise this is a much better investment than a timeshare.");
+    dialog_text(CHARACTERS_OLDLADY, "That's a low bar, dear. But yes, I'll take it. Let me find my purse. It's around here somewhere...");
+    dialog_text(CHARACTERS_SALESMAN, "Pleasure doing business with you, ma'am. You and Harold enjoy that vase.");
+
+    encounter_end();
+}
+
+void encounter_oldlady_comicbook(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon! How are we doing today?");
+    dialog_text(CHARACTERS_OLDLADY, "Oh, hello there. I was just watching my stories. You made me miss whether Valentina found out about the affair.");
+    dialog_text(CHARACTERS_SALESMAN, "My deepest apologies. But I think I have something even more dramatic than daytime television.");
+    dialog_text(CHARACTERS_OLDLADY, "I sincerely doubt that, young man.");
+    dialog_text(CHARACTERS_SALESMAN, "Feast your eyes on this. A genuine, mint condition comic book. We're talking a classic piece of American storytelling right here.");
+    dialog_text(CHARACTERS_OLDLADY, "A comic book? Honey, I haven't read one of those since Eisenhower was in office.");
+    dialog_text(CHARACTERS_SALESMAN, "That's what makes this special! It's a collector's item. This thing appreciates in value every single year.");
+    dialog_text(CHARACTERS_OLDLADY, "So does my hip replacement, but I wouldn't call that exciting.");
+
+    switch (dialog_selection("Pitch angle",
+        "It's a great investment",
+        "Your grandkids would love it",
+        "It's a piece of history")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Think of it as an investment, ma'am. This comic could be worth ten times what you pay today.");
+            dialog_text(CHARACTERS_OLDLADY, "That's what my financial advisor said about Enron.");
+            dialog_text(CHARACTERS_SALESMAN, "This is significantly less likely to commit fraud.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about it. Your grandkids would go absolutely wild for this.");
+            dialog_text(CHARACTERS_OLDLADY, "My grandchildren only care about their phones and that TikTak thing.");
+            dialog_text(CHARACTERS_SALESMAN, "TikTok. And trust me, vintage comics are making a huge comeback with kids.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "This isn't just a comic book, ma'am. It's a piece of American history. Right up there with apple pie and the moon landing.");
+            dialog_text(CHARACTERS_OLDLADY, "I watched the moon landing live, you know. On a twelve-inch television set. Now THAT was something.");
+            dialog_text(CHARACTERS_SALESMAN, "And this comic is from that same golden era!");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_OLDLADY, "Well, you're certainly persistent. I suppose that counts for something. Go ahead, make your case.");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_OLDLADY, "You know what, you've charmed me. I'll buy the silly thing. Maybe I'll read it during commercials.");
+    dialog_text(CHARACTERS_SALESMAN, "You won't regret it! It's a real page-turner.");
+    dialog_text(CHARACTERS_OLDLADY, "Just don't tell anyone at my bridge club. Marge already thinks I'm losing it.");
+
+    encounter_end();
+}
+
+void encounter_oldlady_football(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Afternoon, ma'am! Beautiful day, isn't it?");
+    dialog_text(CHARACTERS_OLDLADY, "It's raining, dear.");
+    dialog_text(CHARACTERS_SALESMAN, "Beautiful rain, though. Anyway, I have something here that's going to bring some real excitement into your life.");
+    dialog_text(CHARACTERS_OLDLADY, "At my age, excitement usually means a doctor's appointment.");
+    dialog_text(CHARACTERS_SALESMAN, "Not today! Today, I bring you this. A genuine, regulation-size football. Feel that leather. Go ahead.");
+    dialog_text(CHARACTERS_OLDLADY, "A football? Young man, do I look like I play football?");
+    dialog_text(CHARACTERS_SALESMAN, "Ma'am, football is for everyone. It's about the spirit of competition, the thrill of the game.");
+    dialog_text(CHARACTERS_OLDLADY, "The last time I threw something, it was a shoe at a raccoon in my garbage.");
+
+    switch (dialog_selection("Selling strategy",
+        "Perfect arm for football!",
+        "It's decorative too",
+        "Great gift for someone")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "See? You've already got the arm for it! Shoe, football, same throwing motion.");
+            dialog_text(CHARACTERS_OLDLADY, "I missed the raccoon.");
+            dialog_text(CHARACTERS_SALESMAN, "That's what practice is for!");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "And even if you're not tossing it around, it looks fantastic on a shelf. Very distinguished.");
+            dialog_text(CHARACTERS_OLDLADY, "I do have that empty shelf since Harold knocked the vase off...");
+            dialog_text(CHARACTERS_SALESMAN, "A football is much harder for a cat to knock over. It's practically cat-proof.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "And hey, even if it's not your thing, it makes a fantastic gift. Any grandkids?");
+            dialog_text(CHARACTERS_OLDLADY, "Seven. They're all in ballet.");
+            dialog_text(CHARACTERS_SALESMAN, "Ballet requires incredible footwork. This is basically cross-training.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_OLDLADY, "You are the most creative liar I've ever met. And I was married twice.");
+    dialog_text(CHARACTERS_SALESMAN, "I prefer the term 'optimistic reframer.' So what do you say? Give me a shot?");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_OLDLADY, "Oh, fine. I'll take the football. If nothing else, I can throw it at the raccoon next time.");
+    dialog_text(CHARACTERS_SALESMAN, "Now THAT'S the spirit.");
+    dialog_text(CHARACTERS_OLDLADY, "Don't push your luck, dear.");
+
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// NERD ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_nerd_vase(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Hey there! Got a minute?");
+    dialog_text(CHARACTERS_NERD, "You have approximately ninety seconds before my raid group needs me back online, so talk fast.");
+    dialog_text(CHARACTERS_SALESMAN, "A man who values efficiency. I respect that. Check this out. Handcrafted porcelain vase, one of a kind.");
+    dialog_text(CHARACTERS_NERD, "A vase. You came to my door to sell me a vase.");
+    dialog_text(CHARACTERS_SALESMAN, "Not just any vase. Look at the craftsmanship. The glaze on this thing is flawless.");
+    dialog_text(CHARACTERS_NERD, "It does have a surprisingly high poly count. I mean, nice curvature. Whatever.");
+    dialog_text(CHARACTERS_SALESMAN, "See, you've got an eye for quality!");
+    dialog_text(CHARACTERS_NERD, "I've got an eye for polygon meshes, which is a completely different thing.");
+
+    switch (dialog_selection("Appeal to the nerd",
+        "It's like a rare drop",
+        "Great for your setup",
+        "It's a limited edition")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Think of it like a legendary drop. You wouldn't pass up a legendary drop, would you?");
+            dialog_text(CHARACTERS_NERD, "That depends entirely on the stat distribution. What are the stats on this vase?");
+            dialog_text(CHARACTERS_SALESMAN, "Plus ten to interior decoration. Plus five to impressing guests.");
+            dialog_text(CHARACTERS_NERD, "Those aren't real stats, but I appreciate the format.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Picture this on your desk, right next to your monitors. It classes up the whole setup.");
+            dialog_text(CHARACTERS_NERD, "My desk has three monitors, a mechanical keyboard, and a figurine of Commander Shepard. There's no room.");
+            dialog_text(CHARACTERS_SALESMAN, "Commander Shepard would want you to have this vase. It's a Paragon choice.");
+            dialog_text(CHARACTERS_NERD, "Okay, don't use Shepard against me. That's not fair.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "This is a limited edition piece. They only made a handful. You know how limited runs work.");
+            dialog_text(CHARACTERS_NERD, "I literally camped outside a store for six hours for a limited edition graphics card, so yes. I understand scarcity economics on a molecular level.");
+            dialog_text(CHARACTERS_SALESMAN, "Then you know this is an opportunity you don't pass up.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Come on, what do you say? Live a little. Buy the vase.");
+    dialog_text(CHARACTERS_NERD, "Fine. Prove to me you're worth buying from.");
+
+    encounter_minigame(&memory_game);
+
+    dialog_text(CHARACTERS_NERD, "Alright, I'm mildly impressed. I'll take it. But if my raid group asks, this was an ironic purchase.");
+    dialog_text(CHARACTERS_SALESMAN, "Your secret's safe with me.");
+    dialog_text(CHARACTERS_NERD, "It better be. I have a reputation to maintain.");
+
+    encounter_end();
+}
+
+void encounter_nerd_comicbook(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Hey! You look like a man of culture.");
+    dialog_text(CHARACTERS_NERD, "That's either a compliment or a very targeted sales tactic. Either way, I'm listening.");
+    dialog_text(CHARACTERS_SALESMAN, "Feast your eyes on this. Mint condition comic book. Original print run.");
+    dialog_text(CHARACTERS_NERD, "Oh. Oh wow. Is that... let me see that.");
+    dialog_text(CHARACTERS_SALESMAN, "Careful now. This thing is practically sacred.");
+    dialog_text(CHARACTERS_NERD, "I know what this is. Do you know what this is? Because I don't think you know what this is.");
+    dialog_text(CHARACTERS_SALESMAN, "It's a very nice comic book that I would love to sell you for a very reasonable price.");
+    dialog_text(CHARACTERS_NERD, "A 'very nice comic book.' That's like calling the Mona Lisa a 'pretty okay painting.'");
+
+    switch (dialog_selection("Handle the nerd's expertise",
+        "Enlighten me then",
+        "I know exactly what it is",
+        "Does that mean you want it?")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Alright, I can see you're the expert here. Enlighten me.");
+            dialog_text(CHARACTERS_NERD, "This is a first print from the original run. The coloring on the cover alone suggests it's been stored properly, away from UV light. The spine isn't rolled. You could probably get a 9.2 grade on this. Maybe higher.");
+            dialog_text(CHARACTERS_SALESMAN, "So what you're saying is... you want it?");
+            dialog_text(CHARACTERS_NERD, "What I'm saying is you're undercharging. Which, as the buyer, I'm very okay with.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Of course I know what it is. I'm a professional.");
+            dialog_text(CHARACTERS_NERD, "Really? What issue number is it?");
+            dialog_text(CHARACTERS_SALESMAN, "It's the... the really good one.");
+            dialog_text(CHARACTERS_NERD, "Yeah, that's what I thought.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "The real question is: do you want it?");
+            dialog_text(CHARACTERS_NERD, "Do I WANT it? I've been searching for this issue for three years. I've got alerts set up on six different auction sites. I once flew to a convention in Ohio on a rumor that someone had a copy.");
+            dialog_text(CHARACTERS_SALESMAN, "So that's a yes?");
+            dialog_text(CHARACTERS_NERD, "Don't rush me. I need a moment.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Look, this comic and you were clearly meant to be together. Let me make this happen.");
+    dialog_text(CHARACTERS_NERD, "Okay. Okay. Show me what you've got.");
+
+    encounter_minigame(&memory_game);
+
+    dialog_text(CHARACTERS_NERD, "Take my money. Take it right now before I change my mind or realize I need to eat this month.");
+    dialog_text(CHARACTERS_SALESMAN, "A wise investment! You won't regret this.");
+    dialog_text(CHARACTERS_NERD, "I'll need to recalibrate my humidity-controlled display case. This changes everything.");
+    dialog_text(CHARACTERS_SALESMAN, "You have a humidity-controlled display case?");
+    dialog_text(CHARACTERS_NERD, "I have three. Don't judge me.");
+
+    encounter_end();
+}
+
+void encounter_nerd_football(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "What's up, my man? Got something awesome for you today.");
+    dialog_text(CHARACTERS_NERD, "If it's not a graphics card or a first edition anything, I'm already skeptical.");
+    dialog_text(CHARACTERS_SALESMAN, "Even better. Check out this beauty. Genuine leather football.");
+    dialog_text(CHARACTERS_NERD, "...");
+    dialog_text(CHARACTERS_SALESMAN, "Pretty sweet, right?");
+    dialog_text(CHARACTERS_NERD, "You're joking. You came to THIS house, looked at the anime welcome mat, saw the LED strip lighting through the window, and thought 'this guy needs a football.'");
+    dialog_text(CHARACTERS_SALESMAN, "Hey, don't knock it until you try it. You might be a natural.");
+    dialog_text(CHARACTERS_NERD, "The last time I was involved with a football, it hit me in the face during gym class. In 2007. I still flinch when I hear a whistle.");
+
+    switch (dialog_selection("Try to connect football to nerd culture",
+        "Football is basically strategy gaming",
+        "Athletes are basically real-life RPG characters",
+        "You could study the physics")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about it. Football is just real-time strategy with a bigger budget. Formations, play-calling, countering the opponent's moves...");
+            dialog_text(CHARACTERS_NERD, "Huh. I never thought of the quarterback as a raid leader before, but you might be onto something.");
+            dialog_text(CHARACTERS_SALESMAN, "See? Same skills. Different arena.");
+            dialog_text(CHARACTERS_NERD, "The meta would be way harder to patch though.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about football players. They've got stats, they've got rankings, they've got build diversity. They're basically RPG characters.");
+            dialog_text(CHARACTERS_NERD, "So you're saying a linebacker is just a strength-build tank?");
+            dialog_text(CHARACTERS_SALESMAN, "Exactly. And the wide receiver is your glass cannon DPS.");
+            dialog_text(CHARACTERS_NERD, "I hate that this makes sense to me.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "A guy like you could analyze the aerodynamics. The spiral, the trajectory calculations, the air resistance coefficients...");
+            dialog_text(CHARACTERS_NERD, "A prolate spheroid does have interesting flight characteristics due to its asymmetric drag profile.");
+            dialog_text(CHARACTERS_SALESMAN, "Right! What you said! So you're practically already into football.");
+            dialog_text(CHARACTERS_NERD, "I'm into fluid dynamics. Those are VERY different things.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Come on, step outside your comfort zone. Every great character arc needs a twist.");
+    dialog_text(CHARACTERS_NERD, "Did you just use narrative structure to sell me a football?");
+    dialog_text(CHARACTERS_SALESMAN, "Is it working?");
+    dialog_text(CHARACTERS_NERD, "Ugh. Maybe. Fine, let's see what you've got.");
+
+    encounter_minigame(&memory_game);
+
+    dialog_text(CHARACTERS_NERD, "Okay. I'll buy it. But purely as a physics experiment.");
+    dialog_text(CHARACTERS_SALESMAN, "Whatever gets you to the end zone, my friend.");
+    dialog_text(CHARACTERS_NERD, "I'm going to set up a high-speed camera and analyze the spiral dynamics.");
+    dialog_text(CHARACTERS_SALESMAN, "That's the spirit! Kind of.");
+
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// SHOTGUNNER ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_shotgunner_vase(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Hello? Anybody ho--");
+    dialog_text(CHARACTERS_SHOTGUNNER, "That's far enough. State your business.");
+    dialog_text(CHARACTERS_SALESMAN, "Whoa, easy there! I'm just a salesman. See? Briefcase, tie, no weapons. Completely harmless.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "That's exactly what the last guy said. Turned out he was from the IRS.");
+    dialog_text(CHARACTERS_SALESMAN, "Well, I am definitely not from the IRS. I'm here to show you something beautiful. A handcrafted porcelain vase.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "A vase.");
+    dialog_text(CHARACTERS_SALESMAN, "A vase! Elegant, refined, a real conversation piece.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I don't have conversations. I have confrontations.");
+
+    switch (dialog_selection("Try to find an angle",
+        "Every home needs some class",
+        "It could hold your ammo",
+        "Your wife would love it")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Every home needs a touch of class, sir. Even a... fortified one.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "My home has plenty of class. I've got a mounted bass over the fireplace and a flag on the porch.");
+            dialog_text(CHARACTERS_SALESMAN, "And a vase would tie the whole room together! Think of it as the finishing touch.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Hmm. It WOULD fill that gap between the ammo shelf and the deer antlers.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about the practical applications. You could store things in it. Shells, cartridges, whatever you need handy.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "I already have an ammo can for that.");
+            dialog_text(CHARACTERS_SALESMAN, "Sure, but does your ammo can have hand-painted floral patterns?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "...No. No it does not.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "I bet your wife would absolutely love this.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "My ex-wife took everything in the divorce. Including my last vase. And my dog.");
+            dialog_text(CHARACTERS_SALESMAN, "Then this is a fresh start! A new vase for a new chapter.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "You're lucky I respect a man who can pivot that fast.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Look, just give me a chance here. I think you'll be surprised.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Fine. But if this is a waste of my time, you're leaving faster than you came.");
+
+    encounter_minigame(&shotgun_game);
+
+    dialog_text(CHARACTERS_SHOTGUNNER, "Huh. Not bad. Alright, I'll take the vase. But I'm paying cash and I don't want a receipt.");
+    dialog_text(CHARACTERS_SALESMAN, "Cash is king! Pleasure doing business.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Now get off my property before I change my mind.");
+    dialog_text(CHARACTERS_SALESMAN, "Already leaving. Have a great day, sir!");
+
+    encounter_end();
+}
+
+void encounter_shotgunner_comicbook(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon, sir! I--");
+    dialog_text(CHARACTERS_SHOTGUNNER, "There a sign at the end of my driveway. Did you read it?");
+    dialog_text(CHARACTERS_SALESMAN, "The one that says 'No Trespassing, Survivors Will Be Prosecuted'? I assumed that was a joke.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "It ain't.");
+    dialog_text(CHARACTERS_SALESMAN, "Well, before any prosecution happens, can I interest you in a genuine mint condition comic book?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "A comic book. You walked past my sign, up my driveway, and past my security cameras to sell me a comic book.");
+    dialog_text(CHARACTERS_SALESMAN, "It's a really good comic book.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I haven't read a comic book since I was in the service. We used to trade them around on base.");
+
+    switch (dialog_selection("Explore his military connection",
+        "Which branch?",
+        "Comics and military go way back",
+        "This one has a soldier in it")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "You served? Which branch, if you don't mind me asking?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Marines. Two tours. You?");
+            dialog_text(CHARACTERS_SALESMAN, "Sales. Fourteen tours of the tri-county area.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "That's not even close to the same thing, but at least you've got some guts showing up here.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Comics and the military go way back. They used to hand these out to troops overseas. Piece of home, you know?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Yeah. I remember. Some kid from Iowa had a whole footlocker full of them. We'd read them on watch when nothing was happening.");
+            dialog_text(CHARACTERS_SALESMAN, "See? This isn't just a comic. It's a connection to those memories.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Don't go getting sentimental on me.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "And get this, there's a military character in this issue. Real tactical stuff.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Let me see that. ...This guy's holding his rifle wrong.");
+            dialog_text(CHARACTERS_SALESMAN, "Well, he's a superhero. Maybe different rules apply?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Trigger discipline applies to everyone, super or not.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "So what do you think? Want to add this to your collection?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I don't have a collection. I have a house full of practical items and one weird salesman on my porch.");
+    dialog_text(CHARACTERS_SALESMAN, "Let me change your mind.");
+
+    encounter_minigame(&shotgun_game);
+
+    dialog_text(CHARACTERS_SHOTGUNNER, "Alright. You earned it. I'll take the comic. Haven't had something to read besides the survivalist newsletter in months.");
+    dialog_text(CHARACTERS_SALESMAN, "Excellent choice! Enjoy the read.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "If the ending's bad, I'm finding you.");
+    dialog_text(CHARACTERS_SALESMAN, "I'm sure you'll love it. Goodbye now.");
+
+    encounter_end();
+}
+
+void encounter_shotgunner_football(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Hey there! Nice property you've got. Very... secure.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Barbed wire was on sale at the hardware store. What do you want?");
+    dialog_text(CHARACTERS_SALESMAN, "Just a moment of your time and a chance to show you something great. A genuine leather football.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Football? Now you're talking a language I understand.");
+    dialog_text(CHARACTERS_SALESMAN, "Oh yeah? You a fan?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Played linebacker in high school. All-district, three years running. Coach said I hit like a freight train with anger issues.");
+    dialog_text(CHARACTERS_SALESMAN, "That is... both impressive and terrifying.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Best four years of my life. Before the government started putting fluoride in the water.");
+
+    switch (dialog_selection("Keep the football talk going",
+        "You've still got the arm, I bet",
+        "This is game-quality leather",
+        "Perfect for the backyard")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "A guy like you? I bet you've still got the arm.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Threw a trespasser's briefcase over my fence last month. Clean spiral. Forty yards easy.");
+            dialog_text(CHARACTERS_SALESMAN, "That's... wait, was that a salesman's briefcase?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Might've been. They all start to blur together.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Feel that leather. This is the real deal. Game-quality material, perfect grip, regulation weight.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Hmm. Good laces. Decent pebbling on the leather.");
+            dialog_text(CHARACTERS_SALESMAN, "You clearly know your way around a football.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "I know my way around a lot of things. That's why I'm still here and the trespassers aren't.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "With a property this big, you've got your own personal football field out back.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "That's not a field. That's a perimeter zone.");
+            dialog_text(CHARACTERS_SALESMAN, "A perimeter zone that's perfect for throwing a football!");
+            dialog_text(CHARACTERS_SHOTGUNNER, "I suppose it would be a good way to stay sharp. Moving targets aren't the only thing worth tracking.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "So, linebacker, what do you say? Want to relive the glory days?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Glory days never left. But yeah, show me what you've got.");
+
+    encounter_minigame(&shotgun_game);
+
+    dialog_text(CHARACTERS_SHOTGUNNER, "Sold. I'll take it. Haven't had a good football in years. My nephew comes by sometimes. Kid's got no arm, but he tries.");
+    dialog_text(CHARACTERS_SALESMAN, "That's great! Family bonding through football.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "And if nobody's around, I can use it for target practice.");
+    dialog_text(CHARACTERS_SALESMAN, "That's... one way to use it. Enjoy!");
+
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// FATMAN ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_fatman_vase(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Hello? Anyone home?");
+    dialog_text(CHARACTERS_FATMAN, "Hold on... hold on, I'm coming. Give me a second.");
+    dialog_text(CHARACTERS_SALESMAN, "Take your time!");
+    dialog_text(CHARACTERS_FATMAN, "Alright. I'm here. This better be good because I paused my show and left a perfectly good sandwich on the couch.");
+    dialog_text(CHARACTERS_SALESMAN, "It is absolutely worth your time, sir. I've got a stunning porcelain vase here that would look incredible in your home.");
+    dialog_text(CHARACTERS_FATMAN, "A vase? What am I gonna do with a vase?");
+    dialog_text(CHARACTERS_SALESMAN, "Display it! It's a centerpiece. It ties a room together.");
+    dialog_text(CHARACTERS_FATMAN, "My coffee table ties my room together. It's where I put my food. Everything revolves around the food.");
+
+    switch (dialog_selection("Appeal to his lifestyle",
+        "Put snacks in it",
+        "It'll impress your friends",
+        "It's a conversation starter")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "You could use it to hold snacks. Breadsticks, pretzel rods, those long wafer cookies...");
+            dialog_text(CHARACTERS_FATMAN, "Wait. You can put food in a vase?");
+            dialog_text(CHARACTERS_SALESMAN, "You can put whatever you want in a vase. It's YOUR vase.");
+            dialog_text(CHARACTERS_FATMAN, "That's the most exciting thing anyone's said to me all week.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "When you have people over, this vase says 'I'm a man of taste and sophistication.'");
+            dialog_text(CHARACTERS_FATMAN, "The only people who come over are the pizza delivery guys. And my buddy Doug. Doug doesn't care about vases.");
+            dialog_text(CHARACTERS_SALESMAN, "Maybe Doug doesn't know he cares about vases yet. You could be the one to open his eyes.");
+            dialog_text(CHARACTERS_FATMAN, "Doug's eyes are usually half closed. But I see your point.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "It's a real conversation starter. People see this vase and they want to know the story behind it.");
+            dialog_text(CHARACTERS_FATMAN, "The story would be 'some guy knocked on my door and I was too tired to say no.'");
+            dialog_text(CHARACTERS_SALESMAN, "Or, 'I have an eye for fine porcelain.' Sounds better, right?");
+            dialog_text(CHARACTERS_FATMAN, "I mean, it does sound better than most things I say.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Come on, what do you say? Let me show you what I can do.");
+    dialog_text(CHARACTERS_FATMAN, "Fine. But make it quick. My sandwich is getting cold. Well, it's a cold sandwich. But it's getting warm. Which is worse.");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_FATMAN, "You know what, sure. I'll take the vase. I'm gonna put cheese puffs in it.");
+    dialog_text(CHARACTERS_SALESMAN, "A bold choice. I support it fully.");
+    dialog_text(CHARACTERS_FATMAN, "It'll be the fanciest cheese puff container on the block.");
+    dialog_text(CHARACTERS_SALESMAN, "Without a doubt. Enjoy, sir!");
+
+    encounter_end();
+}
+
+void encounter_fatman_comicbook(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Howdy! Hope I'm not catching you at a bad time.");
+    dialog_text(CHARACTERS_FATMAN, "You're catching me in the middle of a meatball sub, so the clock is ticking. What've you got?");
+    dialog_text(CHARACTERS_SALESMAN, "Something that pairs great with a meatball sub. A mint condition comic book!");
+    dialog_text(CHARACTERS_FATMAN, "Nothing pairs with a meatball sub except another meatball sub.");
+    dialog_text(CHARACTERS_SALESMAN, "Fair point. But picture this: you're on the couch, sub in one hand, comic book in the other. That's a perfect Saturday right there.");
+    dialog_text(CHARACTERS_FATMAN, "I usually have my phone in the other hand. Scrolling through restaurant menus.");
+    dialog_text(CHARACTERS_SALESMAN, "But a comic book is way more engaging! Superheroes, action, drama, all without needing to charge a battery.");
+    dialog_text(CHARACTERS_FATMAN, "Does the superhero in this one eat? I find it hard to relate to characters who don't eat.");
+
+    switch (dialog_selection("Address his food concern",
+        "There's definitely a diner scene",
+        "Heroes need fuel too",
+        "You could eat while you read")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Oh absolutely. There's a scene in a diner. Very atmospheric. I think there's pie involved.");
+            dialog_text(CHARACTERS_FATMAN, "What kind of pie?");
+            dialog_text(CHARACTERS_SALESMAN, "The... heroic kind?");
+            dialog_text(CHARACTERS_FATMAN, "I'll accept that answer.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Every hero needs fuel! You think these guys fight evil on an empty stomach? No way.");
+            dialog_text(CHARACTERS_FATMAN, "That's actually a really good point. You can't throw a punch if your blood sugar's low.");
+            dialog_text(CHARACTERS_SALESMAN, "Exactly. This comic understands the importance of proper caloric intake.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "And the beautiful thing about a comic book is you can eat while you read it. Way easier than holding a phone with marinara sauce on your fingers.");
+            dialog_text(CHARACTERS_FATMAN, "You make an extremely valid point. I cracked my phone screen with a chicken wing once.");
+            dialog_text(CHARACTERS_SALESMAN, "A comic book can survive a chicken wing. Trust me on this.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "So what do you say? Add some entertainment to your next meal?");
+    dialog_text(CHARACTERS_FATMAN, "My meals are already entertaining. But sure, let's see what you've got.");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_FATMAN, "Alright, sold. I need something to read anyway. I've memorized every takeout menu within a five-mile radius.");
+    dialog_text(CHARACTERS_SALESMAN, "That's an impressive radius.");
+    dialog_text(CHARACTERS_FATMAN, "Thank you. It took years of dedication. Now if you'll excuse me, my sub is calling.");
+    dialog_text(CHARACTERS_SALESMAN, "Enjoy the comic and the sub!");
+
+    encounter_end();
+}
+
+void encounter_fatman_football(void) {
+    encounter_begin();
+
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon! You look like a man who appreciates the finer things in life.");
+    dialog_text(CHARACTERS_FATMAN, "If by 'finer things' you mean the double bacon cheeseburger I just ordered, then yes. Absolutely.");
+    dialog_text(CHARACTERS_SALESMAN, "I love the energy. But I've got something here that might surprise you. A genuine leather football!");
+    dialog_text(CHARACTERS_FATMAN, "A football. Buddy, look at me. Do I look like I run routes?");
+    dialog_text(CHARACTERS_SALESMAN, "You don't have to run routes to appreciate a quality football!");
+    dialog_text(CHARACTERS_FATMAN, "The last time I ran was when I heard the ice cream truck in 2019. And I didn't even catch it.");
+    dialog_text(CHARACTERS_SALESMAN, "That's heartbreaking.");
+    dialog_text(CHARACTERS_FATMAN, "It still keeps me up at night.");
+
+    switch (dialog_selection("Find the right angle",
+        "You can be an armchair quarterback",
+        "Football watching is better with one",
+        "Toss it around casually")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "You don't need to play to be a football guy. Armchair quarterbacking is a proud American tradition.");
+            dialog_text(CHARACTERS_FATMAN, "I do yell at the TV a lot. My neighbors have complained.");
+            dialog_text(CHARACTERS_SALESMAN, "Having an actual football in your hands while you do it? That's the premium experience. You're not just watching the game, you're PART of it.");
+            dialog_text(CHARACTERS_FATMAN, "I do like the idea of holding something during the game that isn't a remote or a plate.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Picture this: Sunday afternoon, big game on TV, snacks on the table, and a real football sitting right there on the couch with you.");
+            dialog_text(CHARACTERS_FATMAN, "You paint a beautiful picture. Would the snacks be included?");
+            dialog_text(CHARACTERS_SALESMAN, "The snacks are your department. But the football? That's on me.");
+            dialog_text(CHARACTERS_FATMAN, "I can work with that division of labor.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "You and your buddy could toss it around. Nothing intense, just casual backyard throws.");
+            dialog_text(CHARACTERS_FATMAN, "Doug and I tried to play catch once. With a sandwich. Long story. Didn't end well for the sandwich.");
+            dialog_text(CHARACTERS_SALESMAN, "A football is way more aerodynamic than a sandwich.");
+            dialog_text(CHARACTERS_FATMAN, "That depends entirely on the sandwich.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Come on, big guy. Let me show you this is worth it.");
+    dialog_text(CHARACTERS_FATMAN, "Alright, alright. You've piqued my interest. And that's hard to do when there's food waiting.");
+
+    encounter_minigame(&smile_game);
+
+    dialog_text(CHARACTERS_FATMAN, "You know what, fine. I'll take the football. It'll look good next to the TV. Maybe I'll throw it at Doug when he eats the last slice.");
+    dialog_text(CHARACTERS_SALESMAN, "That's the competitive spirit!");
+    dialog_text(CHARACTERS_FATMAN, "Nobody takes my last slice, man. Nobody.");
+    dialog_text(CHARACTERS_SALESMAN, "Enjoy the football, and good luck to Doug.");
+
+    encounter_end();
+}
+
+
+// ============================================================================
+// SALESMAN GAME - DIALOG ENCOUNTERS
+// 16 unique encounters: 4 characters x 4 items
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// OLD LADY ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_oldlady_ak47(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon, ma'am! Beautiful day, isn't it?");
+    dialog_text(CHARACTERS_OLDLADY, "Oh, why yes it is, dear. Can I help you with something?");
+    dialog_text(CHARACTERS_SALESMAN, "Actually, I'm here to help YOU. Do you ever worry about home security?");
+    dialog_text(CHARACTERS_OLDLADY, "Well, there was that raccoon that got into my bird feeder last Tuesday...");
+    dialog_text(CHARACTERS_SALESMAN, "A raccoon! That's practically an invasion. What if I told you I had the ULTIMATE home defense solution?");
+    dialog_text(CHARACTERS_OLDLADY, "Oh my, is it one of those motion-sensor lights? My friend Doris got one of those.");
+    dialog_text(CHARACTERS_SALESMAN, "Even better.");
+    dialog_text(CHARACTERS_OLDLADY, "A deadbolt?");
+    dialog_text(CHARACTERS_SALESMAN, "Ma'am, I present to you... the AK-47. Seventy-five rounds per minute of pure peace of mind.");
+    dialog_text(CHARACTERS_OLDLADY, "Oh heavens! That's a... that's a machine gun!");
+    dialog_text(CHARACTERS_SALESMAN, "Assault rifle, technically. Very reliable. You could leave it in your garden for a year and it would still fire.");
+
+    switch (dialog_selection("Choose your pitch angle", "Home defense", "Gardening tool", "Raccoon deterrent", "Collector's item")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about it. You hear a noise at 2 AM. Instead of calling the police and waiting twenty minutes, you've got instant protection.");
+            dialog_text(CHARACTERS_OLDLADY, "Well, I DO have trouble sleeping anyway...");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Plus, the bayonet attachment is great for aerating soil. Two birds, one stone.");
+            dialog_text(CHARACTERS_OLDLADY, "I HAVE been meaning to turn over my vegetable patch...");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "One burst in the air and I guarantee that raccoon relocates to the next county.");
+            dialog_text(CHARACTERS_OLDLADY, "He DID eat all my tomatoes last summer...");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "These are becoming very rare, ma'am. Your grandchildren will fight over who inherits it. Great conversation piece for the mantle.");
+            dialog_text(CHARACTERS_OLDLADY, "It WOULD look nice next to Harold's bowling trophies...");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_OLDLADY, "I don't know, dear. It seems a bit much. My late husband Harold was in the army, you know.");
+    dialog_text(CHARACTERS_SALESMAN, "Then consider it a tribute to Harold's service! He'd want you protected.");
+    dialog_text(CHARACTERS_OLDLADY, "He always did say I needed to toughen up. Alright, let me see what this thing can do.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_OLDLADY, "Oh my! That was quite something! My hip is vibrating!");
+    dialog_text(CHARACTERS_SALESMAN, "So, what do you think?");
+    dialog_text(CHARACTERS_OLDLADY, "I'll take two. One for me and one for Doris. That woman needs more than a motion-sensor light.");
+    encounter_end();
+}
+
+void encounter_oldlady_cookies(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hello there! Lovely garden you've got.");
+    dialog_text(CHARACTERS_OLDLADY, "Oh, thank you, sweetheart! I've been working on the petunias all morning. Are you from the neighborhood?");
+    dialog_text(CHARACTERS_SALESMAN, "Just passing through, ma'am. I've got something here that I think you'll appreciate. Girl Scout Cookies!");
+    dialog_text(CHARACTERS_OLDLADY, "Girl Scout Cookies? Oh, I used to BE a Girl Scout, back when Eisenhower was president.");
+    dialog_text(CHARACTERS_SALESMAN, "No kidding! Then you know these are the real deal. Thin Mints, Samoas, Tagalongs... the whole lineup.");
+    dialog_text(CHARACTERS_OLDLADY, "Now hold on. Where's the little girl? Aren't these usually sold by the scouts themselves?");
+
+    switch (dialog_selection("Explain the situation", "I'm filling in for my daughter", "The scouts outsourced", "She's in the car", "Dodge the question")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "My daughter's home sick, and she was SO close to earning her cookie badge. I couldn't let her down.");
+            dialog_text(CHARACTERS_OLDLADY, "Oh, what a devoted father! That's so sweet.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Budget cuts, ma'am. The scouts have contracted independent distributors. I'm employee of the month, actually.");
+            dialog_text(CHARACTERS_OLDLADY, "The world sure has changed since my day.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "She's waiting in the van. She's a little shy.");
+            dialog_text(CHARACTERS_OLDLADY, "Oh, the poor thing. Well, I remember how nerve-wracking it was going door to door.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "The important thing, ma'am, is the cookies. Just look at this box. Tell me that doesn't take you back.");
+            dialog_text(CHARACTERS_OLDLADY, "Well, I suppose the cookies are what matters...");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "These Thin Mints are straight out of the freezer. That's where the magic happens.");
+    dialog_text(CHARACTERS_OLDLADY, "Frozen Thin Mints! My Harold used to hide those in the garage freezer so I wouldn't eat them all.");
+    dialog_text(CHARACTERS_SALESMAN, "Smart man. These things are dangerously good. Want to do a taste test?");
+    dialog_text(CHARACTERS_OLDLADY, "I really shouldn't. My doctor says I need to watch my sugar.");
+    dialog_text(CHARACTERS_SALESMAN, "Ma'am, with all due respect, your doctor isn't here. And life's too short for bad cookies.");
+    dialog_text(CHARACTERS_OLDLADY, "You make a compelling point, young man.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_OLDLADY, "Those are just as good as I remember. Maybe better.");
+    dialog_text(CHARACTERS_SALESMAN, "Can I put you down for a few boxes?");
+    dialog_text(CHARACTERS_OLDLADY, "Give me eight boxes. And if you see my doctor, you were never here.");
+    encounter_end();
+}
+
+void encounter_oldlady_steak(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Afternoon, ma'am! Something smells wonderful in there. Are you cooking?");
+    dialog_text(CHARACTERS_OLDLADY, "Just warming up some soup, dear. It's about all I make for myself these days.");
+    dialog_text(CHARACTERS_SALESMAN, "Soup? Ma'am, I hate to say it, but you deserve better. What if I told you I have prime USDA-grade ribeye steaks?");
+    dialog_text(CHARACTERS_OLDLADY, "Steaks? Oh, I haven't had a good steak since Harold was alive. He used to grill every Sunday.");
+    dialog_text(CHARACTERS_SALESMAN, "Every Sunday? The man had taste. Look at this marbling. You can practically hear it sizzling.");
+    dialog_text(CHARACTERS_OLDLADY, "That IS beautiful. But I don't really cook for just myself anymore. It feels like too much trouble.");
+    dialog_text(CHARACTERS_SALESMAN, "Ma'am, cooking a steak this good isn't trouble. It's therapy.");
+
+    switch (dialog_selection("Appeal to her", "Nostalgia angle", "Health benefits", "Invite the neighbors", "Simple recipe")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Close your eyes. Imagine the smell of that grill on a Sunday afternoon. Harold would want you to keep that tradition alive.");
+            dialog_text(CHARACTERS_OLDLADY, "Don't you go making me cry on my own porch, young man.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Red meat is full of iron and B12. Your doctor would actually approve of this one.");
+            dialog_text(CHARACTERS_OLDLADY, "Really? Well, I have been feeling a bit tired lately...");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "Get a few of these, invite Doris and the girls over. Make it an event!");
+            dialog_text(CHARACTERS_OLDLADY, "A dinner party! I haven't hosted one of those in ages!");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Salt, pepper, butter, four minutes each side. That's it. Even Harold couldn't mess that up.");
+            dialog_text(CHARACTERS_OLDLADY, "Ha! He DID burn the burgers more than once, rest his soul.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Tell you what. Let me show you the quality of this cut. One demo and you'll be a believer.");
+    dialog_text(CHARACTERS_OLDLADY, "Alright, alright. But only because you remind me of my grandson. He could sell ice to an eskimo too.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_OLDLADY, "Oh my word. That is the most tender thing I've had in years.");
+    dialog_text(CHARACTERS_SALESMAN, "So? Can I interest you in a few?");
+    dialog_text(CHARACTERS_OLDLADY, "I'll take a dozen. And give me your card. Doris is going to lose her mind when she tastes these.");
+    encounter_end();
+}
+
+void encounter_oldlady_console(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon! You must be the lady of the house.");
+    dialog_text(CHARACTERS_OLDLADY, "I'm the ONLY lady of the house. What can I do for you, young man?");
+    dialog_text(CHARACTERS_SALESMAN, "I have something here that's going to change your evenings forever. A brand new game console!");
+    dialog_text(CHARACTERS_OLDLADY, "A game console? Like a Nintendo? My grandchildren have one of those.");
+    dialog_text(CHARACTERS_SALESMAN, "This makes a Nintendo look like a toaster. We're talking 4K resolution, surround sound, hundreds of games.");
+    dialog_text(CHARACTERS_OLDLADY, "Dear, I can barely work the remote control. Last week I accidentally ordered a movie in Spanish and watched the whole thing because I couldn't figure out how to change it.");
+    dialog_text(CHARACTERS_SALESMAN, "And did you enjoy it?");
+    dialog_text(CHARACTERS_OLDLADY, "Actually, yes. It was quite romantic.");
+
+    switch (dialog_selection("Sell her on it", "Grandkids will visit more", "Brain training games", "It plays movies too", "It's very simple")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Imagine this. You get this console, and suddenly your grandkids are BEGGING to come over every weekend.");
+            dialog_text(CHARACTERS_OLDLADY, "They do usually only come when I bribe them with cookies...");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "They've got puzzle games, brain teasers, the works. Studies show gaming keeps the mind sharp well into your nineties.");
+            dialog_text(CHARACTERS_OLDLADY, "My mind is plenty sharp, thank you. I beat Doris at bridge every single week.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "Forget the games. This thing streams movies, shows, music. And it's all in English. Mostly.");
+            dialog_text(CHARACTERS_OLDLADY, "Can I watch my stories on it? I love my stories.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "It's one button to turn on, and then you just wave your hands around. No remote needed.");
+            dialog_text(CHARACTERS_OLDLADY, "Wave my hands? Like I'm casting a spell?");
+            dialog_text(CHARACTERS_SALESMAN, "Exactly like that, yes.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Just give it a try. Five minutes, that's all I'm asking.");
+    dialog_text(CHARACTERS_OLDLADY, "I suppose five minutes can't hurt. But if it explodes, you're paying for my curtains.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_OLDLADY, "I just... I got the highest score? Is that good?");
+    dialog_text(CHARACTERS_SALESMAN, "That's INCREDIBLE for a first try!");
+    dialog_text(CHARACTERS_OLDLADY, "Move over, grandchildren. Grandma's got a new hobby. I'll take it.");
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// NERD ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_nerd_ak47(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hey there! Got a minute?");
+    dialog_text(CHARACTERS_NERD, "That depends. Are you selling religion, solar panels, or a streaming service? Because I'm not interested in any of those.");
+    dialog_text(CHARACTERS_SALESMAN, "None of the above. I'm selling something way more interesting. How do you feel about firearms?");
+    dialog_text(CHARACTERS_NERD, "Firearms? Like... real ones? I have a level 47 marksman in Fallout, if that counts.");
+    dialog_text(CHARACTERS_SALESMAN, "It absolutely does not. This is an AK-47. The real thing. Mikhail Kalashnikov's masterpiece.");
+    dialog_text(CHARACTERS_NERD, "Oh, I know what an AK-47 is. Iconic Soviet design, 1947. Gas-operated, rotating bolt, 7.62 by 39 millimeter cartridge. I've read the Wikipedia article like four times.");
+    dialog_text(CHARACTERS_SALESMAN, "Okay, so you know your stuff. But have you ever held one?");
+    dialog_text(CHARACTERS_NERD, "I've held a replica at Comic-Con. Does that count?");
+    dialog_text(CHARACTERS_SALESMAN, "Again, absolutely not.");
+
+    switch (dialog_selection("Pick your angle", "Zombie apocalypse prep", "It's like a real-life loot drop", "Historical significance", "Home defense stats")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Let me ask you something. When the zombie apocalypse hits, and we both know it's a matter of WHEN, what's your plan?");
+            dialog_text(CHARACTERS_NERD, "I have a detailed spreadsheet, actually. But the weapons column is mostly baseball bats and kitchen knives.");
+            dialog_text(CHARACTERS_SALESMAN, "That's tragic. This fills that gap beautifully.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Think of this as a legendary loot drop. Right here on your doorstep. What are the odds?");
+            dialog_text(CHARACTERS_NERD, "Statistically pretty low, I'll admit. The RNG gods are smiling on me today.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "This design hasn't changed in almost eighty years because it didn't need to. It's the most produced firearm in history. You'd own a piece of engineering history.");
+            dialog_text(CHARACTERS_NERD, "That IS a compelling provenance. Like owning a first-edition print of a classic.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Ninety-nine percent reliability rate. Exposed to mud, sand, water, doesn't matter. It fires every single time.");
+            dialog_text(CHARACTERS_NERD, "Ninety-nine percent uptime? That's better than most cloud servers.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Here. Just feel the weight of it. No commitment.");
+    dialog_text(CHARACTERS_NERD, "Oh man. Okay. This is... this is significantly heavier than the Comic-Con one.");
+    dialog_text(CHARACTERS_SALESMAN, "That's the weight of quality. Want to really see what it can do?");
+    dialog_text(CHARACTERS_NERD, "I mean, I probably shouldn't... but also I definitely need to for research purposes.");
+    encounter_minigame(&memory_game);
+    dialog_text(CHARACTERS_NERD, "Oh my GOD. My hands are shaking. That was the most visceral experience of my entire life, and I include the time I met Gabe Newell.");
+    dialog_text(CHARACTERS_SALESMAN, "So, can I interest you?");
+    dialog_text(CHARACTERS_NERD, "Shut up and take my money. This is going right above my display shelf next to my Master Sword replica.");
+    encounter_end();
+}
+
+void encounter_nerd_cookies(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hi! Couldn't help but notice the Millennium Falcon doormat. Nice touch.");
+    dialog_text(CHARACTERS_NERD, "Thanks, it was a limited run from ThinkGeek before they shut down. What do you want?");
+    dialog_text(CHARACTERS_SALESMAN, "I come bearing gifts. Well, not gifts. Merchandise. Girl Scout Cookies!");
+    dialog_text(CHARACTERS_NERD, "Girl Scout Cookies? During a non-cookie season? That's suspicious.");
+    dialog_text(CHARACTERS_SALESMAN, "I prefer to think of it as exclusive early access.");
+    dialog_text(CHARACTERS_NERD, "Early access. So they're in beta?");
+    dialog_text(CHARACTERS_SALESMAN, "Sure. Yeah. The cookies are in beta. And I need taste testers. Interested?");
+
+    switch (dialog_selection("Pitch the cookies", "Limited edition flavors", "Perfect gaming fuel", "Support a good cause", "Ingredient stats")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "These are limited edition. Once they're gone, they're gone. Like a rare drop.");
+            dialog_text(CHARACTERS_NERD, "FOMO is a well-documented psychological manipulation tactic and I am fully susceptible to it. Go on.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Think about it. Late-night raid, you're three hours deep, your blood sugar is crashing. You reach over, grab a Thin Mint. Problem solved.");
+            dialog_text(CHARACTERS_NERD, "I usually just drink energy drinks, but my cardiologist has expressed concerns.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "These fund programs that teach young girls about entrepreneurship and leadership. Basically building the next generation of tech founders.");
+            dialog_text(CHARACTERS_NERD, "So I'd be a venture capitalist in the cookie space? I like the framing.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Look at the macros on these bad boys. High caloric density, long shelf life, excellent sugar-to-fat ratio for sustained energy.");
+            dialog_text(CHARACTERS_NERD, "You're speaking my language. I optimize everything else in my life, why not snacks?");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Come on. One taste. What's the worst that could happen?");
+    dialog_text(CHARACTERS_NERD, "Historically, every time someone says that to me, something catches fire. But fine.");
+    encounter_minigame(&memory_game);
+    dialog_text(CHARACTERS_NERD, "Okay. Those Samoas are... those are S-tier. Easily S-tier. Maybe even S-plus.");
+    dialog_text(CHARACTERS_SALESMAN, "How many boxes can I put you down for?");
+    dialog_text(CHARACTERS_NERD, "Give me ten. And I'm going to need a spreadsheet to track my consumption rate so I can reorder before I run out.");
+    dialog_text(CHARACTERS_SALESMAN, "You do that, buddy.");
+    encounter_end();
+}
+
+void encounter_nerd_steak(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hey! Is that a drone on your roof?");
+    dialog_text(CHARACTERS_NERD, "Weather station, actually. I track local atmospheric data and upload it to a community database. What do you need?");
+    dialog_text(CHARACTERS_SALESMAN, "I need you to look at this steak and tell me it isn't the most beautiful thing you've ever seen.");
+    dialog_text(CHARACTERS_NERD, "A steak? You're selling... steaks? Door to door?");
+    dialog_text(CHARACTERS_SALESMAN, "Premium, USDA Prime grade ribeye. Direct from the ranch to your door. No middleman.");
+    dialog_text(CHARACTERS_NERD, "Peer-to-peer steak distribution. That's either genius or deeply concerning.");
+    dialog_text(CHARACTERS_SALESMAN, "It's genius. Look at that marbling. That's not just fat. That's flavor architecture.");
+
+    switch (dialog_selection("Win him over", "Maillard reaction science", "Protein for brain power", "It's organic and ethical", "Cooking is like chemistry")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "You know about the Maillard reaction, right? When you sear this at exactly 375 degrees, the amino acids and sugars undergo a non-enzymatic browning reaction that creates over 600 distinct flavor compounds.");
+            dialog_text(CHARACTERS_NERD, "I... actually didn't know the exact number. Six hundred? That's a significant flavor vector.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "You run that brain hard, right? Steak has creatine, B12, zinc, iron. It's basically a CPU upgrade for your body.");
+            dialog_text(CHARACTERS_NERD, "I have been looking into nootropics. A dietary approach could be more sustainable.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "These are grass-fed, pasture-raised, ethically sourced. If that cow had a LinkedIn, it would have had an impressive resume.");
+            dialog_text(CHARACTERS_NERD, "I appreciate the ethical supply chain transparency. That matters to me.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Cooking a steak is basically applied chemistry. Temperature control, timing, chemical reactions. It's the most delicious experiment you'll ever run.");
+            dialog_text(CHARACTERS_NERD, "Can I use my sous vide machine? I bought it two years ago and I've only used it to heat up ramen.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_NERD, "I mostly eat instant noodles and microwaveable burritos, if I'm being honest.");
+    dialog_text(CHARACTERS_SALESMAN, "And that ends today. Let me show you what real food tastes like.");
+    dialog_text(CHARACTERS_NERD, "Okay but if I don't like it, I'm leaving you a one-star review on every platform I can find.");
+    encounter_minigame(&memory_game);
+    dialog_text(CHARACTERS_NERD, "I'm having a culinary awakening right now. Everything I thought I knew about food was wrong.");
+    dialog_text(CHARACTERS_SALESMAN, "Welcome to the world of real cooking, my friend.");
+    dialog_text(CHARACTERS_NERD, "I'll take four. And do you have a recommended internal temperature chart? I want to cook these with PRECISION.");
+    encounter_end();
+}
+
+void encounter_nerd_console(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hey there! Got something I think you might--");
+    dialog_text(CHARACTERS_NERD, "Is that the XStation Pro? Are you SERIOUS right now?");
+    dialog_text(CHARACTERS_SALESMAN, "I haven't even opened my mouth yet.");
+    dialog_text(CHARACTERS_NERD, "You don't need to. I can see the box. That's the matte black limited edition. Those have been sold out for MONTHS.");
+    dialog_text(CHARACTERS_SALESMAN, "So you're familiar with the product.");
+    dialog_text(CHARACTERS_NERD, "Familiar? I've watched every teardown video. I know the specs better than the engineers who built it. Custom 8-core processor, 16 teraflops, ray tracing, SSD with 9.8 gigabytes per second read speed. Where did you even GET one?");
+    dialog_text(CHARACTERS_SALESMAN, "I have my sources. The question is, do you want it?");
+
+    switch (dialog_selection("Seal the deal", "Below retail price", "Exclusive launch title included", "VR compatible", "Last one in stock")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "I can do this below retail. Consider it a fellow-enthusiast discount.");
+            dialog_text(CHARACTERS_NERD, "Below retail for a sold-out console? What's the catch? Is it stolen? I won't judge, I just need to know.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "It comes bundled with an exclusive launch title that hasn't even hit digital stores yet.");
+            dialog_text(CHARACTERS_NERD, "An EXCLUSIVE? My Twitch followers are going to lose their collective minds.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "This model is VR-ready right out of the box. No adapters, no dongles, just plug and play.");
+            dialog_text(CHARACTERS_NERD, "Dongle-free? In THIS economy? That's practically unheard of.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "This is the last one I have. After this, you're back to refreshing store pages and crying into your keyboard.");
+            dialog_text(CHARACTERS_NERD, "Don't remind me. I've lost six online drops. SIX. My F5 key is worn smooth.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Let me boot it up. You can see for yourself.");
+    dialog_text(CHARACTERS_NERD, "This is the best thing that has happened to me since I found that first-edition Charizard at a garage sale. I need a moment.");
+    dialog_text(CHARACTERS_SALESMAN, "Take your time, buddy.");
+    dialog_text(CHARACTERS_NERD, "I'm fine. I'm fine. Let's do this.");
+    encounter_minigame(&memory_game);
+    dialog_text(CHARACTERS_NERD, "The frame rate. The FRAME RATE. It's like butter. It's like warm, beautiful, 120-frames-per-second butter.");
+    dialog_text(CHARACTERS_SALESMAN, "So I'm going to take that as a yes?");
+    dialog_text(CHARACTERS_NERD, "I would sell a kidney for this. Fortunately I have money. I'll take it. Can you also leave before I start crying? I'd like to do that in private.");
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// SHOTGUNNER ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_shotgunner_ak47(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Howdy! Nice property you've got here.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "That's far enough, stranger. You've got about ten seconds to tell me why you're on my land.");
+    dialog_text(CHARACTERS_SALESMAN, "Easy there, friend. I'm not looking for trouble. I'm looking to make a sale.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I don't need no magazines, no vacuum cleaners, and I already found Jesus. He was behind the couch the whole time.");
+    dialog_text(CHARACTERS_SALESMAN, "How about an AK-47?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "... I'm listening.");
+    dialog_text(CHARACTERS_SALESMAN, "Thought that might get your attention. Genuine AK-47. Factory fresh.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I know what an AK is, boy. Got a gun safe with thirty-seven firearms in it. Why would I need a Russian one?");
+
+    switch (dialog_selection("Convince him", "Compliment his collection", "Reliability argument", "It's a patriotic duty", "Trade-up offer")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Thirty-seven? That's impressive. But a collection that fine? It NEEDS an AK. It's like a museum without a Picasso.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Don't compare my guns to some fancy art. But... I see your point. There IS a gap on the wall.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Look, your shotgun is great for close range. But what about 300 yards out? This fills that gap in your defense perimeter.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Hmm. I HAVE been worried about the treeline to the north. Can't cover it with buckshot.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "Know your enemy, right? Understanding Soviet engineering makes you a better American.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "That... that's the smartest thing a salesman has ever said to me. And I hate that you're right.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "I could take one of your current pieces in trade and give you a discount. Everybody wins.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Trade in one of my babies? You've got some nerve. But... which one would you take?");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SHOTGUNNER, "Alright, salesman. You talked your way this far. But I ain't buying nothing until I see it shoot.");
+    dialog_text(CHARACTERS_SALESMAN, "Wouldn't have it any other way.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "See that old washing machine out by the fence? If it can hit that, we'll talk.");
+    encounter_minigame(&shotgun_game);
+    dialog_text(CHARACTERS_SHOTGUNNER, "Well I'll be damned. Blew that Maytag clean in half.");
+    dialog_text(CHARACTERS_SALESMAN, "So? We got a deal?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "I respect a good firearm, regardless of country of origin. You got yourself a deal, boy. But if you tell anyone I bought a Russian gun, I'll use it on you.");
+    dialog_text(CHARACTERS_SALESMAN, "Wouldn't dream of it, sir.");
+    encounter_end();
+}
+
+void encounter_shotgunner_cookies(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hello there! I--");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Stop right there. You see that sign? NO SOLICITORS. You blind or just stupid?");
+    dialog_text(CHARACTERS_SALESMAN, "I saw it. I just figured you'd make an exception for Girl Scout Cookies.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Girl Scout... hold on. You don't look like no Girl Scout.");
+    dialog_text(CHARACTERS_SALESMAN, "I didn't make the uniform cutoff. But the cookies are the real deal, I promise.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Hmph. My ex-wife used to buy those. Only good decision she ever made.");
+
+    switch (dialog_selection("Approach carefully", "Bond over the cookies", "Man's man approach", "Limited supply urgency", "Challenge his toughness")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "See? Even in the darkest times, cookies bring light. These could be a fresh start.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Don't get philosophical on my porch. But... she always got the Tagalongs. Those were decent.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "These aren't sissy snacks, friend. They're compact, high-calorie, long shelf life. Basically field rations.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Field rations? Now you're speaking my language.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "I've only got a few boxes left. Once they're gone, you'll be cookie-less until next season. That's months away.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "I don't like being told what I can't have.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Most guys are too proud to admit they like cookies. Takes a real man to own it.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "You trying to psychologize me? On my OWN porch?");
+            dialog_text(CHARACTERS_SALESMAN, "Is it working?");
+            dialog_text(CHARACTERS_SHOTGUNNER, "... Maybe.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Just try one. If you don't like it, I'll leave and never come back. Scout's honor.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Fine. But I'm holding my shotgun the entire time.");
+    dialog_text(CHARACTERS_SALESMAN, "Totally reasonable.");
+    encounter_minigame(&shotgun_game);
+    dialog_text(CHARACTERS_SHOTGUNNER, "...");
+    dialog_text(CHARACTERS_SALESMAN, "Well?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "These Thin Mints are... these are really good. Don't look at me like that.");
+    dialog_text(CHARACTERS_SALESMAN, "I'm not looking at you like anything.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Give me five boxes. And if you tell ANYONE about this, there will be consequences.");
+    encounter_end();
+}
+
+void encounter_shotgunner_steak(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Afternoon! I noticed the smoker in your backyard. You a grilling man?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "That ain't a smoker, that's a COMPETITION smoker. Custom-built. Won three county fairs with that thing. What do you want?");
+    dialog_text(CHARACTERS_SALESMAN, "Well then today is your lucky day, sir. Because I've got premium ribeye steaks that would be HONORED to meet that smoker.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Premium? I buy my beef from Dale's ranch down the road. Known that man thirty years. Why would I buy steaks from some stranger?");
+    dialog_text(CHARACTERS_SALESMAN, "Because Dale's steaks are good. These are GREAT. Look at this marbling. Go ahead. I'll wait.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "... That is some serious marbling. Where'd you source these?");
+
+    switch (dialog_selection("Win his trust", "Small ranch, free range", "Challenge his grilling", "Bulk deal for the smoker", "Competition quality")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Small family ranch up north. Grass-fed, pasture-raised, no hormones. These cows lived better than most people.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "That's how it should be. I respect a man who raises cattle right.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "I bet that smoker could do things with this steak that would make a grown man weep. But maybe that's too much to ask...");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Too much? Boy, there ain't a cut of meat on this earth my smoker can't handle. Give me that.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "I'll cut you a bulk deal. Twelve steaks for the price of ten. Stock up that freezer for the next cookout.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "A bulk deal? Now you're talking sense.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "You win county fairs with Dale's beef? Imagine what you'd do with THIS. You could go STATE level.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "State level... Hank Morrison won state last year and he won't shut up about it. I need to dethrone that man.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Let me show you what this cut can do. You've got the skills, just let the steak speak for itself.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Alright, hotshot. But I'm cooking it MY way. None of that medium-rare nonsense.");
+    dialog_text(CHARACTERS_SALESMAN, "Your house, your rules.");
+    encounter_minigame(&shotgun_game);
+    dialog_text(CHARACTERS_SHOTGUNNER, "Alright. I'm man enough to admit it. That's a damn good steak.");
+    dialog_text(CHARACTERS_SALESMAN, "Better than Dale's?");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Don't push your luck. But yeah. Better than Dale's. Give me twenty. And don't tell Dale.");
+    dialog_text(CHARACTERS_SALESMAN, "My lips are sealed, sir.");
+    encounter_end();
+}
+
+void encounter_shotgunner_console(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "How's it going? I've got something here that--");
+    dialog_text(CHARACTERS_SHOTGUNNER, "If that's one of them robot vacuums, my dog shot the last one.");
+    dialog_text(CHARACTERS_SALESMAN, "Your DOG shot a-- never mind. No, this is a game console.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "A game console? Do I look like a twelve-year-old to you?");
+    dialog_text(CHARACTERS_SALESMAN, "You look like a man who enjoys competition. And this has the best hunting and shooting simulators on the market.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Hunting simulators? Why would I simulate hunting when I can just... go hunting?");
+    dialog_text(CHARACTERS_SALESMAN, "Because it's February, deer season's over, and I can see from here that your trigger finger is getting restless.");
+
+    switch (dialog_selection("Reel him in", "Hunting game demo", "It has fishing games too", "Online multiplayer competition", "It's also a DVD player")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "They've got elk, moose, bear, even African big game. Stuff you can't hunt legally in this state.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "African big game? From my living room? That's... not the worst idea.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "And the fishing simulators? Bass, trout, deep sea marlin. No license required.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "No license? So the government can't track my catches? I'm intrigued.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "You can play online against other people. Real competition. Leaderboards. Prove you're the best shot in the country without leaving your house.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "Nationwide leaderboards? Hank Morrison would eat his heart out.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Plus, it plays DVDs, Blu-rays, streams movies. All your action movies in one place.");
+            dialog_text(CHARACTERS_SHOTGUNNER, "I do watch a lot of Chuck Norris. My DVD player's been broken since the dog incident.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Just give it a shot. Pun intended.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "That pun was terrible. But fine. Set it up. If it's stupid, you're taking it and leaving.");
+    encounter_minigame(&shotgun_game);
+    dialog_text(CHARACTERS_SHOTGUNNER, "I just bagged a twelve-point virtual buck and I'm feeling things I wasn't prepared to feel.");
+    dialog_text(CHARACTERS_SALESMAN, "That's the magic of modern gaming, friend.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Alright, you win. But this stays between us. My buddies at the range can never know about this.");
+    dialog_text(CHARACTERS_SALESMAN, "I don't even know your name, sir.");
+    dialog_text(CHARACTERS_SHOTGUNNER, "Good. Keep it that way. I'll take it.");
+    encounter_end();
+}
+
+// ----------------------------------------------------------------------------
+// FAT MAN ENCOUNTERS
+// ----------------------------------------------------------------------------
+
+void encounter_fatman_ak47(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hey there! Beautiful day to--");
+    dialog_text(CHARACTERS_FATMAN, "Hold on, hold on... let me catch my breath. I just walked from the couch to the door.");
+    dialog_text(CHARACTERS_SALESMAN, "Take your time.");
+    dialog_text(CHARACTERS_FATMAN, "Okay. What do you want? And make it quick, my show comes on in ten minutes.");
+    dialog_text(CHARACTERS_SALESMAN, "I'll be brief. How would you like to own an AK-47?");
+    dialog_text(CHARACTERS_FATMAN, "An AK-47? Like, a gun? What would I do with a gun?");
+    dialog_text(CHARACTERS_SALESMAN, "Protect yourself! Defend your home! Look cool!");
+    dialog_text(CHARACTERS_FATMAN, "The only thing I need to defend is the last slice of pizza from my roommate. And I do that just fine with a fork.");
+
+    switch (dialog_selection("Convince him", "Home delivery protection", "It's lighter than you think", "Impress the neighbors", "It's an investment")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "What about delivery drivers? They bring you food, but what if one day they try to TAKE your food?");
+            dialog_text(CHARACTERS_FATMAN, "That's... I never thought about that. That's terrifying.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "This only weighs about eight pounds. Less than a large meat lover's pizza.");
+            dialog_text(CHARACTERS_FATMAN, "I carry those with one hand, so that tracks. Not bad.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "Picture it. You, on your porch, AK in hand. Nobody's ever going to mess with you or your property again.");
+            dialog_text(CHARACTERS_FATMAN, "The HOA has been on my case about the lawn. This could shift that dynamic.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "These appreciate in value. It's like a savings account that can also defend your snack stash.");
+            dialog_text(CHARACTERS_FATMAN, "A financial instrument AND a snack defender? That's dual-purpose. I like efficiency.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Why don't you just try holding it? See how it feels?");
+    dialog_text(CHARACTERS_FATMAN, "I mean, I'm already standing up. Might as well make the trip worth it.");
+    dialog_text(CHARACTERS_SALESMAN, "That's the spirit.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_FATMAN, "Whoa! The recoil gave my arms more exercise than they've had in months!");
+    dialog_text(CHARACTERS_SALESMAN, "See? It's practically a workout machine.");
+    dialog_text(CHARACTERS_FATMAN, "A workout machine that shoots? Now THAT I can get behind. I'll take it. Can you carry it inside for me though? My arms are tired now.");
+    encounter_end();
+}
+
+void encounter_fatman_cookies(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Good afternoon! I've got something special today.");
+    dialog_text(CHARACTERS_FATMAN, "If it's edible, you have my full attention. If it's not, I'm going back to my burrito.");
+    dialog_text(CHARACTERS_SALESMAN, "It is VERY edible. Girl Scout Cookies! Thin Mints, Samoas, Tagalongs, the whole spread.");
+    dialog_text(CHARACTERS_FATMAN, "Girl Scout Cookies? Oh man. Oh MAN. I haven't had those since... okay, since last week. My neighbor's kid sells them. But I already ate everything she had.");
+    dialog_text(CHARACTERS_SALESMAN, "Well, the universe has provided. I've got full stock right here.");
+    dialog_text(CHARACTERS_FATMAN, "Full stock? As in, how many boxes are we talking?");
+    dialog_text(CHARACTERS_SALESMAN, "How many do you want?");
+    dialog_text(CHARACTERS_FATMAN, "That's a dangerous question to ask me.");
+
+    switch (dialog_selection("Close the deal", "Bulk discount", "New flavors available", "Suggest a sampler", "All-you-can-eat pitch")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "I'll do a bulk rate. Buy ten boxes, I'll throw in two free. Can't beat that math.");
+            dialog_text(CHARACTERS_FATMAN, "Free cookies? That's the most beautiful phrase in the English language.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "I've also got a new flavor. Caramel Chocolate Chip. Limited run. Most people haven't even heard of it.");
+            dialog_text(CHARACTERS_FATMAN, "A new flavor I haven't tried? This is like Christmas morning.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "How about a sampler pack? One of everything. Cover all your bases.");
+            dialog_text(CHARACTERS_FATMAN, "A sampler is a good START. Then I'll know which ones to order by the case.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Look, I'll level with you. I've got a van full of cookies and nowhere to store them. Help me out and I'll practically give them away.");
+            dialog_text(CHARACTERS_FATMAN, "You had me at 'van full of cookies.' Say no more.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Let's crack open a box and make sure they meet your standards.");
+    dialog_text(CHARACTERS_FATMAN, "My standards are 'is it food' and 'is it nearby,' so the bar is pretty achievable. But yes, let's taste test.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_FATMAN, "These are perfect. The texture, the sweetness, the way they just DISAPPEAR. I ate six during that conversation.");
+    dialog_text(CHARACTERS_SALESMAN, "I know. I watched. It was impressive.");
+    dialog_text(CHARACTERS_FATMAN, "Give me everything you've got. ALL of it. I'll figure out storage later.");
+    encounter_end();
+}
+
+void encounter_fatman_steak(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Afternoon! Is that a deep fryer I see through your window?");
+    dialog_text(CHARACTERS_FATMAN, "That's one of three. What's it to you?");
+    dialog_text(CHARACTERS_SALESMAN, "A man of culinary ambition! I've got something right up your alley. Premium ribeye steaks.");
+    dialog_text(CHARACTERS_FATMAN, "Steaks. Now you're talking. Come closer. Let me see them.");
+    dialog_text(CHARACTERS_SALESMAN, "Look at this. Two inches thick. Perfect marbling. You could cut this with a stern look.");
+    dialog_text(CHARACTERS_FATMAN, "Oh, that's gorgeous. That right there is a work of art. I want to frame it. And then eat the frame.");
+
+    switch (dialog_selection("Seal the deal", "Pairs great with sides", "Suggest deep-frying it", "Premium butter-baste method", "Go for quantity")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "Imagine this with a loaded baked potato, garlic bread, maybe some mac and cheese on the side...");
+            dialog_text(CHARACTERS_FATMAN, "Stop. You're making me emotional. Keep going.");
+            dialog_text(CHARACTERS_SALESMAN, "... topped with sour cream, chives, and extra cheese.");
+            dialog_text(CHARACTERS_FATMAN, "I think I'm in love.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "Now, hear me out... have you ever deep-fried a steak?");
+            dialog_text(CHARACTERS_FATMAN, "Deep-fried a steak? No. But I feel like I was born to do exactly that.");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "You butter-baste this in a cast iron skillet with garlic and rosemary. The fat bastes the steak. It's like giving it a spa day before you eat it.");
+            dialog_text(CHARACTERS_FATMAN, "A spa day for a steak. That is the most beautiful sentence I've ever heard.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "I can do a case of twenty-four. That's a steak for every day of the week, three times over, with some left for midnight snacks.");
+            dialog_text(CHARACTERS_FATMAN, "Midnight steak. You just invented my new favorite meal.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "What do you say we fire up one of those fryers and give this a test run?");
+    dialog_text(CHARACTERS_FATMAN, "Brother, I thought you'd never ask. Step into my kitchen. Well, don't actually step in, there's not a lot of room. Stand in the doorway.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_FATMAN, "This is the greatest thing I have ever put in my mouth. And I once ate an entire wedding cake by myself.");
+    dialog_text(CHARACTERS_SALESMAN, "An entire wedding cake?");
+    dialog_text(CHARACTERS_FATMAN, "It wasn't my wedding. Long story. Anyway, give me the full case. Actually, give me two cases. One for eating and one for emotional support.");
+    encounter_end();
+}
+
+void encounter_fatman_console(void) {
+    encounter_begin();
+    dialog_text(CHARACTERS_SALESMAN, "Hey! I can hear you've already got a TV going in there. Sounds like a big one.");
+    dialog_text(CHARACTERS_FATMAN, "Seventy-five inches. It's the centerpiece of my life. What do you want?");
+    dialog_text(CHARACTERS_SALESMAN, "I want to make that TV reach its full potential. I've got a brand new game console here.");
+    dialog_text(CHARACTERS_FATMAN, "A game console? I already have one from... I think 2018? It still works. Mostly. The fan sounds like a jet engine and it takes forty minutes to load anything, but it works.");
+    dialog_text(CHARACTERS_SALESMAN, "My friend, that is not working. That is suffering. This right here loads games in under two seconds.");
+    dialog_text(CHARACTERS_FATMAN, "Two seconds? I currently use loading screens as bathroom breaks. What would I even do with all that free time?");
+    dialog_text(CHARACTERS_SALESMAN, "Play more games. Eat more snacks. Live your best life.");
+
+    switch (dialog_selection("Win him over", "Couch co-op games", "Food delivery apps built in", "4K on his 75-inch TV", "Voice controlled")) {
+        case 0: {
+            dialog_text(CHARACTERS_SALESMAN, "This has the best couch co-op library on the market. You don't even have to get up to have a social life.");
+            dialog_text(CHARACTERS_FATMAN, "A social life from my couch? Technology has finally caught up to my lifestyle.");
+        } break;
+        case 1: {
+            dialog_text(CHARACTERS_SALESMAN, "It's got built-in apps for every food delivery service. Order a pizza without pausing your game.");
+            dialog_text(CHARACTERS_FATMAN, "Seamless food-to-gaming pipeline? Where has this been all my life?");
+        } break;
+        case 2: {
+            dialog_text(CHARACTERS_SALESMAN, "On your seventy-five-inch screen, this thing will pump out 4K visuals that will make your eyeballs weep with joy.");
+            dialog_text(CHARACTERS_FATMAN, "My eyeballs DO deserve joy. They work really hard.");
+        } break;
+        case 3: {
+            dialog_text(CHARACTERS_SALESMAN, "Fully voice-controlled. You don't even need to reach for the remote. Just talk and it obeys.");
+            dialog_text(CHARACTERS_FATMAN, "No reaching? You just eliminated the hardest part of my day.");
+        } break;
+    }
+
+    dialog_text(CHARACTERS_SALESMAN, "Let me hook it up to that beast of a TV and you'll see what I mean.");
+    dialog_text(CHARACTERS_FATMAN, "Alright, come in. Watch the pizza boxes by the door. And the ones by the couch. And the hallway.");
+    encounter_minigame(&smile_game);
+    dialog_text(CHARACTERS_FATMAN, "Oh no. Oh NO. Everything I've been playing looks like garbage now. You've ruined my old console for me.");
+    dialog_text(CHARACTERS_SALESMAN, "You're welcome.");
+    dialog_text(CHARACTERS_FATMAN, "I hate you. But I also need this. Take my money before I change my mind. Actually, I won't change my mind. Take my money at whatever speed is convenient.");
+    encounter_end();
+}
+
+
+
 // ============================================================================
 // ENCOUNTER FUNCTION POINTER ARRAY
 // ============================================================================
@@ -1514,6 +2771,13 @@ const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
         [ITEM_KNIVES] = encounter_oldlady_knives,
         [ITEM_LOLLIPOP] = encounter_oldlady_lollipop,
         [ITEM_COMPUTER] = encounter_oldlady_computer,
+        [ITEM_VASE]              = encounter_oldlady_vase,
+        [ITEM_COMIC_BOOK]        = encounter_oldlady_comicbook,
+        [ITEM_FOOTBALL]          = encounter_oldlady_football,
+        [ITEM_AK47]              = encounter_oldlady_ak47,
+        [ITEM_GIRLSCOUT_COOKIES] = encounter_oldlady_cookies,
+        [ITEM_STEAK]             = encounter_oldlady_steak,
+        [ITEM_GAME_CONSOLE]      = encounter_oldlady_console,
     },
     [CHARACTERS_NERD] = {
         [ITEM_VACUUM] = encounter_nerd_vacuum,
@@ -1521,6 +2785,13 @@ const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
         [ITEM_KNIVES] = encounter_nerd_knives,
         [ITEM_LOLLIPOP] = encounter_nerd_lollipop,
         [ITEM_COMPUTER] = encounter_nerd_computer,
+        [ITEM_VASE]              = encounter_nerd_vase,
+        [ITEM_COMIC_BOOK]        = encounter_nerd_comicbook,
+        [ITEM_FOOTBALL]          = encounter_nerd_football,
+        [ITEM_AK47]              = encounter_nerd_ak47,
+        [ITEM_GIRLSCOUT_COOKIES] = encounter_nerd_cookies,
+        [ITEM_STEAK]             = encounter_nerd_steak,
+        [ITEM_GAME_CONSOLE]      = encounter_nerd_console,
     },
     [CHARACTERS_SHOTGUNNER] = {
         [ITEM_VACUUM] = encounter_shotgunner_vacuum,
@@ -1528,6 +2799,13 @@ const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
         [ITEM_KNIVES] = encounter_shotgunner_knives,
         [ITEM_LOLLIPOP] = encounter_shotgunner_lollipop,
         [ITEM_COMPUTER] = encounter_shotgunner_computer,
+        [ITEM_VASE]              = encounter_shotgunner_vase,
+        [ITEM_COMIC_BOOK]        = encounter_shotgunner_comicbook,
+        [ITEM_FOOTBALL]          = encounter_shotgunner_football,
+        [ITEM_AK47]              = encounter_shotgunner_ak47,
+        [ITEM_GIRLSCOUT_COOKIES] = encounter_shotgunner_cookies,
+        [ITEM_STEAK]             = encounter_shotgunner_steak,
+        [ITEM_GAME_CONSOLE]      = encounter_shotgunner_console,
     },
     [CHARACTERS_FATMAN] = {
         [ITEM_VACUUM] = encounter_fatman_vacuum,
@@ -1535,45 +2813,87 @@ const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
         [ITEM_KNIVES] = encounter_fatman_knives,
         [ITEM_LOLLIPOP] = encounter_fatman_lollipop,
         [ITEM_COMPUTER] = encounter_fatman_computer,
+        [ITEM_VASE]              = encounter_fatman_vase,
+        [ITEM_COMIC_BOOK]        = encounter_fatman_comicbook,
+        [ITEM_FOOTBALL]          = encounter_fatman_football,
+        [ITEM_AK47]              = encounter_fatman_ak47,
+        [ITEM_GIRLSCOUT_COOKIES] = encounter_fatman_cookies,
+        [ITEM_STEAK]             = encounter_fatman_steak,
+        [ITEM_GAME_CONSOLE]      = encounter_fatman_console,
     },
 };
 
 
 // const Encounter_Fn encounters[CHARACTERS_COUNT][ITEM_COUNT] = {
 //     [CHARACTERS_SALESMAN] = {
-//         [ITEM_VACUUM]   = sample_encounter,
-//         [ITEM_BOOKS]    = sample_encounter,
-//         [ITEM_KNIVES]   = sample_encounter,
-//         [ITEM_LOLLIPOP] = sample_encounter,
-//         [ITEM_COMPUTER] = sample_encounter,
+//         [ITEM_VACUUM]            = sample_encounter
+//         [ITEM_BOOKS]             = sample_encounter
+//         [ITEM_KNIVES]            = sample_encounter
+//         [ITEM_LOLLIPOP]          = sample_encounter
+//         [ITEM_COMPUTER]          = sample_encounter
+//         [ITEM_VASE]              = sample_encounter
+//         [ITEM_COMIC_BOOK]        = sample_encounter
+//         [ITEM_FOOTBALL]          = sample_encounter
+//         [ITEM_AK47]              = sample_encounter
+//         [ITEM_GIRLSCOUT_COOKIES] = sample_encounter
+//         [ITEM_STEAK]             = sample_encounter
+//         [ITEM_GAME_CONSOLE]      = sample_encounter
 //     },
 //     [CHARACTERS_OLDLADY] = {
-//         [ITEM_VACUUM]   = sample_encounter,
-//         [ITEM_BOOKS]    = sample_encounter,
-//         [ITEM_KNIVES]   = sample_encounter,
-//         [ITEM_LOLLIPOP] = sample_encounter,
-//         [ITEM_COMPUTER] = sample_encounter,
+//         [ITEM_VACUUM]            = sample_encounter
+//         [ITEM_BOOKS]             = sample_encounter
+//         [ITEM_KNIVES]            = sample_encounter
+//         [ITEM_LOLLIPOP]          = sample_encounter
+//         [ITEM_COMPUTER]          = sample_encounter
+//         [ITEM_VASE]              = sample_encounter
+//         [ITEM_COMIC_BOOK]        = sample_encounter
+//         [ITEM_FOOTBALL]          = sample_encounter
+//         [ITEM_AK47]              = sample_encounter
+//         [ITEM_GIRLSCOUT_COOKIES] = sample_encounter
+//         [ITEM_STEAK]             = sample_encounter
+//         [ITEM_GAME_CONSOLE]      = sample_encounter
 //     },
 //     [CHARACTERS_NERD] = {
-//         [ITEM_VACUUM]   = sample_encounter,
-//         [ITEM_BOOKS]    = sample_encounter,
-//         [ITEM_KNIVES]   = sample_encounter,
-//         [ITEM_LOLLIPOP] = sample_encounter,
-//         [ITEM_COMPUTER] = sample_encounter,
+//         [ITEM_VACUUM]            = sample_encounter
+//         [ITEM_BOOKS]             = sample_encounter
+//         [ITEM_KNIVES]            = sample_encounter
+//         [ITEM_LOLLIPOP]          = sample_encounter
+//         [ITEM_COMPUTER]          = sample_encounter
+//         [ITEM_VASE]              = sample_encounter
+//         [ITEM_COMIC_BOOK]        = sample_encounter
+//         [ITEM_FOOTBALL]          = sample_encounter
+//         [ITEM_AK47]              = sample_encounter
+//         [ITEM_GIRLSCOUT_COOKIES] = sample_encounter
+//         [ITEM_STEAK]             = sample_encounter
+//         [ITEM_GAME_CONSOLE]      = sample_encounter
 //     },
 //     [CHARACTERS_SHOTGUNNER] = {
-//         [ITEM_VACUUM]   = sample_encounter,
-//         [ITEM_BOOKS]    = sample_encounter,
-//         [ITEM_KNIVES]   = sample_encounter,
-//         [ITEM_LOLLIPOP] = sample_encounter,
-//         [ITEM_COMPUTER] = sample_encounter,
+//         [ITEM_VACUUM]            = sample_encounter
+//         [ITEM_BOOKS]             = sample_encounter
+//         [ITEM_KNIVES]            = sample_encounter
+//         [ITEM_LOLLIPOP]          = sample_encounter
+//         [ITEM_COMPUTER]          = sample_encounter
+//         [ITEM_VASE]              = sample_encounter
+//         [ITEM_COMIC_BOOK]        = sample_encounter
+//         [ITEM_FOOTBALL]          = sample_encounter
+//         [ITEM_AK47]              = sample_encounter
+//         [ITEM_GIRLSCOUT_COOKIES] = sample_encounter
+//         [ITEM_STEAK]             = sample_encounter
+//         [ITEM_GAME_CONSOLE]      = sample_encounter
 //     },
 //     [CHARACTERS_FATMAN] = {
-//         [ITEM_VACUUM]   = sample_encounter,
-//         [ITEM_BOOKS]    = sample_encounter,
-//         [ITEM_KNIVES]   = sample_encounter,
-//         [ITEM_LOLLIPOP] = sample_encounter,
-//         [ITEM_COMPUTER] = sample_encounter,
+//         [ITEM_VACUUM]            = sample_encounter
+//         [ITEM_BOOKS]             = sample_encounter
+//         [ITEM_KNIVES]            = sample_encounter
+//         [ITEM_LOLLIPOP]          = sample_encounter
+//         [ITEM_COMPUTER]          = sample_encounter
+//         [ITEM_VASE]              = sample_encounter
+//         [ITEM_COMIC_BOOK]        = sample_encounter
+//         [ITEM_FOOTBALL]          = sample_encounter
+//         [ITEM_AK47]              = sample_encounter
+//         [ITEM_GIRLSCOUT_COOKIES] = sample_encounter
+//         [ITEM_STEAK]             = sample_encounter
+//         [ITEM_GAME_CONSOLE]      = sample_encounter
 //     },
 // };
 

@@ -38,6 +38,7 @@ void items_init() {
 
         item_data[item].texture = LoadTexture(texture_path.ptr);
         SetTextureFilter(item_data[item].texture, TEXTURE_FILTER_BILINEAR);
+        SetTextureWrap(item_data[item].texture, TEXTURE_WRAP_CLAMP);
     }
 }
 
@@ -264,6 +265,10 @@ void pick_items_update() {
                 }
 
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && haveFour) { 
+                    for (int i = 0; i < 4; i++) {
+                        game.briefcase.items[i] = data.picked[i];
+                    }
+
                     game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
                 }
             }
@@ -320,7 +325,10 @@ void pick_items_update() {
         float x = delta.x + item_locations[selection_data.selected_index].x - texture.width * 0.5;
         float y = delta.y + item_locations[selection_data.selected_index].y - texture.height * 0.5;
 
-        DrawTexture(texture, x, y, WHITE);
+        BeginShaderMode(item_bg_shader);
+            DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x, y, texture.width, texture.width }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
+        EndShaderMode();
+        // DrawTexture(texture, x, y, WHITE);
     }
 
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -378,5 +386,12 @@ void pick_items_update() {
         }
 
         selection_data.is_selecting = false;
+    }
+
+    if (IsKeyPressed(KEY_R)) {
+        for (int i = 0; i < 4; ++i) {
+            data.picked[i] = data.pickable[i];
+            data.pickable[i] = ITEM_NONE;
+        }
     }
 }

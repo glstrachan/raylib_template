@@ -86,7 +86,7 @@ void game_update() {
         // TODO: Move this into dialog or smth so we can scriptably change the background
         DrawTexture(bg_tex, 0, 0, WHITE);
         characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
-        characters_draw(CHARACTERS_OLDLADY, CHARACTERS_RIGHT);
+        characters_draw(game.current_character, CHARACTERS_RIGHT);
 
         encounter_update();
         if (encounter_is_done()) {
@@ -172,8 +172,6 @@ int main(void)
         pick_encounter_init();
         items_init();
         choose_pickable();
-        // extern Encounter sample_encounter_;
-        // encounter_start(&sample_encounter_);
 
         oc_arena_restore(&frame_arena, save);
     }
@@ -181,14 +179,14 @@ int main(void)
 
     bg_tex = LoadTexture("resources/background.png");
 
-    game_go_to_state(GAME_STATE_DAY_SUMMARY);
+    game_go_to_state(GAME_STATE_SELECT_ITEMS);
 
     game.items_sold_today[0] = (Item_Sold) {
         .item = ITEM_VACUUM,
         .character = CHARACTERS_NERD,
     };
 
-    smile_game.init();
+    // smile_game.init();
     // shotgun_game.init();
 
 
@@ -208,9 +206,9 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
+                game_update();
                 // pick_items_update();
-                // game_update();
-                smile_game.update();
+                // smile_game.update();
                 // shotgun_game.update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
