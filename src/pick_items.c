@@ -250,7 +250,7 @@ void pick_items_update() {
                             .layoutDirection = CLAY_TOP_TO_BOTTOM,
                             .sizing = {
                                 .width = CLAY_SIZING_FIXED(300),
-                                .height = CLAY_SIZING_FIT()
+                                .height = CLAY_SIZING_FIT(0)
                             },
                             .padding = {20, 20, 10, 20}
                         },
@@ -355,7 +355,7 @@ void pick_items_update() {
                 .layoutDirection = CLAY_TOP_TO_BOTTOM,
                 .sizing = {
                     .width = CLAY_SIZING_FIXED(500),
-                    .height = CLAY_SIZING_FIT()
+                    .height = CLAY_SIZING_FIT(0)
                 },
                 .padding = {20, 20, 10, 20}
             },
