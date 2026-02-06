@@ -30,6 +30,8 @@ Enum(Item_Type, uint32_t,
 );
 #undef X
 
+extern Item_Data item_data[];
+
 void items_init();
 void items_cleanup();
 

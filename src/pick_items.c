@@ -23,7 +23,7 @@ typedef struct {
 
 static Pick_Items_Data data = {0};
 
-Item_Data item_data[] = {
+static Item_Data item_data[] = {
     #define X(id, name, desc) [id] = { CSTR_TO_STRING(name), CSTR_TO_STRING(desc), (Texture2D) {} },
     ITEM_LIST(X)
     #undef X

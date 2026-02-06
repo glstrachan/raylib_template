@@ -318,6 +318,10 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
             case CLAY_RENDER_COMMAND_TYPE_RAYLIB: {
                 Clay_RaylibElementConfig *config = &renderCommand->renderData.raylib;
                 switch (config->fn) {
+                case CLAY_RAYLIB_FUNCTION_DRAW_RING: {
+                    DrawRing(config->point, config->thickness, config->radius, 0, 360, 0, config->color);
+                }
+                break;
                 case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE: {
                     DrawRectangleV(config->point, config->size, config->color);
                 } break;

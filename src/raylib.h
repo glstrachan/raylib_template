@@ -186,6 +186,17 @@ static inline void ClayDrawSplineCatmullRom(const Vector2 *points, int pointCoun
     Clay__Raylib(&config);
 }
 
+static inline void ClayDrawRing(Vector2 center, float innerRadius, float outerRadius, Color color) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_DRAW_RING,
+        .color = color,
+        .point = center,
+        .radius = outerRadius,
+        .thickness = innerRadius,
+    };
+    Clay__Raylib(&config);
+}
+
 #define DrawRectangleV(...) ClayDrawRectangleV(__VA_ARGS__)
 #define DrawRectangle(...) ClayDrawRectangle(__VA_ARGS__)
 #define DrawRectangleRec(...) ClayDrawRectangleRec(__VA_ARGS__)
@@ -204,6 +215,7 @@ static inline void ClayDrawSplineCatmullRom(const Vector2 *points, int pointCoun
 #define SetShaderValue(...) ClaySetShaderValue(__VA_ARGS__)
 #define SetShapesTexture(...) ClaySetShapesTexture(__VA_ARGS__)
 #define DrawSplineCatmullRom(...) ClayDrawSplineCatmullRom(__VA_ARGS__)
+#define DrawRing(center, inner, outer, start, end, seg, color) ClayDrawRing(center, inner, outer, color)
 
 #endif
 

@@ -16,7 +16,6 @@
 
 // #include "memory_game.h"
 
-
 void memory_game_init();
 void memory_game_update();
 
@@ -39,6 +38,7 @@ Game_Shaders game_shaders = { 0 };
 
 extern Minigame memory_game;
 extern Minigame smile_game;
+extern Minigame shotgun_game;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
@@ -66,20 +66,6 @@ void game_go_to_state(uint32_t next_state) {
 
 void game_update() {
     switch (game.state) {
-    //     case GAME_STATE_TRANSITION: {
-    //         if (timer_update(&game.transition_timer)) {
-    //             game_go_to_state(game.next_state);
-    //             break;
-    //         }
-
-    //         DrawTexture(game.screenshot, 0, 0, WHITE);
-    //         float interp = timer_interpolate(&game.transition_timer);
-    //         interp = interp * 2.0f - 1.0f;
-    //         if (interp < 0.0f) interp = -interp;
-    //         interp = 1.0f - interp;
-
-    //     DrawRectangle(0, 0, game_parameters.screen_width, game_parameters.screen_height, (Color){ 0, 0, 0, 255 * interp });
-    // } break;
     case GAME_STATE_SELECT_ITEMS: {
         pick_items_update();
     } break;
@@ -106,17 +92,16 @@ void game_update() {
 
 Clay_Arena global_clay_arena;
 Font_Manager* global_font_manager;
-// Font* global_clay_fonts;
 
 int main(void)
 {
     const int screenWidth = 1920;
     const int screenHeight = 1080;
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI);
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Travelling Salesman Problems");
     InitAudioDevice();
-    SetTargetFPS(240);
+    SetTargetFPS(0);
     
     Camera2D camera = { 0 };
     camera.offset = (Vector2) { 0.0f, 0.0f };
@@ -173,7 +158,8 @@ int main(void)
         .character = CHARACTERS_NERD,
     };
 
-    smile_game.init();
+    // smile_game.init();
+    shotgun_game.init();
 
 
     while (!WindowShouldClose()) {
@@ -192,9 +178,10 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                pick_items_update();
+                // pick_items_update();
                 // game_update();
                 // smile_game.update();
+                shotgun_game.update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();
