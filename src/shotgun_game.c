@@ -30,22 +30,32 @@ static Texture2D alert_tex;
 
 static float start_time;
 
+static uint32_t score;
+
 static inline float get_random_float() {
     return ((float)GetRandomValue(0, INT_MAX) / (float)INT_MAX);
 }
 
 static void shotgun_game_add_items(int n) {
+    // Periodically space out when things spawn
+    // also initial locations to be just outside the perimeter of the screen
+    // and it chooses a initial velocity pointing towards a point along the center of the screen
+
+    float spawn_time = 0.0f;
+
     for(int i = 0; i < 30; i++) {
+            spawn_time += get_random_float() * 1.0 + 0.1;
+
+            Vector2 spawn_location = (get_random_float() > 0.5) ? (Vector2) {0 - 50, GetRandomValue(20, 900)} : (Vector2) {1920 + 50, GetRandomValue(20, 900)};
+            Vector2 center_point = (Vector2) {1920 / 2, GetRandomValue(-200, 700)};
+
             oc_array_append(&arena, &shotgun_game_items, ((Shotgun_Game_Item) {
             GetRandomValue(0, ITEM_COUNT - 1),
-            (Vector2) {
-                GetRandomValue(0, 1920),
-                GetRandomValue(0, 1080)
-            },
-            Vector2Normalize((Vector2) { get_random_float() - 0.5, get_random_float() - 0.5 }),
+            spawn_location,
+            Vector2Scale(Vector2Normalize(Vector2Subtract(center_point, spawn_location)), get_random_float() * 3.5f + 1.5f),
             SHOTGUN_ITEM_STATE_UNSPAWNED,
             0.2f,
-            10.0 * get_random_float()
+            spawn_time
         }));
     }
     
@@ -57,6 +67,7 @@ void shotgun_game_init() {
     alert_tex = LoadTexture("resources/alert.png");   // Same
 
     start_time = GetTime();
+    score = 0;
     
     shotgun_game_add_items(20);
     
@@ -86,6 +97,8 @@ bool shotgun_game_update() {
                 float dist = Vector2Distance(mouse, game_item->position);
                 
                 if(dist < item_hit_radius) {
+                    // TODO: Add scoring logic
+                    score += 500;
                     game_item->state = SHOTGUN_ITEM_STATE_DESTROYED;
                 }
             }
@@ -97,6 +110,10 @@ bool shotgun_game_update() {
 
     for(uint32_t i = 0; i < shotgun_game_items.count; i++) {
         Shotgun_Game_Item* game_item = &shotgun_game_items.items[i];
+
+        if(game_item->position.y > 1500) {
+            game_item->state = SHOTGUN_ITEM_STATE_DESTROYED;
+        }
 
         if(game_item->state == SHOTGUN_ITEM_STATE_DESTROYED) {
             game_item->cooldown -= GetFrameTime();
@@ -115,6 +132,26 @@ bool shotgun_game_update() {
     // Draw Background
     DrawTexture(bg_tex, 0, 0, WHITE);
 
+    // Draw UI bs
+    game_objective_widget(lit("Shoot any item that isnt [INSERT CORRECT ONE HERE]"));
+
+    // Draw the score
+    CLAY_AUTO_ID({
+        .floating = { .offset = { 16, 100 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_RIGHT_TOP, CLAY_ATTACH_POINT_RIGHT_TOP } },
+        .layout = {
+            .padding = {10, 25, 0, 0},
+            .sizing = {
+                .width = CLAY_SIZING_FIT(),
+                .height = CLAY_SIZING_FIT()
+            },
+        },
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .custom = { .customData = make_cool_background() },
+        .cornerRadius = CLAY_CORNER_RADIUS(6),
+    }) {
+        CLAY_TEXT((oc_format(&frame_arena, "Score: {}", score)), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+    }
+
     // Draw all the items
     for(uint32_t i = 0; i < shotgun_game_items.count; i++) {
         Shotgun_Game_Item* game_item = &shotgun_game_items.items[i];
@@ -127,11 +164,20 @@ bool shotgun_game_update() {
                 }
             } break;
             case SHOTGUN_ITEM_STATE_ALERTING: {
-                if(GetTime() - start_time > game_item->spawn_time + 0.5) {
+                if(GetTime() - start_time > game_item->spawn_time + 1.0) {
                     game_item->state = SHOTGUN_ITEM_STATE_SPAWNED;
                 }
+                
+                // TODO: Draw the texture on screen at the nearest location
 
-                DrawTexture(alert_tex, game_item->position.x - alert_tex.width * 0.5, game_item->position.y - alert_tex.height * 0.5, WHITE);
+                if(game_item->position.x < 0) {
+                    DrawTexture(alert_tex, game_item->position.x - alert_tex.width * 0.5 + 100, game_item->position.y - alert_tex.height * 0.5, WHITE);
+                }
+                else {
+                    DrawTexture(alert_tex, game_item->position.x - alert_tex.width * 0.5 - 100, game_item->position.y - alert_tex.height * 0.5, WHITE);
+                }
+
+                
             } break;
             case SHOTGUN_ITEM_STATE_SPAWNED: {
                 game_item->velocity = Vector2Subtract(game_item->velocity, Vector2Scale((Vector2) {0.0, -1.5}, GetFrameTime()));
@@ -152,8 +198,6 @@ bool shotgun_game_update() {
     DrawCircle(mouse.x, mouse.y, 5, (Color) {255, 0, 0, 255});
     DrawRing(mouse, 25, 30, 0, 360, 100, ((Color) {255, 0, 0, 255}));
 
-    game_objective_widget(lit("Shoot the right items!"));
-
     return false;
 }
 
@@ -161,23 +205,3 @@ Minigame shotgun_game = {
     .init = shotgun_game_init,
     .update = shotgun_game_update,
 };
-
-// Game structure
-
-// So there is several rounds
-
-// and in each round you play a variant of the minigame
-
-// In the most basic variant
-
-// There is a set of items that will spawn in
-
-// We spawn them in
-
-// Basically score the user based on if they click on an item successfully
-
-
-
-// How does the state machine or whatever work
-
-// 
