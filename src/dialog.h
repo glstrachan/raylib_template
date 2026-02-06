@@ -22,7 +22,7 @@ void dialog_cleanup();
 typedef struct {
     uint32_t total_chars;
     uint32_t printed_chars;
-    Game_Timer char_timer;
+    Game_Timer char_timer, timeout_timer;
 } Dialog_Text_Data;
 
 typedef struct {
@@ -42,10 +42,13 @@ typedef struct {
     void *stack, *old_stack;
     bool first_time;
     bool is_done;
+    float current_mood;
 } Encounter_Sequence;
 
 typedef struct {
     void (*place_above_dialog)(void);
+    float timeout;
+    float mood;
 } Dialog_Parameter;
 
 bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters);

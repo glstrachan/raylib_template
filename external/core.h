@@ -508,6 +508,11 @@ typedef struct {
 		}                                                                                          \
 		(array)->count += (plus_count);                                                                 \
 	} while (0)
+#define oc_array_unordered_remove(arena, array, index)              \
+	do {                                                            \
+        (array)->items[index] = (array)->items[(array)->count - 1]; \
+		(array)->count--;                                           \
+	} while (0)
 
 static inline uword oc_align_forward(uword value, uword alignment_in_bytes) {
     return (value + alignment_in_bytes - 1) & ~(alignment_in_bytes - 1);
@@ -1105,16 +1110,17 @@ void oc_writer_format_and_write_float(Oc_Writer *writer, Oc_Format_Config cfg, d
         writer->write(writer, int_buffer + int_buffer_offset + 1, sizeof(int_buffer) - int_buffer_offset - 1);
     }
 
-    int decimal_places = 6;
+    int decimal_places = cfg.size ? cfg.size : 6;
     double e = 0.5;
     for (int i = 0; i < decimal_places; ++i) e /= 10.0;
-    dvalue += e;
+    // dvalue += e; why was this here??
 
     uint64 multiply = 10;
     double shifted = dvalue;
     double acc = 0.0;
     int_buffer_offset = 0;
     int_buffer[int_buffer_offset++] = '.';
+    int decimals = 0;
     if ((dvalue - acc) > e) {
         while ((dvalue - acc) > e) {
             double d = shifted * 10;
@@ -1123,6 +1129,15 @@ void oc_writer_format_and_write_float(Oc_Writer *writer, Oc_Format_Config cfg, d
             int_buffer[int_buffer_offset++] = i + '0';
             shifted = d - i;
             multiply *= 10;
+            decimals++;
+        }
+        if (cfg.size && decimals < cfg.size) {
+            while (decimals < cfg.size) {
+                int_buffer[int_buffer_offset++] = '0';
+                decimals++;
+            }
+        } else if (cfg.size && decimals > cfg.size) {
+            int_buffer_offset -= (decimals - cfg.size);
         }
     } else {
         int_buffer[int_buffer_offset++] = '0';

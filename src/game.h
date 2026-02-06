@@ -27,6 +27,10 @@ static inline int64_t timer_elapsed(Game_Timer* timer) {
     return max(timer->start - timer->tick, 0);
 }
 
+static inline int64_t timer_time_left(Game_Timer* timer) {
+    return max(timer->tick, 0);
+}
+
 // returns value from 0.0 to 1.0, 0.0. being start of timer, 1.0 being end of timer
 static inline float timer_interpolate(Game_Timer* timer) {
     return max(0.0f, (float)(timer->start - timer->tick) / (float)timer->start);
@@ -83,6 +87,7 @@ typedef struct {
         GAME_STATE_SELECT_ITEMS,
         GAME_STATE_SELECT_ENCOUNTER,
         GAME_STATE_IN_ENCOUNTER,
+        GAME_STATE_DONE_ENCOUNTER,
         GAME_STATE_DAY_SUMMARY,
         GAME_STATE_PLAYTHROUGH_SUMMARY,
     } state;
@@ -99,11 +104,20 @@ typedef struct {
 
     uint8_t current_day;
 
+    float minigame_scores;
+    int minigame_count;
     Item_Sold items_sold_today[4];
     Array(Item_Sold) prev_items_sold;
 } Game_State;
 extern Game_State game;
 
+/*
+* Submit a score for a finished minigame. score goes from 0.0f (bad) to 1.0f (good)
+*/
+static inline void game_submit_minigame_score(float score) {
+    game.minigame_count++;
+    game.minigame_scores += score;
+}
 void game_go_to_state(uint32_t next_state);
 
 extern void HandleClayErrors(Clay_ErrorData errorData);
