@@ -69,7 +69,6 @@ void pick_encounter_init(void) {
 void pick_encounter(void) {
     game.current_character = CHARACTERS_OLDLADY;
     // game.encounter = &sample_encounter_;
-    game.briefcase.items[0] = ITEM_LOLLIPOP;
     selected_item = -1;
 }
 
