@@ -118,6 +118,8 @@ int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, co
     return result;
 }
 
+static Shader timer_shader;
+
 bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters) {
 
     // draw the text
@@ -125,6 +127,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
         data.text.total_chars = text.len;
         data.text.printed_chars = 0;
         timer_init(&data.text.char_timer, 30);
+        if (parameters.timeout > 0.0f) timer_init(&data.text.timeout_timer, parameters.timeout);
         sequence->first_time = false;
     }
 
@@ -135,17 +138,28 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             timer_reset(&data.text.char_timer);
             data.text.printed_chars++;
         }
-        
-        if(IsKeyPressed(KEY_SPACE)) {
-            data.text.printed_chars = data.text.total_chars;
-        }
-    } else if(data.text.total_chars == data.text.printed_chars) {
-        if (IsKeyPressed(KEY_SPACE)) {
+    }
+
+    if (parameters.timeout > 0.0f) {
+        if (timer_update(&data.text.timeout_timer)) {
             result = true;
+        }
+    } else {
+        if(data.text.printed_chars < data.text.total_chars) {
+            if(IsKeyPressed(KEY_SPACE)) {
+                data.text.printed_chars = data.text.total_chars;
+            }
+        } else if(data.text.total_chars == data.text.printed_chars) {
+            if (IsKeyPressed(KEY_SPACE)) {
+                result = true;
+            }
         }
     }
 
-    CustomLayoutElement* customBackgroundData = make_cool_background();
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = timer_shader };
+
 
     DialogTextUserData* textUserData = oc_arena_alloc(&frame_arena, sizeof(DialogTextUserData));
     textUserData->visible_chars = data.text.printed_chars;
@@ -164,74 +178,106 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
             parameters.place_above_dialog();
         }
 
-        CLAY(CLAY_ID("DialogBox"), {
+
+        CLAY_AUTO_ID({
             .layout = {
-                .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                .layoutDirection = CLAY_LEFT_TO_RIGHT,
                 .sizing = {
                     .width = CLAY_SIZING_GROW(),
                     .height = CLAY_SIZING_FIXED(200)
                 },
-                .padding = {16, 16, 20, 10},
+                .padding = {16, 20, 20, 10},
             },
             .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-            .custom = { .customData = customBackgroundData },
+            .custom = { .customData = make_cool_background() },
             .cornerRadius = CLAY_CORNER_RADIUS(16)
         }) {
-            CLAY(CLAY_ID("DialogName"), {
+            CLAY(CLAY_ID("DialogBox"), {
                 .layout = {
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
                     .sizing = {
-                        .width = CLAY_SIZING_PERCENT(1.0),
-                        .height = CLAY_SIZING_PERCENT(0.25)
+                        .width = CLAY_SIZING_GROW(),
                     },
-                    .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
                 },
-                .backgroundColor = {200, 0, 0, 0},
             }) {
-                CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-            }
-            CLAY(CLAY_ID("DialogTextContainer"), {
-                .layout = {
-                    .sizing = {
-                        .width = CLAY_SIZING_PERCENT(1.0),
-                        .height = CLAY_SIZING_GROW(),
-                    },
-                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
-                },
-                .backgroundColor = {0, 255, 0, 0},
-            }) {
-                CLAY(CLAY_ID("DialogText"), {
+                CLAY(CLAY_ID("DialogName"), {
                     .layout = {
                         .sizing = {
-                            .width = CLAY_SIZING_PERCENT(0.95),
-                            .height = CLAY_SIZING_GROW(),
-                        }
+                            .width = CLAY_SIZING_PERCENT(1.0),
+                            .height = CLAY_SIZING_PERCENT(0.25)
+                        },
+                        .childAlignment = { .y = CLAY_ALIGN_Y_CENTER }
                     },
-                    .backgroundColor = {0, 255, 255, 0},
+                    .backgroundColor = {200, 0, 0, 0},
                 }) {
-                    CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
+                    CLAY_TEXT(((Clay_String) { .length = speaker_name.len, .chars = speaker_name.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+                }
+                CLAY(CLAY_ID("DialogTextContainer"), {
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_PERCENT(1.0),
+                            .height = CLAY_SIZING_GROW(),
+                        },
+                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
+                    },
+                    .backgroundColor = {0, 255, 0, 0},
+                }) {
+                    CLAY(CLAY_ID("DialogText"), {
+                        .layout = {
+                            .sizing = {
+                                .width = CLAY_SIZING_PERCENT(0.95),
+                                .height = CLAY_SIZING_GROW(),
+                            }
+                        },
+                        .backgroundColor = {0, 255, 255, 0},
+                    }) {
+                        CLAY_TEXT(((Clay_String) { .length = text.len, .chars = text.ptr }), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255}, .userData = textUserData }));
+                    }
+                }
+                CLAY(CLAY_ID("DialogContinue"), {
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_PERCENT(1.0),
+                            .height = CLAY_SIZING_PERCENT(0.18)
+                        },
+                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
+                    },
+                    .backgroundColor = {200, 0, 0, 0},
+                }) {
+                    if(data.text.total_chars == data.text.printed_chars && parameters.timeout == 0.0f) {
+                        CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
+                    }
                 }
             }
-            CLAY(CLAY_ID("DialogContinue"), {
-                .layout = {
-                    .sizing = {
-                        .width = CLAY_SIZING_PERCENT(1.0),
-                        .height = CLAY_SIZING_PERCENT(0.18)
-                    },
-                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
-                },
-                .backgroundColor = {200, 0, 0, 0},
-            }) {
-                if(data.text.total_chars == data.text.printed_chars) {
-                    CLAY_TEXT((CLAY_STRING("Space to Continue")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
+
+            // CLAY_AUTO_ID({ .layout = { .sizing = { .width = CLAY_SIZING_GROW() } } });
+            CLAY_AUTO_ID({}) {
+                float f = timer_interpolate(&data.text.timeout_timer);
+                SetShaderValue(timer_shader, GetShaderLocation(timer_shader, "completion"), &f, SHADER_UNIFORM_FLOAT);
+                CLAY_AUTO_ID({
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(50), .height = CLAY_SIZING_FIXED(50) } },
+                    .border = { .width = { 2, 2, 2, 2, 0 }, .color = {135, 135, 135, 255} },
+                    .cornerRadius = CLAY_CORNER_RADIUS(1000),
+                    .custom = { .customData = customBackgroundData },
+                    // .backgroundColor = { 0, 0, 255, 255 },
+                });
+
+                CLAY_AUTO_ID({
+                    .floating = { .offset = {-10, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_LEFT_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+                }) {
+                    CLAY_TEXT(oc_format(&frame_arena, "{1}", timer_time_left(&data.text.timeout_timer) / 1000.0f), CLAY_TEXT_CONFIG({ .fontId = FONT_ITIM, .fontSize = 20, .textColor = {255, 255, 255, 255} }));
                 }
             }
         }
+
+
     }
 
     return result;
 }
 
 void dialog_init() {
+    timer_shader = LoadShader(NULL, "resources/timer_shader.fs");
 }
 
 void dialog_cleanup() {

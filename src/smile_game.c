@@ -119,8 +119,8 @@ static void place_bar(void) {
 
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
-    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there", .place_above_dialog = place_bar);
-    dialog_text(CHARACTERS_OLDLADY, "my cat died", .place_above_dialog = place_bar);
+    dialog_text(CHARACTERS_OLDLADY, "soo nice smile u have there", .place_above_dialog = place_bar, .timeout = 5000.0f);
+    dialog_text(CHARACTERS_OLDLADY, "my cat died", .place_above_dialog = place_bar, .timeout = 5000.0f);
     encounter_end();
 }
 

@@ -27,6 +27,10 @@ static inline int64_t timer_elapsed(Game_Timer* timer) {
     return max(timer->start - timer->tick, 0);
 }
 
+static inline int64_t timer_time_left(Game_Timer* timer) {
+    return max(timer->tick, 0);
+}
+
 // returns value from 0.0 to 1.0, 0.0. being start of timer, 1.0 being end of timer
 static inline float timer_interpolate(Game_Timer* timer) {
     return max(0.0f, (float)(timer->start - timer->tick) / (float)timer->start);
