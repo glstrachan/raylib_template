@@ -191,7 +191,7 @@ int main(void)
     smile_game.init();
     shotgun_game.init();
     rhythm_game.init();
-
+    memory_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -219,6 +219,7 @@ int main(void)
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
+                memory_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
