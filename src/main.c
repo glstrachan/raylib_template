@@ -200,14 +200,15 @@ int main(void)
         game_parameters.screen_width = GetScreenWidth();
         game_parameters.screen_height = GetScreenHeight();
 
-        Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
-        Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-        Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
 
         if (game.current_prerender) game.current_prerender();
 
         // game_parameters.screen_width = GetScreenWidth();
         // game_parameters.screen_height = GetScreenHeight();
+
+        Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
+        Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+        Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
 
         Clay_BeginLayout();
 

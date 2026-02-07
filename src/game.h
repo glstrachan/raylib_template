@@ -59,6 +59,7 @@ static inline float half_smoothstep(float x) {
 
 typedef struct {
     void (*init)(void);
+    void (*cleanup)(void);
     bool (*update)(void);
 } Minigame;
 

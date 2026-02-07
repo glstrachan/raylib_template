@@ -56,6 +56,7 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
     if (!(minigame)->update()) {                \
         my_longjmp(__current_sequence->jump_back_buf, 1); \
     }                                           \
+    if ((minigame)->cleanup) (minigame)->cleanup(); \
     game.current_prerender = NULL; \
 } while (0)
 

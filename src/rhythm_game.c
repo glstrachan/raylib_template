@@ -29,6 +29,11 @@ static enum {
     STATE_PLAYBACK,
     STATE_BEAM,
 } current_state = STATE_POPIN;
+static int current_round;
+static int target_rounds;
+const float ACCURACY_LENIENCY = 0.4f;
+static float accuracy;
+static int total_shots;
 
 typedef struct {
     int count;
@@ -281,17 +286,28 @@ void rhythm_game_prerender(void) {
         if (timer_update(&rhythm_sequence_timer)) {
             if (rhythm_sequence_beat_index >= 8) {
                 set_random_points();
+                current_round += 1;
                 // do_wait_then_state(STATE_POPIN);
             } else {
                 if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
                     PlaySound(katana1);
                     rhythm_sequence_note_index++;
+                    total_shots += 1;
                 }
                 rhythm_sequence_beat_index++;
                 timer_reset(&rhythm_sequence_timer);
             }
         }
-        if (IsKeyPressed(KEY_SPACE)) {
+        if (IsKeyPressed(KEY_SPACE) && current_shot_point_index < points_count) {
+            if (current_shot_point_index == rhythm_sequence_note_index) {
+                accuracy += Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            } else if (current_shot_point_index == rhythm_sequence_note_index - 1) {
+                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            } else if (current_shot_point_index == rhythm_sequence_note_index + 1) {
+                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            }
+            // else if (current_shot_point_index == rhythm_sequence_note_index)
+
             timer_init(&beam_timer, 100);
             is_shooting = true;
         }
@@ -318,7 +334,24 @@ void rhythm_game_prerender(void) {
     BeginTextureMode(tv_game);
     ClearBackground(RED);
         BeginMode2D(camera);
+            Clay_SetLayoutDimensions((Clay_Dimensions) { 800, 600 });
+
             Clay_BeginLayout();
+                CLAY_AUTO_ID({
+                    .floating = { .offset = {-100, 16 }, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_RIGHT_BOTTOM, CLAY_ATTACH_POINT_RIGHT_BOTTOM } },
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_FIT(.min = 170)
+                        },
+                        .padding = {16, 16, 10, 34},
+                    },
+                    .cornerRadius = CLAY_CORNER_RADIUS(16),
+                    .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+                    .custom = { .customData = make_cool_background() },
+                }) {
+                    CLAY_TEXT(oc_format(&frame_arena, "Accuracy: {2}/{}", accuracy, total_shots), CLAY_TEXT_CONFIG({ .fontId = FONT_ITIM, .fontSize = 24, .textColor = {255, 255, 255, 255} }));
+                }
+
                 float t = 0.0f;
                 DrawTexturePro(space_texture, (Rectangle) { (1920 - (1080 * 4.0f / 3.0f)) / 2.0f * t, 0.0f, 1080 * 4.0f / 3.0f, 1080.0f }, (Rectangle) { 0.0f, 0.0f, 800.0f, 600.0f }, (Vector2) {0, 0}, 0.0f, WHITE);
 
@@ -396,16 +429,40 @@ void rhythm_game_init(void) {
     katana1 = LoadSound("resources/sounds/katana1.mp3");
     knife = LoadSound("resources/sounds/knife.mp3");
     stabbing = LoadSound("resources/sounds/stabbing.mp3");
+    tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
 
     tv_game = LoadRenderTexture(800, 600);
-    tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
+
     game.current_prerender = rhythm_game_prerender;
     current_shot_point_index = 0;
-    set_random_points();
     current_canon_angle = 0.0f;
+    accuracy = 0.0f;
+    total_shots = 0;
+    current_round = 0;
+    target_rounds = 5;
+    set_random_points();
+}
+
+void rhythm_game_cleanup(void) {
+    UnloadTexture(tv_texture);
+    UnloadTexture(space_texture);
+    UnloadTexture(laser_canon_body);
+    UnloadTexture(laser_canon_barrel);
+    UnloadTexture(laser_canon_wheel);
+    
+    UnloadSound(katana1);
+    UnloadSound(knife);
+    UnloadSound(stabbing);
+    UnloadShader(tv_shader);
+
+    UnloadRenderTexture(tv_game);
 }
 
 bool rhythm_game_update(void) {
+    if (current_round > target_rounds) {
+        game_submit_minigame_score(accuracy / total_shots);
+        return true;
+    }
     Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, -(float)tv_game.texture.height };
     Rectangle observerDest = {
         100, 96,
@@ -444,5 +501,6 @@ bool rhythm_game_update(void) {
 
 Minigame rhythm_game = {
     .init = rhythm_game_init,
+    .cleanup = rhythm_game_cleanup,
     .update = rhythm_game_update,
 };
