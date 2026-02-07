@@ -165,6 +165,16 @@ static inline void ClaySetShaderValue(Shader shader, int locIndex, const void *v
     Clay__Raylib(&config);
 }
 
+static inline void ClaySetShaderValueTexture(Shader shader, int locIndex, Texture2D texture) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE_TEXTURE,
+        .shader = shader,
+        .shaderLocIdx = locIndex,
+        .texture = texture,
+    };
+    Clay__Raylib(&config);
+}
+
 static inline void ClaySetShapesTexture(Texture2D texture, Rectangle rect) {
     Clay_RaylibElementConfig config = {
         .fn = CLAY_RAYLIB_FUNCTION_SET_SHAPES_TEXTURE,
@@ -212,6 +222,22 @@ static inline void ClayEndTextureMode(void) {
     Clay__Raylib(&config);
 }
 
+static inline void ClayBeginScissorMode(int x, int y, int width, int height) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_BEGIN_SCISSOR_MODE,
+        .x = x, .y = y,
+        .width = width, .height = height,
+    };
+    Clay__Raylib(&config);
+}
+
+static inline void ClayEndScissorMode(void) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_END_SCISSOR_MODE,
+    };
+    Clay__Raylib(&config);
+}
+
 #define DrawRectangleV(...) ClayDrawRectangleV(__VA_ARGS__)
 #define DrawRectangle(...) ClayDrawRectangle(__VA_ARGS__)
 #define DrawRectangleRec(...) ClayDrawRectangleRec(__VA_ARGS__)
@@ -228,9 +254,13 @@ static inline void ClayEndTextureMode(void) {
 #define BeginShaderMode(...) ClayBeginShaderMode(__VA_ARGS__)
 #define EndShaderMode(...) ClayEndShaderMode(__VA_ARGS__)
 #define SetShaderValue(...) ClaySetShaderValue(__VA_ARGS__)
+#define SetShaderValueTexture(...) ClaySetShaderValueTexture(__VA_ARGS__)
 #define SetShapesTexture(...) ClaySetShapesTexture(__VA_ARGS__)
 #define DrawSplineCatmullRom(...) ClayDrawSplineCatmullRom(__VA_ARGS__)
 #define DrawRing(center, inner, outer, start, end, seg, color) ClayDrawRing(center, inner, outer, color)
+
+#define BeginScissorMode(...) ClayBeginScissorMode(__VA_ARGS__)
+#define EndScissorMode(...) ClayEndScissorMode(__VA_ARGS__)
 
 // #define BeginTextureMode(...) ClayBeginTextureMode(__VA_ARGS__)
 // #define EndTextureMode(...) ClayEndTextureMode(__VA_ARGS__)

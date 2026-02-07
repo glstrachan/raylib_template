@@ -219,6 +219,7 @@ int main(void)
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
+
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
             EndMode2D();

@@ -17,28 +17,20 @@ static Texture2D nerd_tex;
 static Texture2D shotgunner_tex;
 static Texture2D fatman_tex;
 
-void characters_draw(Character_Type type, Character_Position pos) {
-    Texture2D tex;
-
+Texture2D* characters_get_texture(Character_Type type) {
     switch(type) {
-        case CHARACTERS_SALESMAN:
-            tex = salesman_tex;
-            break;
-        case CHARACTERS_OLDLADY:
-            tex = oldlady_tex;
-            break;
-        case CHARACTERS_NERD:
-            tex = nerd_tex;
-            break;
-        case CHARACTERS_SHOTGUNNER:
-            tex = shotgunner_tex;
-            break;
-        case CHARACTERS_FATMAN:
-            tex = fatman_tex;
-            break;
+        case CHARACTERS_SALESMAN:   return &salesman_tex;
+        case CHARACTERS_OLDLADY:    return &oldlady_tex;
+        case CHARACTERS_NERD:       return &nerd_tex;
+        case CHARACTERS_SHOTGUNNER: return &shotgunner_tex;
+        case CHARACTERS_FATMAN:     return &fatman_tex;
         case CHARACTERS_COUNT:
         case CHARACTERS_NONE: oc_assert(false); break;
     }
+}
+
+void characters_draw(Character_Type type, Character_Position pos) {
+    Texture2D tex = *characters_get_texture(type);
 
     Vector2 position = (pos == CHARACTERS_LEFT ? position_left : position_right);
     position.y -= tex.height;
@@ -48,10 +40,15 @@ void characters_draw(Character_Type type, Character_Position pos) {
 
 void characters_init() {
     salesman_tex = LoadTexture("resources/salesman.png");
+    SetTextureWrap(salesman_tex, TEXTURE_WRAP_CLAMP);
     oldlady_tex = LoadTexture("resources/oldlady.png");
+    SetTextureWrap(oldlady_tex, TEXTURE_WRAP_CLAMP);
     nerd_tex = LoadTexture("resources/nerd.png");
+    SetTextureWrap(nerd_tex, TEXTURE_WRAP_CLAMP);
     shotgunner_tex = LoadTexture("resources/shotgunner.png");
+    SetTextureWrap(shotgunner_tex, TEXTURE_WRAP_CLAMP);
     fatman_tex = LoadTexture("resources/fatman.png");
+    SetTextureWrap(fatman_tex, TEXTURE_WRAP_CLAMP);
 }
 
 void characters_cleanup() {
