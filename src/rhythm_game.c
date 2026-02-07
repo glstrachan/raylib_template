@@ -1,10 +1,16 @@
 #include "game.h"
 
 static Texture2D tv_texture;
+static Texture2D space_texture;
+static Texture2D laser_canon_body;
+static Texture2D laser_canon_barrel;
+static Texture2D laser_canon_wheel;
 static RenderTexture2D tv_game;
 static Shader tv_shader;
 
 static Vector2 position;
+
+static float t = 0.0f;
 
 void rhythm_game_prerender(void) {
     Vector2 velocity = { 0, 0 };
@@ -22,6 +28,9 @@ void rhythm_game_prerender(void) {
         velocity.y = -SPEED * GetFrameTime();
     }
 
+    float angle = sinf(t) * 70.0f;
+    t += 0.01f;
+
     position = Vector2Add(position, velocity);
 
     Camera2D camera = { 0 };
@@ -31,6 +40,34 @@ void rhythm_game_prerender(void) {
     ClearBackground(RED);
         BeginMode2D(camera);
             Clay_BeginLayout();
+                float t = 0.0f;
+                DrawTexturePro(space_texture, (Rectangle) { (1920 - (1080 * 4.0f / 3.0f)) / 2.0f * t, 0.0f, 1080 * 4.0f / 3.0f, 1080.0f }, (Rectangle) { 0.0f, 0.0f, 800.0f, 600.0f }, (Vector2) {0, 0}, 0.0f, WHITE);
+
+                DrawTexturePro(laser_canon_barrel,
+                    (Rectangle) {0,0, laser_canon_barrel.width,laser_canon_barrel.height},
+                    (Rectangle) {
+                        320+laser_canon_body.width / 2.0f,
+                        600.0f - 95.0f,
+
+                        laser_canon_barrel.width,laser_canon_barrel.height
+                    },
+                    (Vector2) {laser_canon_barrel.width/2.0f,90.0f}, angle, WHITE
+                );
+                DrawTexture(laser_canon_body, 320, 600 - laser_canon_body.height, WHITE);
+                DrawTexturePro(laser_canon_wheel,
+                    (Rectangle) {0,0, laser_canon_wheel.width,laser_canon_wheel.height},
+                    (Rectangle) {
+                        320+laser_canon_body.width / 2.0f,
+                        600.0f - 95.0f,
+
+                        laser_canon_wheel.width,laser_canon_wheel.height
+                    },
+                    (Vector2) {laser_canon_wheel.width/2.0f,laser_canon_wheel.height/2.0f}, angle, WHITE
+                );
+
+                // DrawTexture(laser_canon_barrel, 320, 600 - laser_canon_body.height, WHITE);
+
+
                 DrawRectangleV(position, (Vector2) { 100, 100 }, WHITE);
             // DrawRectangle(700, 500, 100, 100, WHITE);
             Clay_RenderCommandArray renderCommands = Clay_EndLayout();
@@ -41,6 +78,11 @@ void rhythm_game_prerender(void) {
 
 void rhythm_game_init(void) {
     tv_texture = LoadTexture("resources/tv.png");
+    space_texture = LoadTexture("resources/background_space.png");
+    laser_canon_body = LoadTexture("resources/laser_canon_body.png");
+    laser_canon_barrel = LoadTexture("resources/laser_canon_barrel.png");
+    laser_canon_wheel = LoadTexture("resources/laser_canon_wheel.png");
+
     tv_game = LoadRenderTexture(800, 600);
     tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
     game.current_prerender = rhythm_game_prerender;
@@ -48,10 +90,10 @@ void rhythm_game_init(void) {
 }
 
 bool rhythm_game_update(void) {
-    Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, (float)tv_game.texture.height };
+    Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, -(float)tv_game.texture.height };
     Rectangle observerDest = {
-        101, 99,
-        926, 770,
+        100, 96,
+        800, 602,
     };
 
     observerDest.x += game_parameters.screen_width / 2 - tv_texture.width / 2;
