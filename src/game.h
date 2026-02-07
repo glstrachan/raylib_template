@@ -49,6 +49,14 @@ static inline bool timer_ready(Game_Timer* timer) {
     return timer->tick <= 0;
 }
 
+static inline float smoothstep(float x) {
+    return 3.0f * x * x - 2.0f * x * x * x;
+}
+
+static inline float half_smoothstep(float x) {
+    return (smoothstep(x * 0.5 + 0.5) - 0.5) * 2.0;
+}
+
 typedef struct {
     void (*init)(void);
     bool (*update)(void);

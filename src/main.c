@@ -191,7 +191,7 @@ int main(void)
     smile_game.init();
     shotgun_game.init();
     rhythm_game.init();
-
+    memory_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
