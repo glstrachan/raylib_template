@@ -23,6 +23,18 @@ static inline void ClayDrawRectangle(int posX, int posY, int width, int height, 
     Clay__Raylib(&config);
 }
 
+static inline void ClayDrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_PRO,
+        .color = color,
+        .point = { rec.x, rec.y },
+        .size = { rec.width, rec.height },
+        .origin = origin,
+        .rotation = rotation,
+    };
+    Clay__Raylib(&config);
+}
+
 static inline void ClayDrawRectangleRec(Rectangle rec, Color color) {
     Clay_RaylibElementConfig config = {
         .fn = CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE,
@@ -241,6 +253,7 @@ static inline void ClayEndScissorMode(void) {
 #define DrawRectangleV(...) ClayDrawRectangleV(__VA_ARGS__)
 #define DrawRectangle(...) ClayDrawRectangle(__VA_ARGS__)
 #define DrawRectangleRec(...) ClayDrawRectangleRec(__VA_ARGS__)
+#define DrawRectanglePro(...) ClayDrawRectanglePro(__VA_ARGS__)
 #define DrawRectangleLinesEx(...) ClayDrawRectangleLinesEx(__VA_ARGS__)
 #define DrawCircleV(...) ClayDrawCircleV(__VA_ARGS__)
 #define DrawCircle(...) ClayDrawCircle(__VA_ARGS__)

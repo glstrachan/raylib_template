@@ -561,6 +561,7 @@ CLAY__WRAPPER_STRUCT(Clay_BorderElementConfig);
 
 typedef CLAY_PACKED_ENUM {
     CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE,
+    CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_PRO,
     CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_LINES,
     CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE,
     CLAY_RAYLIB_FUNCTION_DRAW_CIRCLE_LINES,
@@ -615,6 +616,7 @@ typedef struct Clay_RaylibElementConfig {
             union {
                 Font font;
                 Vector2 v3;
+                Vector2 origin;
                 Rectangle dst;
             };
             Color color;
