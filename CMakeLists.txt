@@ -21,6 +21,7 @@ set(SOURCES
     src/memory_game.c
     src/smile_game.c
     src/shotgun_game.c
+    src/rhythm_game.c
 )
 
 include_directories(

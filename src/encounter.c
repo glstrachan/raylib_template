@@ -52,7 +52,7 @@ bool encounter_is_done(void) {
     return encounter_top_sequence.is_done;
 }
 
-extern Minigame memory_game, smile_game, shotgun_game;
+extern Minigame memory_game, smile_game, shotgun_game, rhythm_game;
 
 static int selected_item;
 
@@ -67,7 +67,7 @@ void pick_encounter_init(void) {
 }
 
 void pick_encounter(void) {
-    game.current_character = CHARACTERS_OLDLADY;
+    game.current_character = CHARACTERS_FATMAN;
     // game.encounter = &sample_encounter_;
     selected_item = -1;
 }
@@ -1220,7 +1220,7 @@ void encounter_fatman_vacuum(void) {
     dialog_text(CHARACTERS_FATMAN, "Alright, show me what it can do. But I'm not getting up. Demonstrate from here.");
     dialog_text(CHARACTERS_SALESMAN, "I can work with that. Watch this!");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     
     dialog_text(CHARACTERS_FATMAN, "Huh. That actually worked. And you didn't even need me to move.");
     dialog_text(CHARACTERS_SALESMAN, "The future of cleaning!");
@@ -1278,7 +1278,7 @@ void encounter_fatman_books(void) {
     dialog_text(CHARACTERS_SALESMAN, "Here you go. Volume F through G.");
     dialog_text(CHARACTERS_FATMAN, "F through G? Perfect. That covers 'Food' and 'Gastronomy.'");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     
     dialog_text(CHARACTERS_FATMAN, "This is actually pretty good. Nice pictures too.");
     dialog_text(CHARACTERS_SALESMAN, "So you'll take a set?");
@@ -1335,7 +1335,7 @@ void encounter_fatman_knives(void) {
     dialog_text(CHARACTERS_FATMAN, "Alright, let's see what these knives can do. I have some cheese that needs cutting.");
     dialog_text(CHARACTERS_SALESMAN, "Cheese? I can demonstrate on that!");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     
     dialog_text(CHARACTERS_FATMAN, "Beautiful. That cheese was defiant, and now it's in perfect cubes.");
     dialog_text(CHARACTERS_SALESMAN, "Victory over cheese!");
@@ -1392,7 +1392,7 @@ void encounter_fatman_lollipop(void) {
     dialog_text(CHARACTERS_FATMAN, "Let me sample some of these. For research purposes.");
     dialog_text(CHARACTERS_SALESMAN, "Of course! Here's an assortment!");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     
     dialog_text(CHARACTERS_FATMAN, "These are excellent. High marks across the board.");
     dialog_text(CHARACTERS_SALESMAN, "I'm glad you approve!");
@@ -1449,7 +1449,7 @@ void encounter_fatman_computer(void) {
     dialog_text(CHARACTERS_FATMAN, "Alright, show me how this food delivery thing works.");
     dialog_text(CHARACTERS_SALESMAN, "Watch this! Just a few clicks and—");
     
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     
     dialog_text(CHARACTERS_FATMAN, "Amazing. I just ordered a pizza without moving anything but my fingers.");
     dialog_text(CHARACTERS_SALESMAN, "The magic of technology!");
@@ -1953,7 +1953,7 @@ void encounter_fatman_vase(void) {
     dialog_text(CHARACTERS_SALESMAN, "Come on, what do you say? Let me show you what I can do.");
     dialog_text(CHARACTERS_FATMAN, "Fine. But make it quick. My sandwich is getting cold. Well, it's a cold sandwich. But it's getting warm. Which is worse.");
 
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
 
     dialog_text(CHARACTERS_FATMAN, "You know what, sure. I'll take the vase. I'm gonna put cheese puffs in it.");
     dialog_text(CHARACTERS_SALESMAN, "A bold choice. I support it fully.");
@@ -2000,7 +2000,7 @@ void encounter_fatman_comicbook(void) {
     dialog_text(CHARACTERS_SALESMAN, "So what do you say? Add some entertainment to your next meal?");
     dialog_text(CHARACTERS_FATMAN, "My meals are already entertaining. But sure, let's see what you've got.");
 
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
 
     dialog_text(CHARACTERS_FATMAN, "Alright, sold. I need something to read anyway. I've memorized every takeout menu within a five-mile radius.");
     dialog_text(CHARACTERS_SALESMAN, "That's an impressive radius.");
@@ -2049,7 +2049,7 @@ void encounter_fatman_football(void) {
     dialog_text(CHARACTERS_SALESMAN, "Come on, big guy. Let me show you this is worth it.");
     dialog_text(CHARACTERS_FATMAN, "Alright, alright. You've piqued my interest. And that's hard to do when there's food waiting.");
 
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
 
     dialog_text(CHARACTERS_FATMAN, "You know what, fine. I'll take the football. It'll look good next to the TV. Maybe I'll throw it at Doug when he eats the last slice.");
     dialog_text(CHARACTERS_SALESMAN, "That's the competitive spirit!");
@@ -2599,7 +2599,7 @@ void encounter_fatman_ak47(void) {
     dialog_text(CHARACTERS_SALESMAN, "Why don't you just try holding it? See how it feels?");
     dialog_text(CHARACTERS_FATMAN, "I mean, I'm already standing up. Might as well make the trip worth it.");
     dialog_text(CHARACTERS_SALESMAN, "That's the spirit.");
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     dialog_text(CHARACTERS_FATMAN, "Whoa! The recoil gave my arms more exercise than they've had in months!");
     dialog_text(CHARACTERS_SALESMAN, "See? It's practically a workout machine.");
     dialog_text(CHARACTERS_FATMAN, "A workout machine that shoots? Now THAT I can get behind. I'll take it. Can you carry it inside for me though? My arms are tired now.");
@@ -2638,7 +2638,7 @@ void encounter_fatman_cookies(void) {
 
     dialog_text(CHARACTERS_SALESMAN, "Let's crack open a box and make sure they meet your standards.");
     dialog_text(CHARACTERS_FATMAN, "My standards are 'is it food' and 'is it nearby,' so the bar is pretty achievable. But yes, let's taste test.");
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     dialog_text(CHARACTERS_FATMAN, "These are perfect. The texture, the sweetness, the way they just DISAPPEAR. I ate six during that conversation.");
     dialog_text(CHARACTERS_SALESMAN, "I know. I watched. It was impressive.");
     dialog_text(CHARACTERS_FATMAN, "Give me everything you've got. ALL of it. I'll figure out storage later.");
@@ -2677,7 +2677,7 @@ void encounter_fatman_steak(void) {
 
     dialog_text(CHARACTERS_SALESMAN, "What do you say we fire up one of those fryers and give this a test run?");
     dialog_text(CHARACTERS_FATMAN, "Brother, I thought you'd never ask. Step into my kitchen. Well, don't actually step in, there's not a lot of room. Stand in the doorway.");
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     dialog_text(CHARACTERS_FATMAN, "This is the greatest thing I have ever put in my mouth. And I once ate an entire wedding cake by myself.");
     dialog_text(CHARACTERS_SALESMAN, "An entire wedding cake?");
     dialog_text(CHARACTERS_FATMAN, "It wasn't my wedding. Long story. Anyway, give me the full case. Actually, give me two cases. One for eating and one for emotional support.");
@@ -2715,7 +2715,7 @@ void encounter_fatman_console(void) {
 
     dialog_text(CHARACTERS_SALESMAN, "Let me hook it up to that beast of a TV and you'll see what I mean.");
     dialog_text(CHARACTERS_FATMAN, "Alright, come in. Watch the pizza boxes by the door. And the ones by the couch. And the hallway.");
-    encounter_minigame(&smile_game);
+    encounter_minigame(&rhythm_game);
     dialog_text(CHARACTERS_FATMAN, "Oh no. Oh NO. Everything I've been playing looks like garbage now. You've ruined my old console for me.");
     dialog_text(CHARACTERS_SALESMAN, "You're welcome.");
     dialog_text(CHARACTERS_FATMAN, "I hate you. But I also need this. Take my money before I change my mind. Actually, I won't change my mind. Take my money at whatever speed is convenient.");

@@ -357,7 +357,7 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                     DrawTextureV(config->texture, config->point, config->color);
                 } break;
                 case CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE_PRO: {
-                    DrawTexturePro(config->texture, config->dst, config->src, config->point, config->rotation, config->color);
+                    DrawTexturePro(config->texture, config->src, config->dst, config->point, config->rotation, config->color);
                 } break;
                 case CLAY_RAYLIB_FUNCTION_BEGIN_SHADER_MODE: {
                     BeginShaderMode(config->shader);
@@ -382,6 +382,12 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                     // };
                     // SetShapesTexture(config->texture, rect);
                     DrawSplineCatmullRom(config->points, config->pointsCount, config->thickness, config->color);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_BEGIN_TEXTURE_MODE: {
+                    BeginTextureMode(config->render_texture);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_END_TEXTURE_MODE: {
+                    EndTextureMode();
                 } break;
                 default: {
                     printf("Error: unhandled render command.");

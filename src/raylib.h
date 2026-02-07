@@ -126,7 +126,7 @@ static inline void ClayDrawTexture(Texture2D texture, int posX, int posY, Color 
     Clay__Raylib(&config);
 }
 
-static inline void ClayDrawTexturePro(Texture2D texture, Rectangle dst, Rectangle src, Vector2 origin, float rotation, Color tint) {
+static inline void ClayDrawTexturePro(Texture2D texture, Rectangle src, Rectangle dst, Vector2 origin, float rotation, Color tint) {
     Clay_RaylibElementConfig config = {
         .fn = CLAY_RAYLIB_FUNCTION_DRAW_TEXTURE_PRO,
         .color = tint,
@@ -197,6 +197,21 @@ static inline void ClayDrawRing(Vector2 center, float innerRadius, float outerRa
     Clay__Raylib(&config);
 }
 
+static inline void ClayBeginTextureMode(RenderTexture2D renderTexture) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_BEGIN_TEXTURE_MODE,
+        .render_texture = renderTexture
+    };
+    Clay__Raylib(&config);
+}
+
+static inline void ClayEndTextureMode(void) {
+    Clay_RaylibElementConfig config = {
+        .fn = CLAY_RAYLIB_FUNCTION_END_TEXTURE_MODE,
+    };
+    Clay__Raylib(&config);
+}
+
 #define DrawRectangleV(...) ClayDrawRectangleV(__VA_ARGS__)
 #define DrawRectangle(...) ClayDrawRectangle(__VA_ARGS__)
 #define DrawRectangleRec(...) ClayDrawRectangleRec(__VA_ARGS__)
@@ -216,6 +231,9 @@ static inline void ClayDrawRing(Vector2 center, float innerRadius, float outerRa
 #define SetShapesTexture(...) ClaySetShapesTexture(__VA_ARGS__)
 #define DrawSplineCatmullRom(...) ClayDrawSplineCatmullRom(__VA_ARGS__)
 #define DrawRing(center, inner, outer, start, end, seg, color) ClayDrawRing(center, inner, outer, color)
+
+// #define BeginTextureMode(...) ClayBeginTextureMode(__VA_ARGS__)
+// #define EndTextureMode(...) ClayEndTextureMode(__VA_ARGS__)
 
 #endif
 

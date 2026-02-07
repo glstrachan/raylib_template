@@ -96,6 +96,7 @@ typedef struct {
 
     Game_Timer transition_timer;
     Texture2D screenshot;
+    void (*current_prerender)(void);
 
     Briefcase briefcase;
     Item_Type current_item;

@@ -56,6 +56,7 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
     if (!(minigame)->update()) {                \
         my_longjmp(__current_sequence->jump_back_buf, 1); \
     }                                           \
+    game.current_prerender = NULL; \
 } while (0)
 
 #define encounter_begin(...) Encounter_Sequence* __current_sequence = (&encounter_top_sequence, ## __VA_ARGS__ /* omg lol */)

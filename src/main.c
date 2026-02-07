@@ -40,6 +40,7 @@ Game_Shaders game_shaders = { 0 };
 extern Minigame memory_game;
 extern Minigame smile_game;
 extern Minigame shotgun_game;
+extern Minigame rhythm_game;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
@@ -189,6 +190,7 @@ int main(void)
 
     smile_game.init();
     shotgun_game.init();
+    rhythm_game.init();
 
 
     while (!WindowShouldClose()) {
@@ -202,14 +204,21 @@ int main(void)
         Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
         Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
 
+        if (game.current_prerender) game.current_prerender();
+
+        // game_parameters.screen_width = GetScreenWidth();
+        // game_parameters.screen_height = GetScreenHeight();
+
         Clay_BeginLayout();
 
+        // SetupVi
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
                 game_update();
                 // pick_items_update();
                 // smile_game.update();
+                // rhythm_game.update();
                 // shotgun_game.update();
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
