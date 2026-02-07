@@ -49,6 +49,7 @@ typedef struct {
     void (*place_above_dialog)(void);
     float timeout;
     float mood;
+    bool no_skip;
 } Dialog_Parameter;
 
 bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters);

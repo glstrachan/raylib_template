@@ -9,8 +9,12 @@ uniform int thickness;
 
 void main() {
     vec2 size = 1.0 / textureSize(myTexture, 0);
+    vec2 uv = fragTexCoord;
+    uv -= 0.5;
+    uv *= (1 + size * 4);
+    uv += 0.5;
 
-    vec4 aC = texture(myTexture, fragTexCoord);
+    vec4 aC = texture(myTexture, uv);
     if (aC.a > 0.1) {
         finalColor = mix(fragColor, aC, aC.a);
     } else {
@@ -18,7 +22,7 @@ void main() {
         for (int x = -thickness; x <= thickness; x++)
         for (int y = -thickness; y <= thickness; y++)
         {
-            alpha += texture(myTexture, fragTexCoord + vec2(x, y) * size).a;
+            alpha += texture(myTexture, uv + vec2(x, y) * size).a;
         }
 
         if (alpha > 0.01) {

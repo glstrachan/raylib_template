@@ -27,7 +27,6 @@ static enum {
     STATE_WAIT,
     STATE_POPIN,
     STATE_PLAYBACK,
-    STATE_BEAM,
 } current_state = STATE_POPIN;
 static int current_round;
 static int target_rounds;
@@ -53,7 +52,7 @@ static Rhythm_Sequence rhythm_sequences[] = {
     { 5, { EIGTH_NOTE(0, 0), EIGTH_NOTE(0, 1), QUARTER_NOTE(2), EIGTH_NOTE(3, 0), EIGTH_NOTE(3, 1) } },
     { 8, { EIGTH_NOTE(0, 0), EIGTH_NOTE(0, 1), EIGTH_NOTE(1, 0), EIGTH_NOTE(1, 1), EIGTH_NOTE(2, 0), EIGTH_NOTE(2, 1), EIGTH_NOTE(3, 0), EIGTH_NOTE(3, 1) } },
 };
-static Rhythm_Sequence rhythm_sequences_shuffled[oc_len(rhythm_sequences)];
+// static Rhythm_Sequence rhythm_sequences_shuffled[oc_len(rhythm_sequences)];
 
 static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
 {
@@ -218,11 +217,11 @@ static void set_random_points(void) {
     is_shooting = false;
 }
 
-static inline void do_wait_then_state(int next_state) {
-    current_state = STATE_WAIT;
-    wait_next_state = next_state;
-    timer_init(&wait_timer, 500);
-}
+// static inline void do_wait_then_state(int next_state) {
+//     current_state = STATE_WAIT;
+//     wait_next_state = next_state;
+//     timer_init(&wait_timer, 500);
+// }
 
 void rhythm_game_prerender(void) {
     const float POINT_RADIUS = 20.0f;
@@ -257,9 +256,7 @@ void rhythm_game_prerender(void) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && point_locked) {
             points[point_locked] = mouse;
         }
-    }
-
-    switch (current_state) {
+    } else switch (current_state) {
     case STATE_WAIT: {
         if (timer_update(&wait_timer)) {
             current_state = wait_next_state;
@@ -390,7 +387,12 @@ void rhythm_game_prerender(void) {
                     (Vector2) {laser_canon_wheel.width/2.0f,laser_canon_wheel.height/2.0f}, current_canon_angle, WHITE
                 );
 
-                switch (current_state) {
+                if (do_create_points) {
+                    for (int i = 0; i < points_count; i++) {
+                        DrawCircleV(points[i], POINT_RADIUS, RED);
+                        DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
+                    }
+                } else switch (current_state) {
                 case STATE_POPIN: {
                     for (int i = 0; i < rhythm_sequence_note_index; i++) {
                         DrawCircleV(points[i], POINT_RADIUS, RED);
@@ -399,16 +401,9 @@ void rhythm_game_prerender(void) {
                 } break;
                 case STATE_WAIT: if(wait_next_state != STATE_PLAYBACK) break;
                 case STATE_PLAYBACK: {
-                    if (do_create_points) {
-                        for (int i = 0; i < points_count; i++) {
-                            DrawCircleV(points[i], POINT_RADIUS, RED);
-                            DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
-                        }
-                    } else {
-                        for (int i = current_shot_point_index; i < points_count; i++) {
-                            DrawCircleV(points[i], POINT_RADIUS, RED);
-                            DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
-                        }
+                    for (int i = current_shot_point_index; i < points_count; i++) {
+                        DrawCircleV(points[i], POINT_RADIUS, RED);
+                        DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
                     }
                 } break;
                 }

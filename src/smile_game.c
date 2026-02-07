@@ -34,7 +34,7 @@ encounter: (person, item)
 #include <raylib.h>
 #include "game.h"
 
-static Texture2D image_mad, image_sad, image_neutral, image_happy, image_max_happy;
+static Texture2D image_mad, image_sad, image_neutral, image_happy, image_max_happy, bighead;
 static Shader shader;
 static float sweetspot;
 static float smileness;
@@ -49,7 +49,10 @@ static float acceleration1;
 
 Encounter_Sequence dialog_sequence = { 0 };
 
+static bool is_in_old_lady_dialog = false;
+
 static void place_bar(void) {
+    is_in_old_lady_dialog = true;
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
     customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
     customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = shader };
@@ -122,13 +125,102 @@ static void place_bar(void) {
     }
 }
 
-#define SMILE_DIALOG_PARAMS() .place_above_dialog = place_bar, .timeout = 5000.0f
-#define old_lady_dialog(text, ...) dialog_text(CHARACTERS_OLDLADY, (text), SMILE_DIALOG_PARAMS(), __VA_ARGS__);
+#define DEFAULT_DIFFICULTY (5000.0f)
+#define SALESMAN_TIMEOUT (2000.0f)
+static float difficulty_timeout = DEFAULT_DIFFICULTY;
+static int target_dialog_count;
+static int dialog_count;
+
+#define SMILE_DIALOG_PARAMS() .place_above_dialog = place_bar, .timeout = difficulty_timeout
+#define old_lady_dialog(text, ...) do {                                          \
+    if (dialog_count >= target_dialog_count) dialog_yield();                      \
+    dialog_text(CHARACTERS_OLDLADY, (text), SMILE_DIALOG_PARAMS(), __VA_ARGS__); \
+    dialog_count++;                                                              \
+} while (0)
 
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
-    old_lady_dialog("soo nice smile u have there", .mood = 1.0f);
-    old_lady_dialog("my cat died", .mood = 0.0f);
+    
+    // Very Good (0.9-1.0)
+    old_lady_dialog("what a wonderful day this is! the sun is shining!", .mood = 0.95f);
+    dialog_text(CHARACTERS_SALESMAN, "It really is beautiful outside!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good (0.7-0.8)
+    old_lady_dialog("my garden is looking quite nice this year", .mood = 0.75f);
+    dialog_text(CHARACTERS_SALESMAN, "I noticed those lovely flowers by your door!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Neutral (0.4-0.6)
+    old_lady_dialog("well, i suppose the groceries cost a bit more these days", .mood = 0.5f);
+    dialog_text(CHARACTERS_SALESMAN, "Yes, prices have certainly gone up recently.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Bad (0.2-0.3)
+    old_lady_dialog("my knees have been bothering me something awful lately", .mood = 0.25f);
+    dialog_text(CHARACTERS_SALESMAN, "Oh dear, that sounds quite painful.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Very Bad (0.0-0.1)
+    old_lady_dialog("my cat harold passed away last week. he was my best friend.", .mood = 0.05f);
+    dialog_text(CHARACTERS_SALESMAN, "I'm so sorry to hear that. That must be really difficult.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good again (0.7-0.8)
+    old_lady_dialog("but you know, at least i have these nice memories with him", .mood = 0.72f);
+    dialog_text(CHARACTERS_SALESMAN, "Those memories are truly precious.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Very Good (0.85-0.95)
+    old_lady_dialog("and now i'm looking forward to enjoying my time with visitors like you!", .mood = 0.88f);
+    dialog_text(CHARACTERS_SALESMAN, "Well, it's been a pleasure talking with you!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Neutral-Bad (0.35-0.45)
+    old_lady_dialog("though i do worry sometimes about managing everything on my own", .mood = 0.4f);
+    dialog_text(CHARACTERS_SALESMAN, "That's completely understandable.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good (0.65-0.75)
+    old_lady_dialog("but i'm a strong woman, and i've made it this far just fine", .mood = 0.7f);
+    dialog_text(CHARACTERS_SALESMAN, "You certainly seem like someone with a lot of character!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Very Good (0.9-1.0)
+    old_lady_dialog("and that smile of yours reminds me why life is worth living!", .mood = 0.92f);
+    dialog_text(CHARACTERS_SALESMAN, "That's the nicest thing anyone's said to me all week!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Neutral (0.45-0.55)
+    old_lady_dialog("you know, my grandson visited last month. he's doing well in school.", .mood = 0.52f);
+    dialog_text(CHARACTERS_SALESMAN, "That's wonderful! You must be very proud of him.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Bad (0.15-0.25)
+    old_lady_dialog("though he doesn't call me as often as i'd like", .mood = 0.2f);
+    dialog_text(CHARACTERS_SALESMAN, "I'm sure he thinks of you often, even when he's busy.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good (0.75-0.85)
+    old_lady_dialog("my bridge club meets every thursday and we always have a good laugh", .mood = 0.8f);
+    dialog_text(CHARACTERS_SALESMAN, "That sounds like so much fun! I love hearing about that.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Bad (0.2-0.35)
+    old_lady_dialog("though sometimes my old bones make it hard to get around", .mood = 0.28f);
+    dialog_text(CHARACTERS_SALESMAN, "I can certainly understand that struggle.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good (0.7-0.8)
+    old_lady_dialog("but i refuse to let a little thing like that slow me down!", .mood = 0.78f);
+    dialog_text(CHARACTERS_SALESMAN, "That's the spirit! Your determination is inspiring.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Neutral-Good (0.55-0.65)
+    old_lady_dialog("my late husband used to say 'life is what you make of it'", .mood = 0.6f);
+    dialog_text(CHARACTERS_SALESMAN, "He sounds like he was a very wise man.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Very Good (0.88-0.98)
+    old_lady_dialog("and i've decided to make mine count for as much as i can!", .mood = 0.93f);
+    dialog_text(CHARACTERS_SALESMAN, "Now that's a wonderful way to live your life!", .timeout = SALESMAN_TIMEOUT);
+    
+    // Bad (0.18-0.28)
+    old_lady_dialog("sometimes the house feels too quiet without anyone around", .mood = 0.23f);
+    dialog_text(CHARACTERS_SALESMAN, "That must be a lonely feeling. Thank you for letting me visit.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Very Good (0.85-0.95)
+    old_lady_dialog("but days like this remind me that there's still so much joy to be found!", .mood = 0.9f);
+    dialog_text(CHARACTERS_SALESMAN, "You have such a beautiful outlook on life! It's truly wonderful.", .timeout = SALESMAN_TIMEOUT);
+    
+    // Good (0.72-0.82)
+    old_lady_dialog("well, you've certainly brightened my day, young man. thank you for that", .mood = 0.77f);
+    dialog_text(CHARACTERS_SALESMAN, "The pleasure has been all mine, ma'am. Thank you for your kindness.", .timeout = SALESMAN_TIMEOUT);
+    
     encounter_end();
 }
 
@@ -139,6 +231,7 @@ void smile_game_init(void) {
     image_neutral = LoadTexture("resources/neutral.png");
     image_happy = LoadTexture("resources/happy.png");
     image_max_happy = LoadTexture("resources/max_happy.png");
+    bighead = LoadTexture("resources/bighead.png");
     shader = LoadShader(NULL, "resources/smile_shader.fs");
 
     smileness = GetRandomValue(0, 1000) / 1000.0f;
@@ -150,53 +243,69 @@ void smile_game_init(void) {
 
     encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
     timer_init(&mood_sampler, 1000);
+    
+    difficulty_timeout = DEFAULT_DIFFICULTY - 1000.0f * game.current_day;
+    target_dialog_count = 5 + 5 * game.current_day;
+    dialog_count = 0;
 }
 
 bool smile_game_update(void) {
+    is_in_old_lady_dialog = false;
     encounter_sequence_update(&dialog_sequence);
-    if (dialog_sequence.is_done) {
+    if (dialog_sequence.is_done || dialog_count >= target_dialog_count) {
         float well_done = Clamp(mood_matching / mood_expected * 0.8314, 0.0f, 1.0f);
-        print("{} {}\n", mood_matching, mood_expected);
         return true;
     }
 
-    if (timer_update(&mood_sampler)) {
-        mood_matching += 1.0f - fabsf(dialog_sequence.current_mood - smileness);
-        mood_expected += 1.0f;
-        timer_reset(&mood_sampler);
-    }
+    #ifndef _NDEBUG
+        if (IsKeyPressed(KEY_F)) {
+            return true;
+        }
+    #endif
 
-    const int width = 100;
-    const int padding_offset = 100;
+    if (is_in_old_lady_dialog) {
+        if (timer_update(&mood_sampler)) {
+            mood_matching += 1.0f - fabsf(dialog_sequence.current_mood - smileness);
+            mood_expected += 1.0f;
+            timer_reset(&mood_sampler);
+        }
 
-    float dt = GetFrameTime();
+        const int width = 100;
+        const int padding_offset = 100;
 
-    float net_acceleration = acceleration1 + acceleration;
-    velocity += net_acceleration * dt;
-    smileness += velocity * dt;
-    if (smileness > 1.0f) {
-        smileness = 1.0f;
-        velocity = 0.0f;
-    } else if (smileness < 0.0f) {
-        smileness = 0.0f;
-        velocity = 0.0f;
-    }
+        float dt = GetFrameTime();
 
-    if (IsKeyPressed(KEY_SPACE)) {
-        acceleration1 = 200.0f;
+        float net_acceleration = acceleration1 + acceleration;
+        velocity += net_acceleration * dt;
+        smileness += velocity * dt;
+        if (smileness > 1.0f) {
+            smileness = 1.0f;
+            velocity = 0.0f;
+        } else if (smileness < 0.0f) {
+            smileness = 0.0f;
+            velocity = 0.0f;
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            acceleration1 = 200.0f;
+        } else {
+            acceleration1 = dt * acceleration1;
+            // acceleration1 = 0.0f;
+        }
     } else {
-        acceleration1 = dt * acceleration1;
-        // acceleration1 = 0.0f;
+        velocity = 0.0f;
     }
     // smileness = min(smileness + velocity * dt, 1.0f);
 
 
+    DrawTexture(bighead, 408, 0, WHITE);
+    // smileness = 0.4f;
     {
-        float midline = game_parameters.screen_height / 2.0f;
-        float startpoint_x = 400.00f;
-        float height = 20.0f;
-        float gap = 200.0f;
-        float smileness_scale = -height * 0.5 * ((1.0f - smileness) * 2.0f - 1.0f) * 5.0f;
+        float midline = 400.0f;
+        float height = 4.0f;
+        float gap = 18.0f;
+        float startpoint_x = 400 + bighead.width/2.0f - gap*5.0f/2.0f;
+        float smileness_scale = -height * 0.5 * (smileness * 2.0f - 1.0f) * 3.0f;
 
         static Vector2 points[8];
         points[0] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
@@ -218,10 +327,10 @@ bool smile_game_update(void) {
         points1[6] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
         points1[7] = (Vector2) {startpoint_x, midline + smileness_scale * 3.0f};
 
-        Color color = {200, 10, 50, 255};
+        Color color = {0, 0, 0, 255};
         // DrawSplineLinear(points, oc_len(points), 1.0f, (Color){255, 255, 255, 255});
-        DrawSplineCatmullRom(points, oc_len(points), 4.0f, color);
-        DrawSplineCatmullRom(points1, oc_len(points1), 4.0f, color);
+        DrawSplineCatmullRom(points, oc_len(points), 5.0f, color);
+        DrawSplineCatmullRom(points1, oc_len(points1), 5.0f, color);
     }
 
     game_objective_widget(lit("Smile the right amount based on what the Old Lady is saying!"));
