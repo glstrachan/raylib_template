@@ -335,6 +335,13 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                 case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE: {
                     DrawRectangleV(config->point, config->size, config->color);
                 } break;
+                case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_PRO: {
+                    Rectangle rect = {
+                        config->point.x, config->point.y,
+                        config->size.x, config->size.y,
+                    };
+                    DrawRectanglePro(rect, config->origin, config->rotation, config->color);
+                } break;
                 case CLAY_RAYLIB_FUNCTION_DRAW_RECTANGLE_LINES: {
                     Rectangle rect = {
                         config->point.x, config->point.y,
