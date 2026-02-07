@@ -29,6 +29,8 @@ static Texture2D bam_tex;
 static Texture2D alert_tex;
 
 static float start_time;
+static bool ended;
+static float end_time;
 
 static uint32_t score;
 
@@ -68,18 +70,10 @@ void shotgun_game_init() {
 
     start_time = GetTime();
     score = 0;
+
+    ended = false;
     
     shotgun_game_add_items(20);
-    
-    // Basic test
-    // oc_array_append(&arena, &shotgun_game_items, ((Shotgun_Game_Item) {
-    //     ITEM_AK47, 
-    //     (Vector2) {100, 100},
-    //     (Vector2) {1, -1},
-    //     SHOTGUN_ITEM_STATE_UNSPAWNED,
-    //     0.2f,
-    //     1.5
-    // }));
 }
 
 bool shotgun_game_update() {
@@ -197,6 +191,17 @@ bool shotgun_game_update() {
     DrawCircle(mouse.x, mouse.y, 30, (Color) {255, 0, 0, 86});
     DrawCircle(mouse.x, mouse.y, 5, (Color) {255, 0, 0, 255});
     DrawRing(mouse, 25, 30, 0, 360, 100, ((Color) {255, 0, 0, 255}));
+
+    // Check if we should end the game
+    if(shotgun_game_items.count == 0) {
+        if(!ended) {
+            ended = true;
+            end_time = GetTime();
+        }
+        else if(GetTime() - end_time > 1.0f) {
+            return true;
+        }
+    }
 
     return false;
 }
