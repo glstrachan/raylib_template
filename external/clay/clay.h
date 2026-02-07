@@ -574,11 +574,14 @@ typedef CLAY_PACKED_ENUM {
     CLAY_RAYLIB_FUNCTION_BEGIN_SHADER_MODE,
     CLAY_RAYLIB_FUNCTION_END_SHADER_MODE,
     CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE,
+    CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE_TEXTURE,
     CLAY_RAYLIB_FUNCTION_SET_SHAPES_TEXTURE,
     CLAY_RAYLIB_FUNCTION_DRAW_RING,
 
     CLAY_RAYLIB_FUNCTION_BEGIN_TEXTURE_MODE,
     CLAY_RAYLIB_FUNCTION_END_TEXTURE_MODE,
+    CLAY_RAYLIB_FUNCTION_BEGIN_SCISSOR_MODE,
+    CLAY_RAYLIB_FUNCTION_END_SCISSOR_MODE,
 } Clay_RaylibRenderFunction;
 
 // Controls settings related to element borders.
@@ -594,12 +597,14 @@ typedef struct Clay_RaylibElementConfig {
                 Vector2 point;
                 Vector2 v1;
                 struct { const Vector2* points; int pointsCount; };
+                struct { int x, y; };
             };
             union {
                 Vector2 size;
                 Vector2 v2;
                 float radius;
                 struct { float fontSize; float spacing; };
+                struct { int width, height; };
             };
             union {
                 const char* text;

@@ -190,7 +190,8 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                 break;
             }
             case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START: {
-                BeginScissorMode((int)roundf(boundingBox.x), (int)roundf(boundingBox.y), (int)roundf(boundingBox.width), (int)roundf(boundingBox.height));
+                Vector2 scale = GetWindowScaleDPI();
+                BeginScissorMode((int)roundf(boundingBox.x/scale.x), (int)roundf(boundingBox.y/scale.y), (int)roundf(boundingBox.width/scale.x), (int)roundf(boundingBox.height/scale.y));
                 break;
             }
             case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END: {
@@ -305,6 +306,9 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "color2"), color2, SHADER_UNIFORM_VEC4);
 
                         BeginShaderMode(data->shader);
+                        if (data->texture.id) {
+                            SetShaderValueTexture(data->shader, GetShaderLocation(data->shader, "textureSampler"), data->texture);
+                        }
 
                         if (config->cornerRadius.topLeft > 0) {
                             float radius = (config->cornerRadius.topLeft * 2) / (float)((boundingBox.width > boundingBox.height) ? boundingBox.height : boundingBox.width);
@@ -368,6 +372,9 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                 case CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE: {
                     SetShaderValue(config->shader, config->shaderLocIdx, config->shaderValue, config->uniformType);
                 } break;
+                case CLAY_RAYLIB_FUNCTION_SET_SHADER_VALUE_TEXTURE: {
+                    SetShaderValueTexture(config->shader, config->shaderLocIdx, config->texture);
+                } break;
                 case CLAY_RAYLIB_FUNCTION_SET_SHAPES_TEXTURE: {
                     Rectangle rect = {
                         config->point.x, config->point.y,
@@ -388,6 +395,12 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                 } break;
                 case CLAY_RAYLIB_FUNCTION_END_TEXTURE_MODE: {
                     EndTextureMode();
+                } break;
+                case CLAY_RAYLIB_FUNCTION_BEGIN_SCISSOR_MODE: {
+                    BeginScissorMode(config->x, config->y, config->width, config->height);
+                } break;
+                case CLAY_RAYLIB_FUNCTION_END_SCISSOR_MODE: {
+                    EndScissorMode();
                 } break;
                 default: {
                     printf("Error: unhandled render command.");

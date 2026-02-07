@@ -58,12 +58,16 @@ static int selected_item;
 
 static Texture2D house_bg = { 0 };
 static Texture2D briefcase_tex = { 0 };
+static Texture2D clipboard_text = { 0 };
 static Shader item_bg_shader;
+static Shader circle_shader;
 
 void pick_encounter_init(void) {
     if (!house_bg.id) house_bg = LoadTexture("resources/background.png");
     if (!briefcase_tex.id) briefcase_tex = LoadTexture("resources/briefcase.png");
+    if (!clipboard_text.id) clipboard_text = LoadTexture("resources/clipboard.png");
     if (!item_bg_shader.id) item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
+    if (!circle_shader.id) circle_shader = LoadShader(NULL, "resources/circle_texture.fs");
 }
 
 void pick_encounter(void) {
@@ -72,12 +76,19 @@ void pick_encounter(void) {
     selected_item = -1;
 }
 
+// static Vector2 pick_item_locations[] = {
+//     // Briefcase
+//     (Vector2) {1220, 805},
+//     (Vector2) {1460, 830},
+//     (Vector2) {1220, 670},
+//     (Vector2) {1480, 700}
+// };
 static Vector2 pick_item_locations[] = {
     // Briefcase
-    (Vector2) {1220, 805},
-    (Vector2) {1460, 830},
-    (Vector2) {1220, 670},
-    (Vector2) {1480, 700}
+    (Vector2) {1220, 860},
+    (Vector2) {1320, 860},
+    (Vector2) {1420, 860},
+    (Vector2) {1520, 860}
 };
 
 Encounter_Fn get_encounter_fn(void);
@@ -85,43 +96,58 @@ Encounter_Fn get_encounter_fn(void);
 void pick_encounter_update(void) {
     DrawTexture(house_bg, 0, 0, WHITE);
 
-    // DrawTexture(briefcase_tex, 1100, 430, WHITE);
     const float item_location_offset_x = -400.0f;
     const float item_location_offset_y = -120.0f;
 
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
-        float selection_radius = 65.0f;
-
-        for (uint32_t i = 0; i < oc_len(pick_item_locations); ++i) {
-            Vector2 loc = { item_location_offset_x, item_location_offset_y };
-            float dist = Vector2Distance(mouse, Vector2Add(pick_item_locations[i], loc));
-
-            if (dist < selection_radius) {
-                selected_item = i;
-                break;
-            }
-        }
-    }
+    Texture2D* t = characters_get_texture(game.current_character);
+    CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
+    customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
+    customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = circle_shader, .texture = *t };
 
     CLAY(CLAY_ID("PickEncounter"), {
         .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
         .layout = {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
             .sizing = {
-                .width = CLAY_SIZING_PERCENT(0.5),
-                // .height = CLAY_SIZING_PERCENT(0.6)
+                .width = CLAY_SIZING_FIXED(clipboard_text.width),
+                .height = CLAY_SIZING_FIXED(clipboard_text.height),
             },
-            .padding = {40, 16, 30, 16},
-            .childGap = 16
+            .padding = {70, 50, 200, 60},
+            .childGap = 16,
+            .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
         },
-        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
-        .custom = { .customData = make_cool_background() },
+        .image = { .imageData = &clipboard_text },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", character_data[game.current_character].name), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
-        CLAY_TEXT(oc_format(&frame_arena, "Pick item to sell"), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Selling to {}", character_data[game.current_character].name), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255} }));
+
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .width = CLAY_SIZING_GROW(0),
+                },
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
+            },
+        }) {
+            CLAY_AUTO_ID({
+                .layout = {
+                    .sizing = {
+                        .width = CLAY_SIZING_FIXED(t->width),
+                        .height = CLAY_SIZING_FIXED(t->width),
+                    },
+                },
+                .custom = { .customData = customBackgroundData },
+                .cornerRadius = CLAY_CORNER_RADIUS(1000),
+                .border = { .width = { 5, 5, 5, 5, 0 }, .color = {55, 55, 55, 255} },
+            });
+        }
+        CLAY_AUTO_ID({ .layout = { .sizing = { .height = CLAY_SIZING_FIXED(10) } } });
+
+
+        CLAY_TEXT(oc_format(&frame_arena, "Pick item to sell"), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255} }));
+        
+
 
         CLAY_AUTO_ID({
             .layout = {
@@ -132,39 +158,126 @@ void pick_encounter_update(void) {
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            CLAY_AUTO_ID({
-                .layout = {
-                    .sizing = {
-                        .width = CLAY_SIZING_FIXED(552),
-                        .height = CLAY_SIZING_FIXED(556),
-                    },
-                },
-                .image = { .imageData = &briefcase_tex },
-            }) {
-                for (uint32_t i = 0; i < oc_len(game.briefcase.items); i++) {
-                    if (game.briefcase.used[i]) continue;
-                    if (i == selected_item) continue;
+            float base_x = 770.0f;
+            float base_y = 680.0f;
+            Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
+            float selection_radius = 65.0f;
 
-                    Item_Type item_type = game.briefcase.items[i];
-                    Texture2D texture = item_data[item_type].texture;
-                    float x = pick_item_locations[i].x - texture.width * 0.5 + item_location_offset_x;
-                    float y = pick_item_locations[i].y - texture.height * 0.5 + item_location_offset_y;
+            if (selected_item > -1) {
+                Item_Type item_type = game.briefcase.items[selected_item];
+                Texture2D texture = item_data[item_type].texture;
 
-                    DrawTexture(texture, x, y, WHITE);
-                }
+                BeginShaderMode(item_bg_shader);
+                    static int i = 4;
+                    SetShaderValue(item_bg_shader, GetShaderLocation(item_bg_shader, "thickness"), &i, SHADER_UNIFORM_INT);
+                    DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + selected_item * 100.0f - 4.0f, base_y - 4.0f, 108, 108 }, (Vector2) { 0.0f, 0.0f }, 0, RED);
+                EndShaderMode();
+            }
 
-                if (selected_item > -1) {
-                    Item_Type item_type = game.briefcase.items[selected_item];
-                    Texture2D texture = item_data[item_type].texture;
-                    float x = pick_item_locations[selected_item].x - texture.width * 0.5 + item_location_offset_x;
-                    float y = pick_item_locations[selected_item].y - texture.height * 0.5 + item_location_offset_y;
+            for (uint32_t i = 0; i < oc_len(game.briefcase.items); i++) {
+                if (game.briefcase.used[i]) continue;
+                if (i == selected_item) continue;
 
-                    BeginShaderMode(item_bg_shader);
-                        DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
-                    EndShaderMode();
+                Item_Type item_type = game.briefcase.items[i];
+                Texture2D texture = item_data[item_type].texture;
+
+                DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + i * 100.0f, base_y, 100, 100 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
+
+
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    Vector2 loc = { base_x + i * 100.0f + 50.0f, base_y + 50.0f };
+                    float dist = Vector2Distance(mouse, loc);
+                    if (dist < selection_radius) {
+                        selected_item = i;
+                    }
                 }
             }
+
+
+            // for (uint32_t i = 0; i < oc_len(game.briefcase.items); i++) {
+            //     if (game.briefcase.used[i]) continue;
+
+            //     Item_Type item_type = game.briefcase.items[i];
+            //     Texture2D texture = item_data[item_type].texture;
+
+            //     CLAY_AUTO_ID({
+            //         .layout = {
+            //             .sizing = {
+            //                 .width = CLAY_SIZING_FIXED(100),
+            //                 .height = CLAY_SIZING_FIXED(100),
+            //             },
+            //             .padding = {10, 10, 10, 10},
+            //         },
+            //         .border = (i == selected_item) ? (Clay_BorderElementConfig) { .width = { 3, 3, 3, 3, 0 }, .color = {148, 31, 0, 255} } : (Clay_BorderElementConfig) { 0 },
+            //         .backgroundColor = Clay_Hovered() ? (Clay_Color) { 100, 100, 100, 100 } : (Clay_Color) { 0, 0, 0, 0 },
+            //     }) {
+            //         CLAY_AUTO_ID({
+            //             .layout = {
+            //                 .sizing = {
+            //                     .width = CLAY_SIZING_GROW(0),
+            //                     .height = CLAY_SIZING_GROW(0),
+            //                 },
+            //             },
+            //             .image = { .imageData = &item_data[item_type].texture }
+            //         })
+            //         if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            //             selected_item = i;
+            //         }
+            //     }
+            // }
         }
+
+        CLAY_AUTO_ID({
+            .layout = {
+                .sizing = {
+                    .height = CLAY_SIZING_GROW(),
+                },
+            },
+        });
+
+
+        // CLAY_AUTO_ID({
+        //     .layout = {
+        //         .sizing = {
+        //             .width = CLAY_SIZING_PERCENT(1.0),
+        //         },
+        //         .childAlignment = { .x = CLAY_ALIGN_X_CENTER }
+        //     },
+        //     .backgroundColor = {200, 0, 0, 0},
+        // }) {
+        //     CLAY_AUTO_ID({
+        //         .layout = {
+        //             .sizing = {
+        //                 .width = CLAY_SIZING_FIXED(552),
+        //                 .height = CLAY_SIZING_FIXED(556),
+        //             },
+        //         },
+        //         .image = { .imageData = &briefcase_tex },
+        //     }) {
+        //         for (uint32_t i = 0; i < oc_len(game.briefcase.items); i++) {
+        //             if (game.briefcase.used[i]) continue;
+        //             if (i == selected_item) continue;
+
+        //             Item_Type item_type = game.briefcase.items[i];
+        //             Texture2D texture = item_data[item_type].texture;
+        //             float x = pick_item_locations[i].x - texture.width * 0.5 + item_location_offset_x;
+        //             float y = pick_item_locations[i].y - texture.height * 0.5 + item_location_offset_y;
+
+        //             DrawTexture(texture, x, y, WHITE);
+        //         }
+
+        //         if (selected_item > -1) {
+        //             Item_Type item_type = game.briefcase.items[selected_item];
+        //             Texture2D texture = item_data[item_type].texture;
+        //             float x = pick_item_locations[selected_item].x - texture.width * 0.5 + item_location_offset_x;
+        //             float y = pick_item_locations[selected_item].y - texture.height * 0.5 + item_location_offset_y;
+
+        //             BeginShaderMode(item_bg_shader);
+        //                 DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x - 4, y - 4, texture.width + 8, texture.width + 8 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
+        //             EndShaderMode();
+        //         }
+        //     }
+        // }
         CLAY(CLAY_ID("PickEncounterLower"), {
             .layout = {
                 .sizing = {

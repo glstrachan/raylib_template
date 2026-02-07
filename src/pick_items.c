@@ -326,6 +326,8 @@ void pick_items_update() {
         float y = delta.y + item_locations[selection_data.selected_index].y - texture.height * 0.5;
 
         BeginShaderMode(item_bg_shader);
+            static int i = 2;
+            SetShaderValue(item_bg_shader, GetShaderLocation(item_bg_shader, "thickness"), &i, SHADER_UNIFORM_INT);
             DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { x, y, texture.width, texture.width }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
         EndShaderMode();
         // DrawTexture(texture, x, y, WHITE);

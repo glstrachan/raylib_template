@@ -26,6 +26,7 @@ typedef struct
 {
     Shader shader;
     Color color1, color2;
+    Texture2D texture;
 } CustomLayoutElement_Background;
 
 typedef struct
