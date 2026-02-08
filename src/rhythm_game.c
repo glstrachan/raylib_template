@@ -1,4 +1,5 @@
 #include "game.h"
+#include "encounter.h"
 
 static Texture2D tv_texture;
 static Texture2D space_texture;
@@ -8,7 +9,11 @@ static Texture2D laser_canon_wheel;
 static RenderTexture2D tv_game;
 static Shader tv_shader;
 
-static Sound katana1, knife, stabbing;
+static Sound sound_response_hit, sound_response_fail, sound_call;
+const int MUSIC_TEMPO = 99;
+// const float MS_PER_EIGTH = (60.0f * 1000.0f) / MUSIC_TEMPO / 2.0f;
+const float MS_PER_EIGTH = (60.0f * 1000.0f) / MUSIC_TEMPO / 2.0f - 3;
+static Music song;
 
 static int point_locked = -1;
 static int points_count = 0;
@@ -24,7 +29,6 @@ static float current_canon_angle;
 static Game_Timer wait_timer;
 static int wait_next_state;
 static enum {
-    STATE_WAIT,
     STATE_POPIN,
     STATE_PLAYBACK,
 } current_state = STATE_POPIN;
@@ -158,7 +162,13 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
 },
 };
 
+static double last_time;
 static void set_random_points(void) {
+    // int index = GetRandomValue(0, oc_len(DEFINED_POINTS) - 1);
+    // points = DEFINED_POINTS[index].points;
+    // points_count = DEFINED_POINTS[index].point_count;
+
+    #if 1
     while (true) {
         // for(int32_t i = oc_len(rhythm_sequences_shuffled) - 1; i >= 0; i--) {
         //     uint32_t j = GetRandomValue(0, i);
@@ -200,6 +210,7 @@ static void set_random_points(void) {
         // }
         // if (current_rhythm_sequence) break;
     }
+        #endif
 
     current_shot_point_index = 0;
     Vector2 canon_pivot = {
@@ -212,7 +223,8 @@ static void set_random_points(void) {
     rhythm_sequence_note_index = 0;
     rhythm_sequence_beat_index = 0;
     current_state = STATE_POPIN;
-    timer_init(&rhythm_sequence_timer, 250);
+    timer_init(&rhythm_sequence_timer, MS_PER_EIGTH);
+    last_time = GetTime();
 
     is_shooting = false;
 }
@@ -223,7 +235,23 @@ static void set_random_points(void) {
 //     timer_init(&wait_timer, 500);
 // }
 
+static bool first_time;
+static Game_Timer start_music_timer;
+static bool played_music;
 void rhythm_game_prerender(void) {
+    bool ft = first_time;
+    if (first_time) {
+        timer_init(&start_music_timer, 0);
+        first_time = false;
+    }
+    if (!played_music && timer_update(&start_music_timer)) {
+        played_music = true;
+        PlayMusicStream(song);
+        SetMusicVolume(song, 0.3f);
+    }
+    if (!IsMusicStreamPlaying(song)) {
+        PlayMusicStream(song);
+    }
     const float POINT_RADIUS = 20.0f;
 
     if (do_create_points) {
@@ -257,19 +285,19 @@ void rhythm_game_prerender(void) {
             points[point_locked] = mouse;
         }
     } else switch (current_state) {
-    case STATE_WAIT: {
-        if (timer_update(&wait_timer)) {
-            current_state = wait_next_state;
-        }
-    } break;
     case STATE_POPIN: {
-        if (timer_update(&rhythm_sequence_timer)) {
+        double time = GetTime();
+
+        if (time - last_time >= MS_PER_EIGTH/1000.0f || ft) {
+            last_time = time;
+            // last_time = time;
+        // if (timer_update(&rhythm_sequence_timer)) {
             if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
-                PlaySound(stabbing);
+                PlaySound(sound_call);
                 rhythm_sequence_note_index++;
             }
-            rhythm_sequence_beat_index++;
 
+            rhythm_sequence_beat_index++;
             if (rhythm_sequence_beat_index >= 8) {
                 rhythm_sequence_beat_index = 0;
                 rhythm_sequence_note_index = 0;
@@ -280,30 +308,38 @@ void rhythm_game_prerender(void) {
         }
     } break;
     case STATE_PLAYBACK: {
-        if (timer_update(&rhythm_sequence_timer)) {
+        double time = GetTime();
+        // if (timer_update(&rhythm_sequence_timer)) {
+        if (time - last_time >= MS_PER_EIGTH/1000.0f) {
+            last_time = time;
+            if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
+                PlaySound(sound_response_hit);
+                rhythm_sequence_note_index++;
+                total_shots += 1;
+            }
+
+            rhythm_sequence_beat_index++;
             if (rhythm_sequence_beat_index >= 8) {
                 set_random_points();
                 current_round += 1;
-                // do_wait_then_state(STATE_POPIN);
-            } else {
-                if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
-                    PlaySound(katana1);
-                    rhythm_sequence_note_index++;
-                    total_shots += 1;
-                }
-                rhythm_sequence_beat_index++;
-                timer_reset(&rhythm_sequence_timer);
             }
+            timer_reset(&rhythm_sequence_timer);
         }
         if (IsKeyPressed(KEY_SPACE) && current_shot_point_index < points_count) {
+            float this_accuracy  = 0.0f;
             if (current_shot_point_index == rhythm_sequence_note_index) {
-                accuracy += Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+                this_accuracy = Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
             } else if (current_shot_point_index == rhythm_sequence_note_index - 1) {
-                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+                this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
             } else if (current_shot_point_index == rhythm_sequence_note_index + 1) {
-                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+                this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
             }
-            // else if (current_shot_point_index == rhythm_sequence_note_index)
+			// if (this_accuracy > 0.8f) {
+			// 	PlaySound(sound_response_hit);
+			// } else {
+			// 	PlaySound(sound_response_fail);
+			// }
+			accuracy += this_accuracy;
 
             timer_init(&beam_timer, 100);
             is_shooting = true;
@@ -399,7 +435,6 @@ void rhythm_game_prerender(void) {
                         DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
                     }
                 } break;
-                case STATE_WAIT: if(wait_next_state != STATE_PLAYBACK) break;
                 case STATE_PLAYBACK: {
                     for (int i = current_shot_point_index; i < points_count; i++) {
                         DrawCircleV(points[i], POINT_RADIUS, RED);
@@ -421,9 +456,10 @@ void rhythm_game_init(void) {
     laser_canon_barrel = LoadTexture("resources/laser_canon_barrel.png");
     laser_canon_wheel = LoadTexture("resources/laser_canon_wheel.png");
     
-    katana1 = LoadSound("resources/sounds/katana1.mp3");
-    knife = LoadSound("resources/sounds/knife.mp3");
-    stabbing = LoadSound("resources/sounds/stabbing.mp3");
+    sound_response_hit = LoadSound("resources/sounds/rhythm_response-hit.wav");
+    sound_response_fail = LoadSound("resources/sounds/rhythm_response-fail.wav");
+    sound_call = LoadSound("resources/sounds/rhythm_call.wav");
+    song = LoadMusicStream("resources/music/rhythm game.wav");
     tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
 
     tv_game = LoadRenderTexture(800, 600);
@@ -434,8 +470,11 @@ void rhythm_game_init(void) {
     accuracy = 0.0f;
     total_shots = 0;
     current_round = 0;
-    target_rounds = 5;
+    target_rounds = 5 + 5 * game.current_day;
+    played_music = false;
     set_random_points();
+
+    first_time = true;
 }
 
 void rhythm_game_cleanup(void) {
@@ -445,9 +484,9 @@ void rhythm_game_cleanup(void) {
     UnloadTexture(laser_canon_barrel);
     UnloadTexture(laser_canon_wheel);
     
-    UnloadSound(katana1);
-    UnloadSound(knife);
-    UnloadSound(stabbing);
+    UnloadSound(sound_response_hit);
+    UnloadSound(sound_response_fail);
+    UnloadSound(sound_call);
     UnloadShader(tv_shader);
 
     UnloadRenderTexture(tv_game);
@@ -458,6 +497,11 @@ bool rhythm_game_update(void) {
         game_submit_minigame_score(accuracy / total_shots);
         return true;
     }
+
+    UpdateMusicStream(song);
+
+    
+
     Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, -(float)tv_game.texture.height };
     Rectangle observerDest = {
         100, 96,

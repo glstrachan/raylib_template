@@ -17,6 +17,7 @@ void pick_encounter(void);
 void pick_encounter_update(void);
 
 extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
+extern Encounter_Sequence encounter_top_sequence;
 
 #define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 

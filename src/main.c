@@ -202,7 +202,7 @@ int main(void)
 
     smile_game.init();
     shotgun_game.init();
-    // rhythm_game.init();
+    rhythm_game.init();
     memory_game.init();
 
     while (!WindowShouldClose()) {
@@ -214,9 +214,6 @@ int main(void)
 
 
         if (game.current_prerender) game.current_prerender();
-
-        // game_parameters.screen_width = GetScreenWidth();
-        // game_parameters.screen_height = GetScreenHeight();
 
         Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
         Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
@@ -232,7 +229,7 @@ int main(void)
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
-                // rhythm_game.update();
+                rhythm_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
