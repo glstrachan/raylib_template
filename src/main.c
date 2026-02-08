@@ -55,8 +55,12 @@ void game_go_to_state(uint32_t next_state) {
     case GAME_STATE_SELECT_ENCOUNTER: {
         pick_encounter();
     } break;
-    case GAME_STATE_IN_ENCOUNTER: {
+    case GAME_STATE_START_DAY: {
         memset(&game.items_sold_today, 0, sizeof(game.items_sold_today));
+        game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+        return;
+    } break;
+    case GAME_STATE_IN_ENCOUNTER: {
         game.minigame_scores = 0.0f;
         game.minigame_count = 0;
         encounter_start(game.encounter);
@@ -65,7 +69,15 @@ void game_go_to_state(uint32_t next_state) {
         if (game.minigame_scores < (float)game.minigame_count * 0.5f) {
             timer_init(&show_fail_timer, 4000);
         } else {
-            game_go_to_state(GAME_STATE_SELECT_ITEMS);
+            game.current_encounter++;
+            game.briefcase.used[game.current_item_index] = 1;
+
+            if (game.current_encounter >= 4) {
+                game_go_to_state(GAME_STATE_DAY_SUMMARY);
+            } else {
+                game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+            }
+            return;
         }
     } break;
     case GAME_STATE_DAY_SUMMARY: break;
@@ -113,7 +125,7 @@ void game_update() {
                 CLAY_TEXT(lit("FAIL"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 60, .textColor = {200, 30, 0, 255} }));
             }
             if (timer_update(&show_fail_timer)) {
-                // TODO: reset game
+                game_go_to_state(GAME_STATE_SELECT_ITEMS);
             }
         }
     } break;
@@ -190,7 +202,7 @@ int main(void)
 
     smile_game.init();
     shotgun_game.init();
-    rhythm_game.init();
+    // rhythm_game.init();
     memory_game.init();
 
     while (!WindowShouldClose()) {
@@ -200,21 +212,22 @@ int main(void)
         game_parameters.screen_width = GetScreenWidth();
         game_parameters.screen_height = GetScreenHeight();
 
-        Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
-        Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-        Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
 
         if (game.current_prerender) game.current_prerender();
 
         // game_parameters.screen_width = GetScreenWidth();
         // game_parameters.screen_height = GetScreenHeight();
 
+        Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
+        Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+        Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
+
         Clay_BeginLayout();
 
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                // game_update();
+                game_update();
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();

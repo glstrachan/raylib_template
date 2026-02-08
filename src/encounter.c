@@ -25,6 +25,7 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encount
     }
     sequence->encounter = encounter;
     sequence->first_time = true;
+    sequence->is_done = false;
 
     uintptr_t top_of_stack = oc_align_forward(((uintptr_t)sequence->stack) + STACK_SIZE - 16, 16);
 
@@ -39,13 +40,13 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encount
 }
 
 void encounter_sequence_update(Encounter_Sequence* sequence) {
-    static Encounter_Sequence* static_sequence;
-    static_sequence = sequence;
-    asm volatile("mov %%rsp, %0" : "=r" (static_sequence->old_stack));
-    if (my_setjmp(static_sequence->jump_back_buf) == 0) {
-        my_longjmp(static_sequence->jump_buf, 1);
+    // static Encounter_Sequence* static_sequence;
+    // static_sequence = sequence;
+    asm volatile("mov %%rsp, %0" : "=r" (sequence->old_stack));
+    if (my_setjmp(sequence->jump_back_buf) == 0) {
+        my_longjmp(sequence->jump_buf, 1);
     }
-    asm volatile("mov %0, %%rsp" :: "r" (static_sequence->old_stack) : "rsp");
+    asm volatile("mov %0, %%rsp" :: "r" (sequence->old_stack) : "rsp");
 }
 
 bool encounter_is_done(void) {
@@ -72,6 +73,7 @@ void pick_encounter_init(void) {
 
 void pick_encounter(void) {
     game.current_character = CHARACTERS_FATMAN;
+    game.current_character = CHARACTERS_OLDLADY;
     // game.encounter = &sample_encounter_;
     selected_item = -1;
 }
@@ -158,39 +160,35 @@ void pick_encounter_update(void) {
             },
             .backgroundColor = {200, 0, 0, 0},
         }) {
-            float base_x = 770.0f;
+            float base_x = 670.0f;
             float base_y = 680.0f;
             Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
             float selection_radius = 65.0f;
 
-            if (selected_item > -1) {
-                Item_Type item_type = game.briefcase.items[selected_item];
-                Texture2D texture = item_data[item_type].texture;
-
-                BeginShaderMode(item_bg_shader);
-                    static int i = 4;
-                    SetShaderValue(item_bg_shader, GetShaderLocation(item_bg_shader, "thickness"), &i, SHADER_UNIFORM_INT);
-                    DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + selected_item * 100.0f - 4.0f, base_y - 4.0f, 108, 108 }, (Vector2) { 0.0f, 0.0f }, 0, RED);
-                EndShaderMode();
-            }
-
-            for (uint32_t i = 0; i < oc_len(game.briefcase.items); i++) {
+            for (uint32_t i = 0, dest = 0; i < oc_len(game.briefcase.items); i++) {
                 if (game.briefcase.used[i]) continue;
-                if (i == selected_item) continue;
 
                 Item_Type item_type = game.briefcase.items[i];
                 Texture2D texture = item_data[item_type].texture;
 
-                DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + i * 100.0f, base_y, 100, 100 }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
+                if (i == selected_item) {
+                    BeginShaderMode(item_bg_shader);
+                        static int thickness = 4;
+                        SetShaderValue(item_bg_shader, GetShaderLocation(item_bg_shader, "thickness"), &thickness, SHADER_UNIFORM_INT);
+                        DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + dest * 150.0f - 4.0f, base_y - 4.0f, 150.0f + 8, 150.0f + 8 }, (Vector2) { 0.0f, 0.0f }, 0, RED);
+                    EndShaderMode();
+                } else {
+                    DrawTexturePro(texture, (Rectangle) { 0, 0, texture.width, texture.height }, (Rectangle) { base_x + dest * 150.0f, base_y, 150.0f, 150.0f }, (Vector2) { 0.0f, 0.0f }, 0, WHITE);
 
-
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    Vector2 loc = { base_x + i * 100.0f + 50.0f, base_y + 50.0f };
-                    float dist = Vector2Distance(mouse, loc);
-                    if (dist < selection_radius) {
-                        selected_item = i;
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                        Vector2 loc = { base_x + dest * 150.0f + 50.0f, base_y + 50.0f };
+                        float dist = Vector2Distance(mouse, loc);
+                        if (dist < selection_radius) {
+                            selected_item = i;
+                        }
                     }
                 }
+                dest++;
             }
 
 
@@ -304,6 +302,7 @@ void pick_encounter_update(void) {
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && selected_item != -1) {
                     // extern Encounter sample_encounter_;
                     // game.encounter = &sample_encounter_;
+                    game.current_item_index = selected_item;
                     game.current_item = game.briefcase.items[selected_item];
                     game.encounter = get_encounter_fn();
                     game_go_to_state(GAME_STATE_IN_ENCOUNTER);

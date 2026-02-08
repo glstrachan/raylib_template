@@ -158,7 +158,7 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
         if (timer_update(&data.text.timeout_timer)) {
             result = true;
         }
-    } else {
+    } else if(!parameters.no_skip) {
         if(data.text.printed_chars < data.text.total_chars) {
             if(IsKeyPressed(KEY_SPACE)) {
                 data.text.printed_chars = data.text.total_chars;

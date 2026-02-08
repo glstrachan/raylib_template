@@ -8,6 +8,8 @@ static Texture2D laser_canon_wheel;
 static RenderTexture2D tv_game;
 static Shader tv_shader;
 
+static Sound katana1, knife, stabbing;
+
 static int point_locked = -1;
 static int points_count = 0;
 static Vector2* points;
@@ -17,11 +19,40 @@ static int current_shot_point_index;
 
 static Game_Timer beam_timer;
 
+static bool is_shooting = false;
 static float current_canon_angle;
+static Game_Timer wait_timer;
+static int wait_next_state;
 static enum {
-    STATE_IDLE,
-    STATE_BEAM,
-} current_state = STATE_IDLE;
+    STATE_WAIT,
+    STATE_POPIN,
+    STATE_PLAYBACK,
+} current_state = STATE_POPIN;
+static int current_round;
+static int target_rounds;
+const float ACCURACY_LENIENCY = 0.4f;
+static float accuracy;
+static int total_shots;
+
+typedef struct {
+    int count;
+    uint8_t notes[8];
+} Rhythm_Sequence;
+
+#define EIGTH_NOTE(beat, sub_beat) [(beat) * 2 + (sub_beat)] = 1
+#define QUARTER_NOTE(beat) [(beat) * 2] = 1
+#define HALF_NOTE(beat) [(beat) * 4] = 1
+
+static Rhythm_Sequence* current_rhythm_sequence;
+static int rhythm_sequence_note_index, rhythm_sequence_beat_index;
+static Game_Timer rhythm_sequence_timer;
+static Rhythm_Sequence rhythm_sequences[] = {
+    { 4, { QUARTER_NOTE(0), QUARTER_NOTE(1), QUARTER_NOTE(2), QUARTER_NOTE(3) } },
+    { 4, { QUARTER_NOTE(0), QUARTER_NOTE(1), EIGTH_NOTE(2, 0), EIGTH_NOTE(2, 1) } },
+    { 5, { EIGTH_NOTE(0, 0), EIGTH_NOTE(0, 1), QUARTER_NOTE(2), EIGTH_NOTE(3, 0), EIGTH_NOTE(3, 1) } },
+    { 8, { EIGTH_NOTE(0, 0), EIGTH_NOTE(0, 1), EIGTH_NOTE(1, 0), EIGTH_NOTE(1, 1), EIGTH_NOTE(2, 0), EIGTH_NOTE(2, 1), EIGTH_NOTE(3, 0), EIGTH_NOTE(3, 1) } },
+};
+// static Rhythm_Sequence rhythm_sequences_shuffled[oc_len(rhythm_sequences)];
 
 static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
 {
@@ -34,7 +65,7 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
     }
 },
 {
-    4,
+    5,
     (Vector2[]) {
         { 151.500, 71.500 },
         { 584.500, 66.500 },
@@ -44,7 +75,7 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
     }
 },
 {
-    4,
+    2,
     (Vector2[]) {
         { 147.500, 89.500 },
         { 619.500, 94.500 },
@@ -78,7 +109,7 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
     }
 },
 {
-    4,
+    8,
     (Vector2[]) {
         { 158.500, 76.500 },
         { 290.500, 128.500 },
@@ -91,7 +122,7 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
     }
 },
 {
-    4,
+    3,
     (Vector2[]) {
         { 182.500, 360.500 },
         { 587.500, 377.500 },
@@ -128,10 +159,69 @@ static const struct { int point_count; Vector2* points; } DEFINED_POINTS[] = {
 };
 
 static void set_random_points(void) {
-    int index = GetRandomValue(0, oc_len(DEFINED_POINTS) - 1);
-    points = DEFINED_POINTS[index].points;
-    points_count = DEFINED_POINTS[index].point_count;
+    while (true) {
+        // for(int32_t i = oc_len(rhythm_sequences_shuffled) - 1; i >= 0; i--) {
+        //     uint32_t j = GetRandomValue(0, i);
+        //     rhythm_sequences_shuffled[i] = rhythm_sequences[j];
+        // }
+
+        int index = GetRandomValue(0, oc_len(rhythm_sequences) - 1);
+        current_rhythm_sequence = &rhythm_sequences[index];
+
+        // int index = GetRandomValue(0, oc_len(DEFINED_POINTS) - 1);
+
+        points = NULL;
+        for(int32_t i = oc_len(DEFINED_POINTS) - 1; i >= 0; i--) {
+            uint32_t j = GetRandomValue(0, i);
+
+            if (DEFINED_POINTS[j].point_count == current_rhythm_sequence->count) {
+                points = DEFINED_POINTS[j].points;
+                points_count = DEFINED_POINTS[j].point_count;
+                break;
+            }
+        }
+        if (points) break;
+        
+
+        // points = NULL;
+        // for (int i = 0; i < oc_len(DEFINED_POINTS); i++) {
+        //     if (DEFINED_POINTS[index].point_count == current_rhythm_sequence->count) {
+        //         points = DEFINED_POINTS[index].points;
+        //         points_count = DEFINED_POINTS[index].point_count;
+        //     }
+        // }
+        // if (points) break;
+
+        // current_rhythm_sequence = NULL;
+        // for (int i = 0; i < oc_len(rhythm_sequences_shuffled); i++) {
+        //     if (rhythm_sequences_shuffled[i].count == points_count) {
+        //         current_rhythm_sequence = &rhythm_sequences_shuffled[i];
+        //     }
+        // }
+        // if (current_rhythm_sequence) break;
+    }
+
+    current_shot_point_index = 0;
+    Vector2 canon_pivot = {
+        320+laser_canon_body.width / 2.0f,
+        600.0f - 95.0f,
+    };
+    Vector2 diff = Vector2Subtract(points[current_shot_point_index], canon_pivot);
+    current_canon_angle = atan2f(diff.y, diff.x) * 180 / PI + 90.0f;
+
+    rhythm_sequence_note_index = 0;
+    rhythm_sequence_beat_index = 0;
+    current_state = STATE_POPIN;
+    timer_init(&rhythm_sequence_timer, 250);
+
+    is_shooting = false;
 }
+
+// static inline void do_wait_then_state(int next_state) {
+//     current_state = STATE_WAIT;
+//     wait_next_state = next_state;
+//     timer_init(&wait_timer, 500);
+// }
 
 void rhythm_game_prerender(void) {
     const float POINT_RADIUS = 20.0f;
@@ -139,7 +229,7 @@ void rhythm_game_prerender(void) {
     if (do_create_points) {
         if (IsKeyPressed(KEY_S)) {
             print("{{\n");
-            print("    4,\n");
+            print("    {},\n", points_count);
             print("    (Vector2[]) {{\n");
             for (int i = 0; i < points_count; i++) {
             print("        {{ {3}, {3} },\n", points[i].x, points[i].y);
@@ -166,25 +256,72 @@ void rhythm_game_prerender(void) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && point_locked) {
             points[point_locked] = mouse;
         }
-    }
-
-    if (IsKeyPressed(KEY_SPACE)) {
-        timer_init(&beam_timer, 100);
-        current_state = STATE_BEAM;
-    }
-
-    switch (current_state) {
-    case STATE_BEAM: {
-        if (timer_update(&beam_timer)) {
-            current_shot_point_index++;
-            if (current_shot_point_index >= points_count) {
-                current_shot_point_index = 0;
-                set_random_points();
+    } else switch (current_state) {
+    case STATE_WAIT: {
+        if (timer_update(&wait_timer)) {
+            current_state = wait_next_state;
+        }
+    } break;
+    case STATE_POPIN: {
+        if (timer_update(&rhythm_sequence_timer)) {
+            if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
+                PlaySound(stabbing);
+                rhythm_sequence_note_index++;
             }
-            current_state = STATE_IDLE;
+            rhythm_sequence_beat_index++;
+
+            if (rhythm_sequence_beat_index >= 8) {
+                rhythm_sequence_beat_index = 0;
+                rhythm_sequence_note_index = 0;
+                current_state = STATE_PLAYBACK;
+                // do_wait_then_state(STATE_PLAYBACK);
+            }
+            timer_reset(&rhythm_sequence_timer);
+        }
+    } break;
+    case STATE_PLAYBACK: {
+        if (timer_update(&rhythm_sequence_timer)) {
+            if (rhythm_sequence_beat_index >= 8) {
+                set_random_points();
+                current_round += 1;
+                // do_wait_then_state(STATE_POPIN);
+            } else {
+                if (current_rhythm_sequence->notes[rhythm_sequence_beat_index]) {
+                    PlaySound(katana1);
+                    rhythm_sequence_note_index++;
+                    total_shots += 1;
+                }
+                rhythm_sequence_beat_index++;
+                timer_reset(&rhythm_sequence_timer);
+            }
+        }
+        if (IsKeyPressed(KEY_SPACE) && current_shot_point_index < points_count) {
+            if (current_shot_point_index == rhythm_sequence_note_index) {
+                accuracy += Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            } else if (current_shot_point_index == rhythm_sequence_note_index - 1) {
+                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            } else if (current_shot_point_index == rhythm_sequence_note_index + 1) {
+                accuracy += Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            }
+            // else if (current_shot_point_index == rhythm_sequence_note_index)
+
+            timer_init(&beam_timer, 100);
+            is_shooting = true;
         }
     } break;
     default: break;
+    }
+
+    if (is_shooting) {
+        if (timer_update(&beam_timer)) {
+            current_shot_point_index++;
+            if (current_shot_point_index >= points_count) {
+                // current_shot_point_index = 0;
+                // set_random_points();
+            } else {
+            }
+            is_shooting = false;
+        }
     }
 
 
@@ -194,7 +331,24 @@ void rhythm_game_prerender(void) {
     BeginTextureMode(tv_game);
     ClearBackground(RED);
         BeginMode2D(camera);
+            Clay_SetLayoutDimensions((Clay_Dimensions) { 800, 600 });
+
             Clay_BeginLayout();
+                CLAY_AUTO_ID({
+                    .floating = { .offset = {-100, 16 }, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_RIGHT_BOTTOM, CLAY_ATTACH_POINT_RIGHT_BOTTOM } },
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_FIT(.min = 170)
+                        },
+                        .padding = {16, 16, 10, 34},
+                    },
+                    .cornerRadius = CLAY_CORNER_RADIUS(16),
+                    .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+                    .custom = { .customData = make_cool_background() },
+                }) {
+                    CLAY_TEXT(oc_format(&frame_arena, "Accuracy: {2}/{}", accuracy, total_shots), CLAY_TEXT_CONFIG({ .fontId = FONT_ITIM, .fontSize = 24, .textColor = {255, 255, 255, 255} }));
+                }
+
                 float t = 0.0f;
                 DrawTexturePro(space_texture, (Rectangle) { (1920 - (1080 * 4.0f / 3.0f)) / 2.0f * t, 0.0f, 1080 * 4.0f / 3.0f, 1080.0f }, (Rectangle) { 0.0f, 0.0f, 800.0f, 600.0f }, (Vector2) {0, 0}, 0.0f, WHITE);
 
@@ -206,15 +360,12 @@ void rhythm_game_prerender(void) {
                 float desired_angle = atan2f(diff.y, diff.x) * 180 / PI + 90.0f;
                 current_canon_angle = Lerp(current_canon_angle, desired_angle, GetFrameTime() * 100.0f);
 
-                switch (current_state) {
-                case STATE_BEAM: {
+                if (is_shooting) {
                     float interp = timer_interpolate(&beam_timer);
                     DrawRectanglePro((Rectangle) {
                         canon_pivot.x + diff.x * interp, canon_pivot.y + diff.y * interp,
                         8.0f, 40.0f,
                     }, (Vector2) { 2.0f, 20.0f}, current_canon_angle, ORANGE);
-                } break;
-                default: break;
                 }
 
                 DrawTexturePro(laser_canon_barrel,
@@ -241,11 +392,20 @@ void rhythm_game_prerender(void) {
                         DrawCircleV(points[i], POINT_RADIUS, RED);
                         DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
                     }
-                } else {
+                } else switch (current_state) {
+                case STATE_POPIN: {
+                    for (int i = 0; i < rhythm_sequence_note_index; i++) {
+                        DrawCircleV(points[i], POINT_RADIUS, RED);
+                        DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
+                    }
+                } break;
+                case STATE_WAIT: if(wait_next_state != STATE_PLAYBACK) break;
+                case STATE_PLAYBACK: {
                     for (int i = current_shot_point_index; i < points_count; i++) {
                         DrawCircleV(points[i], POINT_RADIUS, RED);
                         DrawRing(points[i], POINT_RADIUS - 3, POINT_RADIUS, 0, 360, 100, ((Color) {0, 0, 0, 255}));
                     }
+                } break;
                 }
 
             Clay_RenderCommandArray renderCommands = Clay_EndLayout();
@@ -260,16 +420,44 @@ void rhythm_game_init(void) {
     laser_canon_body = LoadTexture("resources/laser_canon_body.png");
     laser_canon_barrel = LoadTexture("resources/laser_canon_barrel.png");
     laser_canon_wheel = LoadTexture("resources/laser_canon_wheel.png");
+    
+    katana1 = LoadSound("resources/sounds/katana1.mp3");
+    knife = LoadSound("resources/sounds/knife.mp3");
+    stabbing = LoadSound("resources/sounds/stabbing.mp3");
+    tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
 
     tv_game = LoadRenderTexture(800, 600);
-    tv_shader = LoadShader(NULL, "resources/tv_shader.glsl");
+
     game.current_prerender = rhythm_game_prerender;
     current_shot_point_index = 0;
-    set_random_points();
     current_canon_angle = 0.0f;
+    accuracy = 0.0f;
+    total_shots = 0;
+    current_round = 0;
+    target_rounds = 5;
+    set_random_points();
+}
+
+void rhythm_game_cleanup(void) {
+    UnloadTexture(tv_texture);
+    UnloadTexture(space_texture);
+    UnloadTexture(laser_canon_body);
+    UnloadTexture(laser_canon_barrel);
+    UnloadTexture(laser_canon_wheel);
+    
+    UnloadSound(katana1);
+    UnloadSound(knife);
+    UnloadSound(stabbing);
+    UnloadShader(tv_shader);
+
+    UnloadRenderTexture(tv_game);
 }
 
 bool rhythm_game_update(void) {
+    if (current_round > target_rounds) {
+        game_submit_minigame_score(accuracy / total_shots);
+        return true;
+    }
     Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, -(float)tv_game.texture.height };
     Rectangle observerDest = {
         100, 96,
@@ -308,5 +496,6 @@ bool rhythm_game_update(void) {
 
 Minigame rhythm_game = {
     .init = rhythm_game_init,
+    .cleanup = rhythm_game_cleanup,
     .update = rhythm_game_update,
 };

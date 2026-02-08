@@ -37,6 +37,8 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
     selection;                                                                       \
 })
 
+#define dialog_yield() my_longjmp(__current_sequence->jump_back_buf, 1)
+
 #define dialog_text(speaker_name, text, ...) do {                                                                                       \
     if (my_setjmp(__current_sequence->jump_buf) == 0) {                                                                                           \
         __current_sequence->first_time = true;                                                                                                    \
@@ -56,6 +58,7 @@ extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
     if (!(minigame)->update()) {                \
         my_longjmp(__current_sequence->jump_back_buf, 1); \
     }                                           \
+    if ((minigame)->cleanup) (minigame)->cleanup(); \
     game.current_prerender = NULL; \
 } while (0)
 

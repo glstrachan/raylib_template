@@ -59,6 +59,7 @@ static inline float half_smoothstep(float x) {
 
 typedef struct {
     void (*init)(void);
+    void (*cleanup)(void);
     bool (*update)(void);
 } Minigame;
 
@@ -94,6 +95,7 @@ typedef struct {
         GAME_STATE_TUTORIAL,
         GAME_STATE_SELECT_ITEMS,
         GAME_STATE_SELECT_ENCOUNTER,
+        GAME_STATE_START_DAY,
         GAME_STATE_IN_ENCOUNTER,
         GAME_STATE_DONE_ENCOUNTER,
         GAME_STATE_DAY_SUMMARY,
@@ -106,7 +108,9 @@ typedef struct {
     Texture2D screenshot;
     void (*current_prerender)(void);
 
+    int current_encounter;
     Briefcase briefcase;
+    int current_item_index;
     Item_Type current_item;
     Character_Type current_character;
     void (*encounter)(void);

@@ -269,7 +269,7 @@ void pick_items_update() {
                         game.briefcase.items[i] = data.picked[i];
                     }
 
-                    game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+                    game_go_to_state(GAME_STATE_START_DAY);
                 }
             }
         }
