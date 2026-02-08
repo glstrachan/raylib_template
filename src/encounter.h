@@ -52,6 +52,23 @@ extern Sound start_sounds[];
     }                                                                                                                                   \
 } while (0)
 
+#ifdef _DEBUG
+#define encounter_minigame(minigame) do {       \
+    if (my_setjmp(__current_sequence->jump_buf) == 0) {   \
+        __current_sequence->first_time = true;            \
+        (minigame)->init();                     \
+        /* Play a sounds*/                      \
+        PlaySound(start_sounds[game.current_character - CHARACTERS_OLDLADY]); \
+        my_longjmp(__current_sequence->jump_back_buf, 1); \
+    }                                           \
+    if (!(minigame)->update() && !IsKeyPressed(KEY_F)) {                \
+        my_longjmp(__current_sequence->jump_back_buf, 1); \
+    }                                           \
+    if ((minigame)->cleanup) (minigame)->cleanup(); \
+    game.current_prerender = NULL; \
+} while (0)
+#else
+
 #define encounter_minigame(minigame) do {       \
     if (my_setjmp(__current_sequence->jump_buf) == 0) {   \
         __current_sequence->first_time = true;            \
@@ -66,6 +83,7 @@ extern Sound start_sounds[];
     if ((minigame)->cleanup) (minigame)->cleanup(); \
     game.current_prerender = NULL; \
 } while (0)
+#endif
 
 #define encounter_begin(...) Encounter_Sequence* __current_sequence = (&encounter_top_sequence, ## __VA_ARGS__ /* omg lol */)
 #define encounter_end() do { __current_sequence->is_done = true; my_longjmp(__current_sequence->jump_back_buf, 1); } while (0)

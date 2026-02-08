@@ -119,6 +119,7 @@ void game_update() {
 	if (is_transitioning) {
 		if (timer_update(&fade_timer)) {
 			is_transitioning = false;
+            goto DONE_TRANSITIONING;
 		}
 		if (game.state != game.next_state) {
 			float f = timer_interpolate(&fade_timer);
@@ -133,6 +134,7 @@ void game_update() {
 			}
 		}
 	}
+    DONE_TRANSITIONING: (void)0;
     switch (game.state) {
     case GAME_STATE_SELECT_ITEMS: {
         pick_items_update();
@@ -146,6 +148,7 @@ void game_update() {
         characters_draw(CHARACTERS_SALESMAN, CHARACTERS_LEFT);
         characters_draw(game.current_character, CHARACTERS_RIGHT);
 
+        if (is_transitioning) return;
         encounter_update();
         if (encounter_is_done()) {
             game_go_to_state(GAME_STATE_DONE_ENCOUNTER, true);
@@ -155,7 +158,7 @@ void game_update() {
         day_summary_update();
     } break;
     case GAME_STATE_DONE_ENCOUNTER: {
-        if (game.minigame_scores < (float)game.minigame_count * 0.5f) {
+        if (game.minigame_scores < score_needed) {
             CLAY_AUTO_ID({
                 .layout = {
                     .sizing = {
@@ -371,6 +374,8 @@ int entry_main(void)
     bg_tex = LoadTexture("resources/background.png");
 
     game_go_to_state(GAME_STATE_TITLE, false);
+    // game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
+    // game.state = GAME_STATE_IN_ENCOUNTER;
 
     game.items_sold_today[0] = (Item_Sold) {
         .item = ITEM_VACUUM,

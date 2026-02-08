@@ -393,7 +393,7 @@ void pick_items_update() {
         selection_data.is_selecting = false;
     }
 
-#ifndef _DEBUG
+#ifdef _DEBUG
     if (IsKeyPressed(KEY_R)) {
         for (int d = 0; d < 4; d++) {
             if (data.picked[d] != ITEM_NONE) continue;

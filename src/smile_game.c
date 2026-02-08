@@ -257,7 +257,7 @@ bool smile_game_update(void) {
         return true;
     }
 
-    #ifndef _DEBUG
+    #ifdef _DEBUG
         if (IsKeyPressed(KEY_F)) {
             return true;
         }
