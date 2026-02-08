@@ -221,7 +221,6 @@ int main(void)
 
         Clay_BeginLayout();
 
-        // SetupVi
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
