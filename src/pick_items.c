@@ -265,6 +265,7 @@ void pick_items_update() {
                 }
 
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && haveFour) { 
+					PlaySound(game_sounds.button_click);
                     for (int i = 0; i < 4; i++) {
                         game.briefcase.items[i] = data.picked[i];
                     }
@@ -385,6 +386,8 @@ void pick_items_update() {
                     selection_data.selected_index = i;
                 }
             }
+
+			PlaySound(game_sounds.button_hover);
         }
 
         selection_data.is_selecting = false;

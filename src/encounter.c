@@ -184,6 +184,7 @@ void pick_encounter_update(void) {
                         Vector2 loc = { base_x + dest * 150.0f + 50.0f, base_y + 50.0f };
                         float dist = Vector2Distance(mouse, loc);
                         if (dist < selection_radius) {
+							PlaySound(game_sounds.button_hover);
                             selected_item = i;
                         }
                     }
@@ -300,6 +301,7 @@ void pick_encounter_update(void) {
             }) {
                 CLAY_TEXT((CLAY_STRING("Start Selling")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && selected_item != -1) {
+					PlaySound(game_sounds.button_click);
                     // extern Encounter sample_encounter_;
                     // game.encounter = &sample_encounter_;
                     game.current_item_index = selected_item;
@@ -379,6 +381,7 @@ void day_summary_update(void) {
             }) {
                 CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+					PlaySound(game_sounds.button_click);
                     game_go_to_state(GAME_STATE_SELECT_ITEMS);
                 }
             }
