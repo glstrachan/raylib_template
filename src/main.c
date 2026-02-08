@@ -31,6 +31,7 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 }
 
 static Texture2D shop_bg_tex, clipboard_text;
+static Texture2D title_bg_tex;
 static Game_Timer show_fail_timer;
 static Game_Timer fade_timer;
 static Texture2D bg_tex;
@@ -107,6 +108,7 @@ void game_go_to_state(uint32_t next_state, bool transition) {
     } break;
     case GAME_STATE_DAY_SUMMARY: break;
 	case GAME_STATE_TUTORIAL: break;
+    case GAME_STATE_TITLE: break;
     default: oc_assert(false);
     }
 
@@ -241,6 +243,48 @@ void game_update() {
 
 		/* DrawTexture(clipboard_text, game_parameters.screen_width/2.0f - clipboard_text.width/2.0f, game_parameters.screen_height/2.0f - clipboard_text.height/2.0f, WHITE); */
 	} break;
+    case GAME_STATE_TITLE: {
+        DrawTexture(title_bg_tex, 0, 0, WHITE);
+
+        CLAY_AUTO_ID({
+            .floating = { .offset = { -10, 10 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_RIGHT_TOP, CLAY_ATTACH_POINT_RIGHT_TOP } },
+            .layout = {
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                .padding = {25, 25, 0, 0},
+                .sizing = {
+                    .width = CLAY_SIZING_FIT(),
+                    .height = CLAY_SIZING_FIT()
+                },
+            },
+            // .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .backgroundColor = {255, 0, 0, 80},
+            .cornerRadius = CLAY_CORNER_RADIUS(6),
+        }) {
+            CLAY_TEXT((CLAY_STRING("Early Access")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 80} }));
+        }
+
+        CLAY_AUTO_ID({
+            .floating = { .offset = { 0, -150 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+            .layout = {
+                .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                .padding = {25, 25, 10, 10},
+                .sizing = {
+                    .width = CLAY_SIZING_FIT(),
+                    .height = CLAY_SIZING_FIT()
+                },
+            },
+            .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+            .custom = { .customData = make_cool_background() },
+            .backgroundColor = {255, 0, 0, 0},
+            .cornerRadius = CLAY_CORNER_RADIUS(6),
+        }) {
+            CLAY_TEXT((CLAY_STRING("Press Space to Start")), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255 * (0.3 + 0.5 * (sin(GetTime() * 2.0) * 0.5 + 0.5))} }));
+        }
+
+        if(IsKeyPressed(KEY_SPACE)) {
+            game_go_to_state(GAME_STATE_TUTORIAL, true);
+        }
+    } break;
     default: oc_assert(false);
     }
 }
@@ -276,6 +320,7 @@ int main(void)
 	game_sounds.button_click1 = LoadSound("resources/sounds/ui_click-2.wav");
 	game_sounds.button_hover = LoadSound("resources/sounds/ui_hover.wav");
     shop_bg_tex = LoadTexture("resources/background_shop.png");
+    title_bg_tex = LoadTexture("resources/title.png");
 	clipboard_text = LoadTexture("resources/clipboard.png");
 
     Camera2D camera = { 0 };
@@ -325,7 +370,7 @@ int main(void)
 
     bg_tex = LoadTexture("resources/background.png");
 
-    game_go_to_state(GAME_STATE_TUTORIAL, false);
+    game_go_to_state(GAME_STATE_TITLE, false);
 
     game.items_sold_today[0] = (Item_Sold) {
         .item = ITEM_VACUUM,
@@ -337,7 +382,7 @@ int main(void)
 
     // shotgun_game.init();
     // rhythm_game.init();
-    // memory_game.init();
+    memory_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -345,7 +390,6 @@ int main(void)
         Oc_Arena_Save save = oc_arena_save(&frame_arena);
         game_parameters.screen_width = GetScreenWidth();
         game_parameters.screen_height = GetScreenHeight();
-
 
         if (game.current_prerender) game.current_prerender();
 
@@ -360,12 +404,12 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                game_update();
+                // game_update();
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
                 // rhythm_game.update();
-                // memory_game.update();
+                memory_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);

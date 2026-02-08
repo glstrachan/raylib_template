@@ -33,7 +33,7 @@ static bool ended;
 static float end_time;
 
 static uint32_t num_items;
-static uint32_t score_multiplier;
+static uint32_t score_multiplier = 500;
 static uint32_t score;
 
 static float base_velocity;
@@ -114,8 +114,13 @@ bool shotgun_game_update() {
                 float dist = Vector2Distance(mouse, game_item->position);
                 
                 if(dist < item_hit_radius) {
-                    // TODO: Add scoring logic
-                    score += 1;
+                    if(game_item->item_type == game.current_item) {
+                        score = max(0, (int)score - 3);
+                    }
+                    else {
+                        score += 1;
+                    }
+                    
                     game_item->state = SHOTGUN_ITEM_STATE_DESTROYED;
                     PlaySound(explodeSound);
                 }
@@ -152,7 +157,8 @@ bool shotgun_game_update() {
 
     // Draw UI bs
     // TODO
-    game_objective_widget(lit("Shoot any item that isnt [INSERT CORRECT ONE HERE]"));
+
+    game_objective_widget(oc_format(&frame_arena, "Shoot any item that isnt {}", item_data[game.current_item].name));
 
     // Draw the score
     CLAY_AUTO_ID({
