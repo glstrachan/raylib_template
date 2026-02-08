@@ -63,19 +63,38 @@ static Texture2D clipboard_text = { 0 };
 static Shader item_bg_shader;
 static Shader circle_shader;
 
+
+static int next_character;
+static Character_Type shuffled_characters[4];
+
 void pick_encounter_init(void) {
     if (!house_bg.id) house_bg = LoadTexture("resources/background.png");
     if (!briefcase_tex.id) briefcase_tex = LoadTexture("resources/briefcase.png");
     if (!clipboard_text.id) clipboard_text = LoadTexture("resources/clipboard.png");
     if (!item_bg_shader.id) item_bg_shader = LoadShader(NULL, "resources/item_bg_shader.fs");
     if (!circle_shader.id) circle_shader = LoadShader(NULL, "resources/circle_texture.fs");
+
+    next_character = 0;
+
+    shuffled_characters[0] = CHARACTERS_FATMAN;
+    shuffled_characters[1] = CHARACTERS_NERD;
+    shuffled_characters[2] = CHARACTERS_OLDLADY;
+    shuffled_characters[3] = CHARACTERS_SHOTGUNNER;
+    for(int32_t i = 3; i >= 0; i--) {
+        uint32_t j = GetRandomValue(0, i);
+        Character_Type temp = shuffled_characters[j];
+        shuffled_characters[j] = shuffled_characters[i];
+        shuffled_characters[i] = temp;
+    }
 }
 
 void pick_encounter(void) {
-    game.current_character = CHARACTERS_FATMAN;
-    game.current_character = CHARACTERS_OLDLADY;
+    // game.current_character = CHARACTERS_FATMAN;
+    // game.current_character = CHARACTERS_OLDLADY;
     // game.encounter = &sample_encounter_;
+    game.current_character = shuffled_characters[next_character++];
     selected_item = -1;
+    print("foo\n");
 }
 
 // static Vector2 pick_item_locations[] = {
@@ -102,7 +121,7 @@ void pick_encounter_update(void) {
     const float item_location_offset_y = -120.0f;
 
 
-    Texture2D* t = characters_get_texture(game.current_character);
+    Texture2D* t = characters_get_headshot_texture(game.current_character);
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));
     customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;
     customBackgroundData->customData.background = (CustomLayoutElement_Background) { .shader = circle_shader, .texture = *t };
@@ -135,8 +154,8 @@ void pick_encounter_update(void) {
             CLAY_AUTO_ID({
                 .layout = {
                     .sizing = {
-                        .width = CLAY_SIZING_FIXED(t->width),
-                        .height = CLAY_SIZING_FIXED(t->width),
+                        .width = CLAY_SIZING_FIXED(200),
+                        .height = CLAY_SIZING_FIXED(200),
                     },
                 },
                 .custom = { .customData = customBackgroundData },

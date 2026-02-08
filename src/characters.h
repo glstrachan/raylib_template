@@ -31,4 +31,5 @@ void characters_draw(Character_Type type, Character_Position pos);
 void characters_init();
 void characters_cleanup();
 Texture2D* characters_get_texture(Character_Type type);
+Texture2D* characters_get_headshot_texture(Character_Type type);
 Sound characters_get_sound(Character_Type type);

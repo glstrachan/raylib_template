@@ -18,6 +18,10 @@ void main() {
 
     vec2 texSize = textureSize(textureSampler, 0);
     uv.y = uv.y * texSize.x / texSize.y;
+    uv.x -= 0.5;
+    uv.y *= 1.1;
+    uv.x *= 1.1;
+    uv.x += 0.5;
     uv.y -= 0.1;
 
     if (uv.y > 0.0) {

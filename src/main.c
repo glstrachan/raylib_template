@@ -53,9 +53,12 @@ static float score_needed = 0.7;
 
 static bool is_transitioning = false;
 
-static bool did_doorbell;
+static bool did_doorbell, did_switch;
 void game_go_to_state(uint32_t next_state, bool transition) {
-    did_doorbell = false;
+    if (!is_transitioning) {
+        did_doorbell = false;
+        did_switch = false;
+    }
 	if (transition) {
 		timer_init(&fade_timer, 1500);
 		game.next_state = next_state;
@@ -76,6 +79,7 @@ void game_go_to_state(uint32_t next_state, bool transition) {
     } break;
     case GAME_STATE_START_DAY: {
         memset(&game.items_sold_today, 0, sizeof(game.items_sold_today));
+        pick_encounter_init();
         game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, false);
         return;
     } break;
@@ -121,7 +125,8 @@ void game_update() {
                 Sound sound = characters_get_sound(game.current_character);
                 PlaySound(sound);
             }
-			if (f >= 0.5f) {
+			if (!did_switch && f >= 0.5f) {
+                did_switch = true;
 				game_go_to_state(game.next_state, false);
 			}
 		}
@@ -330,7 +335,6 @@ int main(void)
     PlayMusicStream(hold_music);
     SetMusicVolume(hold_music, 0.1f);
 
-    // smile_game.init();
     // shotgun_game.init();
     // rhythm_game.init();
     // memory_game.init();

@@ -16,8 +16,24 @@ static Texture2D oldlady_tex;
 static Texture2D nerd_tex;
 static Texture2D shotgunner_tex;
 static Texture2D fatman_tex;
+static Texture2D oldlady_hs;
+static Texture2D nerd_hs;
+static Texture2D shotgunner_hs;
+static Texture2D fatman_hs;
 
 static Sound doorbells[4];
+
+Texture2D* characters_get_headshot_texture(Character_Type type) {
+    switch(type) {
+        case CHARACTERS_OLDLADY:    return &oldlady_hs;
+        case CHARACTERS_NERD:       return &nerd_hs;
+        case CHARACTERS_SHOTGUNNER: return &shotgunner_hs;
+        case CHARACTERS_FATMAN:     return &fatman_hs;
+        case CHARACTERS_COUNT:
+        case CHARACTERS_NONE: oc_assert(false); break;
+    }
+}
+
 
 Texture2D* characters_get_texture(Character_Type type) {
     switch(type) {
@@ -63,6 +79,15 @@ void characters_init() {
     SetTextureWrap(shotgunner_tex, TEXTURE_WRAP_CLAMP);
     fatman_tex = LoadTexture("resources/fatman.png");
     SetTextureWrap(fatman_tex, TEXTURE_WRAP_CLAMP);
+
+    oldlady_hs = LoadTexture("resources/oldlady_headshot.png");
+    SetTextureWrap(oldlady_hs, TEXTURE_WRAP_CLAMP);
+    nerd_hs = LoadTexture("resources/nerd_headshot.png");
+    SetTextureWrap(nerd_hs, TEXTURE_WRAP_CLAMP);
+    shotgunner_hs = LoadTexture("resources/shotgunner_headshot.png");
+    SetTextureWrap(shotgunner_hs, TEXTURE_WRAP_CLAMP);
+    fatman_hs = LoadTexture("resources/fatman_headshot.png");
+    SetTextureWrap(fatman_hs, TEXTURE_WRAP_CLAMP);
 
 
     doorbells[0] = LoadSound("resources/sounds/doorbell_a.wav");

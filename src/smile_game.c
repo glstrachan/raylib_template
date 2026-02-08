@@ -240,13 +240,13 @@ void smile_game_init(void) {
     acceleration = -0.8;
     acceleration1 = 0.0f;
     mood_matching = 0.0f;
-
-    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
-    timer_init(&mood_sampler, 1000);
     
     difficulty_timeout = DEFAULT_DIFFICULTY - 1000.0f * game.current_day;
     target_dialog_count = 5 + 5 * game.current_day;
     dialog_count = 0;
+
+    encounter_sequence_start(&dialog_sequence, smile_dialog_sequence);
+    timer_init(&mood_sampler, 1000);
 }
 
 bool smile_game_update(void) {
