@@ -35,6 +35,7 @@ static Texture2D title_bg_tex;
 static Game_Timer show_fail_timer;
 static Game_Timer fade_timer;
 static Texture2D bg_tex;
+static Texture2D poo_tex;
 Game_Parameters game_parameters;
 
 Game_State game = { 0 };
@@ -176,6 +177,8 @@ void game_update() {
 			.cornerRadius = CLAY_CORNER_RADIUS(16)
 		}) {
 			CLAY_TEXT(oc_format(&frame_arena, "You failed to sell the item buddy :("), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
+
+            DrawTexture(poo_tex, 1920 / 2 - poo_tex.width / 2, 1080 / 2 - poo_tex.height / 2 + 100, WHITE);
 		}
     } break;
 	case GAME_STATE_TUTORIAL: {
@@ -373,6 +376,7 @@ int entry_main(void)
 
 
     bg_tex = LoadTexture("resources/background.png");
+    poo_tex = LoadTexture("resources/poo.png");
 
     game_go_to_state(GAME_STATE_TITLE, false);
     // game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
