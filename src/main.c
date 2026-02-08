@@ -161,25 +161,30 @@ void game_update() {
     case GAME_STATE_DONE_ENCOUNTER: {
         DrawTexture(bg_tex, 0, 0, WHITE);
 
-        CLAY(CLAY_ID("Retarded Fatty"), {
-			.floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
-			.layout = {
-				.layoutDirection = CLAY_TOP_TO_BOTTOM,
-				.sizing = {
-					.width = CLAY_SIZING_FIXED(clipboard_text.width),
-					.height = CLAY_SIZING_FIXED(clipboard_text.height),
-				},
-				.padding = {70, 50, 200, 60},
-				.childGap = 16,
-				/* .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, */
-			},
-			.image = { .imageData = &clipboard_text },
-			.cornerRadius = CLAY_CORNER_RADIUS(16)
-		}) {
-			CLAY_TEXT(oc_format(&frame_arena, "You failed to sell the item buddy :("), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
+        if (game.minigame_scores < score_needed) {
+            CLAY(CLAY_ID("Retarded Fatty"), {
+                .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
+                .layout = {
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .sizing = {
+                        .width = CLAY_SIZING_FIXED(clipboard_text.width),
+                        .height = CLAY_SIZING_FIXED(clipboard_text.height),
+                    },
+                    .padding = {70, 50, 200, 60},
+                    .childGap = 16,
+                    /* .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, */
+                },
+                .image = { .imageData = &clipboard_text },
+                .cornerRadius = CLAY_CORNER_RADIUS(16)
+            }) {
+                CLAY_TEXT(oc_format(&frame_arena, "You failed to sell the item buddy :("), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
 
-            DrawTexture(poo_tex, 1920 / 2 - poo_tex.width / 2, 1080 / 2 - poo_tex.height / 2 + 100, WHITE);
-		}
+                DrawTexture(poo_tex, 1920 / 2 - poo_tex.width / 2, 1080 / 2 - poo_tex.height / 2 + 100, WHITE);
+            }
+            if (!is_transitioning && timer_update(&show_fail_timer)) {
+                game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
+            }
+        }
     } break;
 	case GAME_STATE_TUTORIAL: {
 		DrawTexture(shop_bg_tex, 0, 0, WHITE);
