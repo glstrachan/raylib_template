@@ -160,36 +160,23 @@ void game_update() {
     case GAME_STATE_DONE_ENCOUNTER: {
         DrawTexture(bg_tex, 0, 0, WHITE);
 
-        CLAY(CLAY_ID("Retarded Fatty"), {
-			.floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
-			.layout = {
-				.layoutDirection = CLAY_TOP_TO_BOTTOM,
-				.sizing = {
-					.width = CLAY_SIZING_FIXED(clipboard_text.width),
-					.height = CLAY_SIZING_FIXED(clipboard_text.height),
-				},
-				.padding = {70, 50, 200, 60},
-				.childGap = 16,
-				/* .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, */
-			},
-			.image = { .imageData = &clipboard_text },
-			.cornerRadius = CLAY_CORNER_RADIUS(16)
-		}) {
-			CLAY_TEXT(oc_format(&frame_arena, "You failed to sell the item buddy :("), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
-		}
         if (game.minigame_scores < score_needed) {
-            CLAY_AUTO_ID({
+            CLAY(CLAY_ID("Retarded Fatty"), {
+                .floating = { .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_CENTER, CLAY_ATTACH_POINT_CENTER_CENTER } },
                 .layout = {
-                    .sizing = {
-                        .width = CLAY_SIZING_PERCENT(1),
-                        .height = CLAY_SIZING_PERCENT(1),
-                    },
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                    .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+                    .sizing = {
+                        .width = CLAY_SIZING_FIXED(clipboard_text.width),
+                        .height = CLAY_SIZING_FIXED(clipboard_text.height),
+                    },
+                    .padding = {70, 50, 200, 60},
+                    .childGap = 16,
+                    /* .childAlignment = { .x = CLAY_ALIGN_X_CENTER }, */
                 },
+                .image = { .imageData = &clipboard_text },
+                .cornerRadius = CLAY_CORNER_RADIUS(16)
             }) {
-                CLAY_TEXT(lit("They did not buy the item"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 80, .textColor = {200, 30, 0, 255} }));
-                CLAY_TEXT(lit("FAIL"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 60, .textColor = {200, 30, 0, 255} }));
+                CLAY_TEXT(oc_format(&frame_arena, "You failed to sell the item buddy :("), CLAY_TEXT_CONFIG({ .fontSize = 61, .fontId = FONT_ITIM, .textColor = {0, 0, 0, 255}, .textAlignment = CLAY_TEXT_ALIGN_CENTER }));
             }
             if (!is_transitioning && timer_update(&show_fail_timer)) {
                 game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
