@@ -32,20 +32,27 @@ static float start_time;
 static bool ended;
 static float end_time;
 
+static uint32_t num_items;
+static uint32_t score_multiplier;
 static uint32_t score;
+
+static float base_velocity;
+
+static Sound flingSound;
+static Sound alertSound;
 
 static inline float get_random_float() {
     return ((float)GetRandomValue(0, INT_MAX) / (float)INT_MAX);
 }
 
-static void shotgun_game_add_items(int n) {
+static void shotgun_game_add_items() {
     // Periodically space out when things spawn
     // also initial locations to be just outside the perimeter of the screen
     // and it chooses a initial velocity pointing towards a point along the center of the screen
 
     float spawn_time = 0.0f;
 
-    for(int i = 0; i < 30; i++) {
+    for(int i = 0; i < num_items; i++) {
             spawn_time += get_random_float() * 1.0 + 0.1;
 
             Vector2 spawn_location = (get_random_float() > 0.5) ? (Vector2) {0 - 50, GetRandomValue(20, 900)} : (Vector2) {1920 + 50, GetRandomValue(20, 900)};
@@ -72,8 +79,18 @@ void shotgun_game_init() {
     score = 0;
 
     ended = false;
+
+    flingSound = LoadSound("resources/sounds/duck-hunt_fling.wav");
+    alertSound = LoadSound("resources/sounds/duck-hunt_warning.wav");
     
-    shotgun_game_add_items(20);
+    // TODO: Change this based on current day
+
+    // depending on the day make it more items
+
+    num_items = game.current_day * 15;
+    base_velocity = (float)game.current_day * 1.0;
+
+    shotgun_game_add_items();
 }
 
 bool shotgun_game_update() {
@@ -92,7 +109,7 @@ bool shotgun_game_update() {
                 
                 if(dist < item_hit_radius) {
                     // TODO: Add scoring logic
-                    score += 500;
+                    score += 1;
                     game_item->state = SHOTGUN_ITEM_STATE_DESTROYED;
                 }
             }
@@ -144,7 +161,7 @@ bool shotgun_game_update() {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(6),
     }) {
-        CLAY_TEXT((oc_format(&frame_arena, "Score: {}", score)), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT((oc_format(&frame_arena, "Score: {}", score * score_multiplier)), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
     }
 
     // Draw all the items
@@ -156,11 +173,13 @@ bool shotgun_game_update() {
             case SHOTGUN_ITEM_STATE_UNSPAWNED: {
                 if(GetTime() - start_time > game_item->spawn_time) {
                     game_item->state = SHOTGUN_ITEM_STATE_ALERTING;
+                    PlaySound(alertSound);
                 }
             } break;
             case SHOTGUN_ITEM_STATE_ALERTING: {
                 if(GetTime() - start_time > game_item->spawn_time + 1.0) {
                     game_item->state = SHOTGUN_ITEM_STATE_SPAWNED;
+                    PlaySound(flingSound);
                 }
                 
                 if(game_item->position.x < 0) {
@@ -198,6 +217,8 @@ bool shotgun_game_update() {
             end_time = GetTime();
         }
         else if(GetTime() - end_time > 1.0f) {
+            game_submit_minigame_score((float)score / (float)num_items);
+
             return true;
         }
     }
