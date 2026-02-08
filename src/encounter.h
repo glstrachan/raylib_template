@@ -19,6 +19,8 @@ void pick_encounter_update(void);
 extern jmp_buf encounter_jump_buf, encounter_jump_back_buf;
 extern Encounter_Sequence encounter_top_sequence;
 
+extern Sound start_sounds[];
+
 #define CSTR_TO_STRING(str) (_Generic((str), string : (str), default: lit(str)))
 
 #define dialog_options(...) ((const char *[]){ __VA_ARGS__ })
@@ -54,6 +56,8 @@ extern Encounter_Sequence encounter_top_sequence;
     if (my_setjmp(__current_sequence->jump_buf) == 0) {   \
         __current_sequence->first_time = true;            \
         (minigame)->init();                     \
+        /* Play a sounds*/                      \
+        PlaySound(start_sounds[game.current_character - CHARACTERS_OLDLADY]); \
         my_longjmp(__current_sequence->jump_back_buf, 1); \
     }                                           \
     if (!(minigame)->update()) {                \

@@ -37,10 +37,17 @@ Game_Parameters game_parameters;
 Game_State game = { 0 };
 Game_Shaders game_shaders = { 0 };
 
+Sound start_sounds[4];
+
 extern Minigame memory_game;
 extern Minigame smile_game;
 extern Minigame shotgun_game;
 extern Minigame rhythm_game;
+
+static Sound failSound;
+static Sound successSound;
+
+static float score_needed = 0.7;
 
 void game_go_to_state(uint32_t next_state) {
     switch (next_state) {
@@ -66,9 +73,11 @@ void game_go_to_state(uint32_t next_state) {
         encounter_start(game.encounter);
     } break;
     case GAME_STATE_DONE_ENCOUNTER: {
-        if (game.minigame_scores < (float)game.minigame_count * 0.5f) {
+        if (game.minigame_scores < score_needed) {
+            PlaySound(failSound);
             timer_init(&show_fail_timer, 4000);
         } else {
+            PlaySound(successSound);
             game.current_encounter++;
             game.briefcase.used[game.current_item_index] = 1;
 
@@ -142,9 +151,16 @@ int main(void)
     const int screenHeight = 1080;
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT);
-    InitWindow(screenWidth, screenHeight, "Travelling Salesman Problems");
+    InitWindow(screenWidth, screenHeight, "Traveling Salesman Problems");
     InitAudioDevice();
     SetTargetFPS(0);
+
+    failSound = LoadSound("resources/sounds/failure.wav");
+    successSound = LoadSound("resources/sounds/success.wav");
+    start_sounds[0] = LoadSound("resources/sounds/casino_a.mp3");
+    start_sounds[1] = LoadSound("resources/sounds/casino_b.mp3");
+    start_sounds[2] = LoadSound("resources/sounds/casino_c.mp3");
+    start_sounds[3] = LoadSound("resources/sounds/casino_d.mp3");
     
     Camera2D camera = { 0 };
     camera.offset = (Vector2) { 0.0f, 0.0f };
@@ -229,6 +245,7 @@ int main(void)
                 // smile_game.update();
                 // shotgun_game.update();
                 // rhythm_game.update();
+                // memory_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);

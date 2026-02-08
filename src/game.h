@@ -131,6 +131,7 @@ static inline void game_submit_minigame_score(float score) {
     game.minigame_count++;
     game.minigame_scores += score;
 }
+
 void game_go_to_state(uint32_t next_state);
 
 extern void HandleClayErrors(Clay_ErrorData errorData);

@@ -5,6 +5,8 @@
 #include "../external/clay/clay_renderer_raylib.h"
 
 static uint32_t score;
+static uint32_t max_possible_score;
+static uint32_t score_multiplier = 100;
 static float timer;
 static uint32_t game_round;
 static uint32_t num_rounds[4] = {2, 3, 4, 5};
@@ -66,6 +68,7 @@ void memory_setup_round() {
 
 void memory_game_init() {
     score = 0;
+    max_possible_score = 0;
     state = MEMORY_DISPLAYING;
     timer = GetTime();
     game_round = 0;
@@ -374,7 +377,9 @@ bool memory_game_update() {
                         num_correct++;
                     }
                 }
-                score += num_correct * 100;
+
+                score += num_correct;
+                max_possible_score += memory_game_items.count;
             }
         } break;
         case MEMORY_RESULT: {
@@ -383,6 +388,9 @@ bool memory_game_update() {
                 timer = GetTime();
 
                 if(game_round == num_rounds[game.current_day]) {
+                    // TODO: Set the mini game score
+                    game_submit_minigame_score((float)score / (float)max_possible_score);
+
                     return true;
                 }
 
@@ -419,7 +427,7 @@ bool memory_game_update() {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(6),
     }) {
-        CLAY_TEXT((oc_format(&frame_arena, "Score: {}", score)), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT((oc_format(&frame_arena, "Score: {}", score * score_multiplier)), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
     }
 
     return false;
