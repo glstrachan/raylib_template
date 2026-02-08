@@ -270,6 +270,22 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
                 }
             }
 
+            if(parameters.use_bottom_text) {
+                CLAY_AUTO_ID({
+                    .floating = { .offset = {0, 0}, .attachTo = CLAY_ATTACH_TO_PARENT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+                    .layout = {
+                        .sizing = {
+                            .width = CLAY_SIZING_PERCENT(1.0),
+                            .height = CLAY_SIZING_FIXED(40)
+                        },
+                        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
+                    },
+                    .backgroundColor = {200, 0, 0, 0},
+                }) {
+                    CLAY_TEXT((CLAY_STRING("Press Space to Smile")), CLAY_TEXT_CONFIG({ .fontSize = 25, .fontId = FONT_ITIM, .textColor = {135, 135, 135, 255} }));
+                }
+            }
+
 
             if (parameters.timeout > 0.0f) {
                 CLAY_AUTO_ID({}) {

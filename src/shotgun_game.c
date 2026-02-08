@@ -166,8 +166,8 @@ bool shotgun_game_update() {
         .layout = {
             .padding = {10, 25, 0, 0},
             .sizing = {
-                .width = CLAY_SIZING_FIT(),
-                .height = CLAY_SIZING_FIT()
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
             },
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },

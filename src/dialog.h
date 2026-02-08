@@ -50,6 +50,7 @@ typedef struct {
     float timeout;
     float mood;
     bool no_skip;
+    bool use_bottom_text;
 } Dialog_Parameter;
 
 bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters);

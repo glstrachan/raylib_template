@@ -493,14 +493,31 @@ void rhythm_game_cleanup(void) {
 }
 
 bool rhythm_game_update(void) {
+    CLAY_AUTO_ID({
+        .floating = { .offset = { 0, -10 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
+        .layout = {
+            .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+            .padding = {10, 10, 10, 10},
+            .sizing = {
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
+            },
+        },
+        .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
+        .custom = { .customData = make_cool_background() },
+        .backgroundColor = {255, 0, 0, 0},
+        .cornerRadius = CLAY_CORNER_RADIUS(6),
+    }) {
+        CLAY_TEXT((CLAY_STRING("Press Space to echo the beat you hear!")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+    }
+
+
     if (current_round > target_rounds) {
         game_submit_minigame_score(accuracy / total_shots);
         return true;
     }
 
     UpdateMusicStream(song);
-
-    
 
     Rectangle observerSource = { 0.0f, 0.0f, (float)tv_game.texture.width, -(float)tv_game.texture.height };
     Rectangle observerDest = {

@@ -255,8 +255,8 @@ void game_update() {
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 .padding = {25, 25, 0, 0},
                 .sizing = {
-                    .width = CLAY_SIZING_FIT(),
-                    .height = CLAY_SIZING_FIT()
+                    .width = CLAY_SIZING_FIT(0),
+                    .height = CLAY_SIZING_FIT(0)
                 },
             },
             // .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -272,8 +272,8 @@ void game_update() {
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 .padding = {25, 25, 10, 10},
                 .sizing = {
-                    .width = CLAY_SIZING_FIT(),
-                    .height = CLAY_SIZING_FIT()
+                    .width = CLAY_SIZING_FIT(0),
+                    .height = CLAY_SIZING_FIT(0)
                 },
             },
             .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -388,6 +388,7 @@ int entry_main(void)
     // shotgun_game.init();
     // rhythm_game.init();
     // memory_game.init();
+    // smile_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
