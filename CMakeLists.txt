@@ -9,6 +9,7 @@ set(GRAPHICS "GRAPHICS_API_OPENGL_43")
 add_subdirectory(external/raylib)
 
 set(SOURCES
+    src/foomain.c
     src/main.c
     src/dialog.c
     src/characters.c
@@ -28,7 +29,7 @@ include_directories(
     src
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} WIN32  ${SOURCES})
 target_link_libraries(${PROJECT_NAME} raylib)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-escape-codes -Wno-initializer-overrides)
@@ -36,3 +37,4 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wall -fcolor-diagnostics -fansi-
 # add_compile_definitions(OC_ENABLE_ASAN_MALLOC)
 # add_compile_options(-fno-omit-frame-pointer -fsanitize=address -static-libasan)
 # add_link_options(-fno-omit-frame-pointer -fsanitize=address -static-libasan   -O1 -g -fsanitize=address -fno-omit-frame-pointer )
+# add_link_options(--subsystem,windows)
