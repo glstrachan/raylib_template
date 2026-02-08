@@ -33,6 +33,8 @@ static Texture2D robot_bottom_tex;
 
 static Shader progressShader;
 
+static Sound tickSound;
+
 Enum(Memory_State, uint32_t,
     MEMORY_DISPLAYING,
     MEMORY_SOLVE,
@@ -83,6 +85,8 @@ void memory_game_init() {
 
     progressShader = LoadShader(NULL, "resources/memory_progress_shader.fs");
 
+    tickSound = LoadSound("resources/sounds/smile_clock-ticking.wav");
+
     tex_width = robot_top_tex.width;
     tex_height = robot_top_tex.height;
 
@@ -95,6 +99,10 @@ void memory_draw_items_displaying() {
     float offset_x = (n / 2) * -item_spacing;\
 
     timer_progress = 1.0 - (GetTime() - timer) / (extra_display_time + n * time_per_item);
+
+    if(!IsSoundPlaying(tickSound)) {
+        PlaySound(tickSound);
+    }
 
     for(uint32_t i = 0; i < n; i++) {
         Texture2D item_texture = item_data[memory_game_items_truth.items[i]].texture;
@@ -142,7 +150,7 @@ void memory_draw_items_displaying() {
         .floating = { .offset = { 0, -50 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
         .layout = {
             .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-            .padding = {10, 25, 0, 0},
+            .padding = {10,10, 10, 10},
             .sizing = {
                 .width = CLAY_SIZING_FIT(),
                 .height = CLAY_SIZING_FIT()
@@ -159,6 +167,10 @@ void memory_draw_items_displaying() {
 // Handles all rearranging logic and drawing
 void memory_draw_items_rearranging() {
     timer_progress = 1.0 - (GetTime() - timer) / (memory_game_items_truth.count * solve_time_per_item);
+
+    if(!IsSoundPlaying(tickSound)) {
+        PlaySound(tickSound);
+    }
 
     // Need to handle three different things
 
@@ -263,7 +275,7 @@ void memory_draw_items_rearranging() {
         .floating = { .offset = { 0, -50 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_CENTER_BOTTOM, CLAY_ATTACH_POINT_CENTER_BOTTOM } },
         .layout = {
             .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-            .padding = {10, 25, 0, 0},
+            .padding = {10, 10, 10, 10},
             .sizing = {
                 .width = CLAY_SIZING_FIT(),
                 .height = CLAY_SIZING_FIT()
@@ -387,6 +399,8 @@ bool memory_game_update() {
                 state = MEMORY_DISPLAYING;
                 timer = GetTime();
 
+                StopSound(tickSound);
+
                 if(game_round == num_rounds[game.current_day]) {
                     // TODO: Set the mini game score
                     game_submit_minigame_score((float)score / (float)max_possible_score);
@@ -417,7 +431,7 @@ bool memory_game_update() {
     CLAY_AUTO_ID({
         .floating = { .offset = { 16, 100 }, .attachTo = CLAY_ATTACH_TO_ROOT, .attachPoints = { CLAY_ATTACH_POINT_RIGHT_TOP, CLAY_ATTACH_POINT_RIGHT_TOP } },
         .layout = {
-            .padding = {10, 25, 0, 0},
+            .padding = {10, 25, 10, 10},
             .sizing = {
                 .width = CLAY_SIZING_FIT(),
                 .height = CLAY_SIZING_FIT()
