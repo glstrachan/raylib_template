@@ -288,7 +288,9 @@ bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text
 
 
             if (parameters.timeout > 0.0f) {
-                CLAY_AUTO_ID({}) {
+                CLAY_AUTO_ID({
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIT(0), .height = CLAY_SIZING_FIT(0) } }
+                }) {
                     float f = timer_interpolate(&data.text.timeout_timer);
                     SetShaderValue(timer_shader, GetShaderLocation(timer_shader, "completion"), &f, SHADER_UNIFORM_FLOAT);
                     CLAY_AUTO_ID({
