@@ -92,12 +92,13 @@ void game_go_to_state(uint32_t next_state, bool transition) {
         encounter_start(game.encounter);
     } break;
     case GAME_STATE_DONE_ENCOUNTER: {
+        game.current_encounter++;
         if (game.minigame_scores < score_needed) {
             PlaySound(failSound);
             timer_init(&show_fail_timer, 4000);
+            game.briefcase.used[game.current_item_index] = 0;
         } else {
             PlaySound(successSound);
-            game.current_encounter++;
             game.briefcase.used[game.current_item_index] = 1;
 
             if (game.current_encounter >= 4) {
@@ -183,7 +184,11 @@ void game_update() {
                 DrawTexture(poo_tex, 1920 / 2 - poo_tex.width / 2, 1080 / 2 - poo_tex.height / 2 + 100, WHITE);
             }
             if (!is_transitioning && timer_update(&show_fail_timer)) {
-                game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
+                if (game.current_encounter >= 4) {
+                    game_go_to_state(GAME_STATE_DAY_SUMMARY, true);
+                } else {
+                    game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, false);
+                }
             }
         }
     } break;
