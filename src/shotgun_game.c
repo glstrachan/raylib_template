@@ -127,6 +127,7 @@ bool shotgun_game_update() {
     DrawTexture(bg_tex, 0, 0, WHITE);
 
     // Draw UI bs
+    // TODO
     game_objective_widget(lit("Shoot any item that isnt [INSERT CORRECT ONE HERE]"));
 
     // Draw the score
@@ -162,8 +163,6 @@ bool shotgun_game_update() {
                     game_item->state = SHOTGUN_ITEM_STATE_SPAWNED;
                 }
                 
-                // TODO: Draw the texture on screen at the nearest location
-
                 if(game_item->position.x < 0) {
                     DrawTexture(alert_tex, game_item->position.x - alert_tex.width * 0.5 + 100, game_item->position.y - alert_tex.height * 0.5, WHITE);
                 }
