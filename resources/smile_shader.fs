@@ -18,5 +18,5 @@ void main() {
     float t = 1.0 - uv.x;
 
     vec2 a = normalize(vec2(1 - t, t));
-    out_color = a.x * green + a.y * red;
+    out_color = a.x * green + a.y * red; // essentially mix
 }

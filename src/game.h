@@ -73,6 +73,14 @@ typedef struct {
 } Game_Shaders;
 extern Game_Shaders game_shaders;
 
+typedef struct {
+    Sound button_click, button_click1;
+    Sound button_hover;
+} Game_Sounds;
+extern Game_Sounds game_sounds;
+
+void game_hover_audio(Clay_ElementId elementId, Clay_PointerData pointerInfo, void *userData);
+
 #define make_cool_background(...) ({                                                                                                                                                                                                                                               \
     CustomLayoutElement* customBackgroundData = oc_arena_alloc(&frame_arena, sizeof(CustomLayoutElement));                                                                                                                                                                         \
     customBackgroundData->type = CUSTOM_LAYOUT_ELEMENT_TYPE_BACKGROUND;                                                                                                                                                                                                            \

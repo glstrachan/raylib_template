@@ -142,8 +142,14 @@ void game_update() {
     }
 }
 
+void game_hover_audio(Clay_ElementId elementId, Clay_PointerData pointerInfo, void *userData) {
+    PlaySound(*((Sound*)userData));
+}
+
 Clay_Arena global_clay_arena;
 Font_Manager* global_font_manager;
+Music hold_music;
+Game_Sounds game_sounds = { 0 };
 
 int main(void)
 {
@@ -161,6 +167,11 @@ int main(void)
     start_sounds[1] = LoadSound("resources/sounds/casino_b.mp3");
     start_sounds[2] = LoadSound("resources/sounds/casino_c.mp3");
     start_sounds[3] = LoadSound("resources/sounds/casino_d.mp3");
+    hold_music = LoadMusicStream("resources/music/hold music.wav");
+
+	game_sounds.button_click = LoadSound("resources/sounds/ui_click-1.wav");
+	game_sounds.button_click1 = LoadSound("resources/sounds/ui_click-2.wav");
+	game_sounds.button_hover = LoadSound("resources/sounds/ui_hover.wav");
     
     Camera2D camera = { 0 };
     camera.offset = (Vector2) { 0.0f, 0.0f };
@@ -216,10 +227,13 @@ int main(void)
         .character = CHARACTERS_NERD,
     };
 
-    smile_game.init();
-    shotgun_game.init();
+    PlayMusicStream(hold_music);
+    SetMusicVolume(hold_music, 0.1f);
+
+    // smile_game.init();
+    // shotgun_game.init();
     // rhythm_game.init();
-    memory_game.init();
+    // memory_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -231,14 +245,13 @@ int main(void)
 
         if (game.current_prerender) game.current_prerender();
 
-        // game_parameters.screen_width = GetScreenWidth();
-        // game_parameters.screen_height = GetScreenHeight();
-
         Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
         Clay_SetPointerState((Clay_Vector2) { GetMouseX(), GetMouseY() }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
         Clay_UpdateScrollContainers(true, (Clay_Vector2) { GetMouseWheelMove(), 0.0 }, dt);
 
         Clay_BeginLayout();
+
+        UpdateMusicStream(hold_music);
 
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
