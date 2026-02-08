@@ -94,7 +94,7 @@ void pick_encounter(void) {
     // game.encounter = &sample_encounter_;
     game.current_character = shuffled_characters[next_character++];
     selected_item = -1;
-    print("foo\n");
+    // print("foo\n");
 }
 
 // static Vector2 pick_item_locations[] = {

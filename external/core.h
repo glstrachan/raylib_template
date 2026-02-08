@@ -660,7 +660,7 @@ extern Oc_Writer stderr_writer;
             while (total_written < data_size) {
                 uint32 written = 0;
                 if (!WriteFile(handle, data, data_size, (unsigned long*)&written, NULL)) {
-                    eprint("WriteFile failed\n");
+                    // eprint("WriteFile failed\n");
                     return 0;
                 }
                 total_written += written;
@@ -676,7 +676,7 @@ extern Oc_Writer stderr_writer;
             while (total_written < data_size) {
                 uint32 written = 0;
                 if (!WriteFile(handle, data, data_size, (unsigned long*)&written, NULL)) {
-                    eprint("WriteFile failed\n");
+                    // eprint("WriteFile failed\n");
                     return 0;
                 }
                 total_written += written;
