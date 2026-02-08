@@ -298,7 +298,7 @@ Font_Manager* global_font_manager;
 Music hold_music;
 Game_Sounds game_sounds = { 0 };
 
-int main(void)
+int entry_main(void)
 {
     const int screenWidth = 1920;
     const int screenHeight = 1080;
