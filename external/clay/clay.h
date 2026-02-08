@@ -3999,7 +3999,8 @@ void* Clay__Array_Allocate_Arena(int32_t capacity, uint32_t itemSize, Clay_Arena
     uintptr_t nextAllocOffset = arena->nextAllocation + ((64 - (arena->nextAllocation % 64)) & 63);
     if (nextAllocOffset + totalSizeBytes <= arena->capacity) {
         arena->nextAllocation = nextAllocOffset + totalSizeBytes;
-        return (void*)((uintptr_t)arena->memory + (uintptr_t)nextAllocOffset);
+        void* p = (void*)((uintptr_t)arena->memory + (uintptr_t)nextAllocOffset);
+        return p;
     }
     else {
         Clay__currentContext->errorHandler.errorHandlerFunction(CLAY__INIT(Clay_ErrorData) {

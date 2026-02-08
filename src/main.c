@@ -341,7 +341,7 @@ int entry_main(void)
 
     
     uint64_t totalMemorySize = Clay_MinMemorySize();
-    Clay_Arena clay_arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, malloc(totalMemorySize));
+    Clay_Arena clay_arena = Clay_CreateArenaWithCapacityAndMemory(totalMemorySize, calloc(totalMemorySize, 1));
     Clay_Initialize(clay_arena, (Clay_Dimensions) { screenWidth, screenHeight }, (Clay_ErrorHandler) { HandleClayErrors, NULL });
     
     game_shaders.background_shader = LoadShader(0, "resources/dialogbackground.fs");
