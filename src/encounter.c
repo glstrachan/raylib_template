@@ -334,7 +334,7 @@ void day_summary_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(oc_format(&frame_arena, "Day {} Summary", game.current_day), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Day {} Summary", game.current_day+1), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", sold), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY(CLAY_ID("ItemsList"), {
             .layout = { .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM, .padding = {50} },

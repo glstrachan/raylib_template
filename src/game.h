@@ -100,6 +100,7 @@ typedef struct {
 
 typedef struct {
     enum {
+        GAME_STATE_TITLE,
         GAME_STATE_TUTORIAL,
         GAME_STATE_SELECT_ITEMS,
         GAME_STATE_SELECT_ENCOUNTER,
@@ -179,7 +180,7 @@ static inline void game_objective_widget(string objective) {
                 },
                 .backgroundColor = { 100, 0, 100, 0 },
             }) {
-                CLAY_TEXT(oc_format(&frame_arena, "Day {}/4", game.current_day), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = { 255, 255, 255, 255 } }));
+                CLAY_TEXT(oc_format(&frame_arena, "Day {}/4", game.current_day+1), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = { 255, 255, 255, 255 } }));
             }
         }
         CLAY_AUTO_ID({
