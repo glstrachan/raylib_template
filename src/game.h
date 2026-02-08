@@ -140,7 +140,7 @@ static inline void game_submit_minigame_score(float score) {
     game.minigame_scores += score;
 }
 
-void game_go_to_state(uint32_t next_state);
+void game_go_to_state(uint32_t next_state, bool transition);
 
 extern void HandleClayErrors(Clay_ErrorData errorData);
 extern Font_Manager* global_font_manager;

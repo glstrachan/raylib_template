@@ -31,6 +31,7 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 }
 
 static Game_Timer show_fail_timer;
+static Game_Timer fade_timer;
 static Texture2D bg_tex;
 Game_Parameters game_parameters;
 
@@ -49,7 +50,17 @@ static Sound successSound;
 
 static float score_needed = 0.7;
 
-void game_go_to_state(uint32_t next_state) {
+static bool is_transitioning = false;
+
+static bool did_doorbell;
+void game_go_to_state(uint32_t next_state, bool transition) {
+    did_doorbell = false;
+	if (transition) {
+		timer_init(&fade_timer, 1500);
+		game.next_state = next_state;
+		is_transitioning = true;
+		return;
+	}
     switch (next_state) {
     // case GAME_STATE_TRANSITION: {
     //     Image screenshot = LoadImageFromScreen();
@@ -64,7 +75,7 @@ void game_go_to_state(uint32_t next_state) {
     } break;
     case GAME_STATE_START_DAY: {
         memset(&game.items_sold_today, 0, sizeof(game.items_sold_today));
-        game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+        game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, false);
         return;
     } break;
     case GAME_STATE_IN_ENCOUNTER: {
@@ -82,9 +93,9 @@ void game_go_to_state(uint32_t next_state) {
             game.briefcase.used[game.current_item_index] = 1;
 
             if (game.current_encounter >= 4) {
-                game_go_to_state(GAME_STATE_DAY_SUMMARY);
+                game_go_to_state(GAME_STATE_DAY_SUMMARY, true);
             } else {
-                game_go_to_state(GAME_STATE_SELECT_ENCOUNTER);
+                game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, true);
             }
             return;
         }
@@ -97,6 +108,22 @@ void game_go_to_state(uint32_t next_state) {
 }
 
 void game_update() {
+	if (is_transitioning) {
+		if (timer_update(&fade_timer)) {
+			is_transitioning = false;
+		}
+		if (game.state != game.next_state) {
+			float f = timer_interpolate(&fade_timer);
+            if (!did_doorbell && f >= 0.3f && game.next_state == GAME_STATE_IN_ENCOUNTER) {
+                did_doorbell = true;
+                Sound sound = characters_get_sound(game.current_character);
+                PlaySound(sound);
+            }
+			if (f >= 0.5f) {
+				game_go_to_state(game.next_state, false);
+			}
+		}
+	}
     switch (game.state) {
     case GAME_STATE_SELECT_ITEMS: {
         pick_items_update();
@@ -112,7 +139,7 @@ void game_update() {
 
         encounter_update();
         if (encounter_is_done()) {
-            game_go_to_state(GAME_STATE_DONE_ENCOUNTER);
+            game_go_to_state(GAME_STATE_DONE_ENCOUNTER, true);
         }
     } break;
     case GAME_STATE_DAY_SUMMARY: {
@@ -134,7 +161,7 @@ void game_update() {
                 CLAY_TEXT(lit("FAIL"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 60, .textColor = {200, 30, 0, 255} }));
             }
             if (timer_update(&show_fail_timer)) {
-                game_go_to_state(GAME_STATE_SELECT_ITEMS);
+                game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
             }
         }
     } break;
@@ -220,7 +247,7 @@ int main(void)
 
     bg_tex = LoadTexture("resources/background.png");
 
-    game_go_to_state(GAME_STATE_SELECT_ITEMS);
+    game_go_to_state(GAME_STATE_SELECT_ITEMS, false);
 
     game.items_sold_today[0] = (Item_Sold) {
         .item = ITEM_VACUUM,
@@ -265,6 +292,33 @@ int main(void)
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
+                
+
+                if (is_transitioning) {
+                    float interp = timer_interpolate(&fade_timer);
+                    interp = interp * 2.0f - 1.0f;
+                    if (interp < 0.0f) interp = -interp;
+                    interp = 1.0f - interp;
+                    interp = Clamp(interp * 2, 0.0f, 1.0f);
+
+                    Clay_RenderCommand rcmd = {
+                        .commandType = CLAY_RENDER_COMMAND_TYPE_RAYLIB,
+                        .renderData = {
+                            .raylib = {
+                                .point = {0, 0},
+                                .size = {game_parameters.screen_width, game_parameters.screen_height},
+                                .color = { 0, 0, 0, 255 * interp }
+                            },
+                        },
+                    };
+                    Clay_RenderCommandArray arr = {
+                        .length = 1,
+                        .capacity = 1,
+                        .internalArray = &rcmd,
+                    };
+
+                    Clay_Raylib_Render(arr, global_font_manager);
+                }
             EndMode2D();
 
         EndDrawing();

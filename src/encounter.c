@@ -307,7 +307,7 @@ void pick_encounter_update(void) {
                     game.current_item_index = selected_item;
                     game.current_item = game.briefcase.items[selected_item];
                     game.encounter = get_encounter_fn();
-                    game_go_to_state(GAME_STATE_IN_ENCOUNTER);
+                    game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
                 }
             }
         }
@@ -382,7 +382,7 @@ void day_summary_update(void) {
                 CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 					PlaySound(game_sounds.button_click);
-                    game_go_to_state(GAME_STATE_SELECT_ITEMS);
+                    game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
                 }
             }
         }
