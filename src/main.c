@@ -74,6 +74,7 @@ void game_go_to_state(uint32_t next_state, bool transition) {
     //     timer_init(&game.transition_timer, 2000);
     // } break;
     case GAME_STATE_SELECT_ITEMS: {
+        pick_items_init();
         choose_pickable();
     } break;
     case GAME_STATE_SELECT_ENCOUNTER: {
@@ -371,7 +372,6 @@ int entry_main(void)
 
         dialog_init();
         characters_init();
-        pick_items_init();
         pick_encounter_init();
         items_init();
         choose_pickable();
@@ -383,7 +383,9 @@ int entry_main(void)
     bg_tex = LoadTexture("resources/background.png");
     poo_tex = LoadTexture("resources/poo.png");
 
-    game_go_to_state(GAME_STATE_TITLE, false);
+    game.minigame_scores = 0.4;
+    game_go_to_state(GAME_STATE_DONE_ENCOUNTER, false);
+    // game_go_to_state(GAME_STATE_TITLE, false);
     // game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
     // game.state = GAME_STATE_IN_ENCOUNTER;
 
