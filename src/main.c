@@ -383,9 +383,9 @@ int entry_main(void)
     bg_tex = LoadTexture("resources/background.png");
     poo_tex = LoadTexture("resources/poo.png");
 
-    game.minigame_scores = 0.4;
-    game_go_to_state(GAME_STATE_DONE_ENCOUNTER, false);
-    // game_go_to_state(GAME_STATE_TITLE, false);
+    // game.minigame_scores = 0.4;
+    // game_go_to_state(GAME_STATE_DONE_ENCOUNTER, false);
+    game_go_to_state(GAME_STATE_TITLE, false);
     // game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
     // game.state = GAME_STATE_IN_ENCOUNTER;
 
