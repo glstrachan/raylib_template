@@ -252,8 +252,8 @@ void game_update() {
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 .padding = {25, 25, 0, 0},
                 .sizing = {
-                    .width = CLAY_SIZING_FIT(),
-                    .height = CLAY_SIZING_FIT()
+                    .width = CLAY_SIZING_FIT(0),
+                    .height = CLAY_SIZING_FIT(0)
                 },
             },
             // .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -269,8 +269,8 @@ void game_update() {
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
                 .padding = {25, 25, 10, 10},
                 .sizing = {
-                    .width = CLAY_SIZING_FIT(),
-                    .height = CLAY_SIZING_FIT()
+                    .width = CLAY_SIZING_FIT(0),
+                    .height = CLAY_SIZING_FIT(0)
                 },
             },
             .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -382,7 +382,8 @@ int main(void)
 
     // shotgun_game.init();
     // rhythm_game.init();
-    memory_game.init();
+    // memory_game.init();
+    // smile_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -404,12 +405,12 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                // game_update();
+                game_update();
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
                 // rhythm_game.update();
-                memory_game.update();
+                // memory_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);

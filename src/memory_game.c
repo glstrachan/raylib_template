@@ -152,8 +152,8 @@ void memory_draw_items_displaying() {
             .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
             .padding = {10,10, 10, 10},
             .sizing = {
-                .width = CLAY_SIZING_FIT(),
-                .height = CLAY_SIZING_FIT()
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
             },
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -277,8 +277,8 @@ void memory_draw_items_rearranging() {
             .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
             .padding = {10, 10, 10, 10},
             .sizing = {
-                .width = CLAY_SIZING_FIT(),
-                .height = CLAY_SIZING_FIT()
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
             },
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -329,8 +329,8 @@ void memory_draw_items_result() {
             .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
             .padding = {10, 25, 0, 0},
             .sizing = {
-                .width = CLAY_SIZING_FIT(),
-                .height = CLAY_SIZING_FIT()
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
             },
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },
@@ -433,8 +433,8 @@ bool memory_game_update() {
         .layout = {
             .padding = {10, 25, 10, 10},
             .sizing = {
-                .width = CLAY_SIZING_FIT(),
-                .height = CLAY_SIZING_FIT()
+                .width = CLAY_SIZING_FIT(0),
+                .height = CLAY_SIZING_FIT(0)
             },
         },
         .border = { .width = { 3, 3, 3, 3, 0 }, .color = {135, 135, 135, 255} },

@@ -131,7 +131,8 @@ static float difficulty_timeout = DEFAULT_DIFFICULTY;
 static int target_dialog_count;
 static int dialog_count;
 
-#define SMILE_DIALOG_PARAMS() .place_above_dialog = place_bar, .timeout = difficulty_timeout
+#define SMILE_DIALOG_PARAMS() .place_above_dialog = place_bar, .timeout = difficulty_timeout, .use_bottom_text = true
+
 #define old_lady_dialog(text, ...) do {                                          \
     if (dialog_count >= target_dialog_count) dialog_yield();                      \
     dialog_text(CHARACTERS_OLDLADY, (text), SMILE_DIALOG_PARAMS(), __VA_ARGS__); \
