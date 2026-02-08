@@ -238,6 +238,8 @@ static void set_random_points(void) {
 static bool first_time;
 static Game_Timer start_music_timer;
 static bool played_music;
+
+extern Music hold_music;
 void rhythm_game_prerender(void) {
     bool ft = first_time;
     if (first_time) {
@@ -248,6 +250,7 @@ void rhythm_game_prerender(void) {
         played_music = true;
         PlayMusicStream(song);
         SetMusicVolume(song, 0.3f);
+        PauseMusicStream(hold_music);
     }
     if (!IsMusicStreamPlaying(song)) {
         PlayMusicStream(song);
@@ -513,6 +516,8 @@ bool rhythm_game_update(void) {
 
 
     if (current_round > target_rounds) {
+        PlayMusicStream(hold_music);
+        SeekMusicStream(hold_music, 0.0f);
         game_submit_minigame_score(accuracy / total_shots);
         return true;
     }

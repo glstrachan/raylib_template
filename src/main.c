@@ -102,7 +102,7 @@ void game_go_to_state(uint32_t next_state, bool transition) {
             if (game.current_encounter >= 4) {
                 game_go_to_state(GAME_STATE_DAY_SUMMARY, true);
             } else {
-                game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, true);
+                game_go_to_state(GAME_STATE_SELECT_ENCOUNTER, false);
             }
             return;
         }

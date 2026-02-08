@@ -255,6 +255,7 @@ bool smile_game_update(void) {
     encounter_sequence_update(&dialog_sequence);
     if (dialog_sequence.is_done || dialog_count >= target_dialog_count) {
         float well_done = Clamp(mood_matching / mood_expected * 0.8314, 0.0f, 1.0f);
+        game_submit_minigame_score(well_done);
         return true;
     }
 
