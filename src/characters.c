@@ -17,6 +17,8 @@ static Texture2D nerd_tex;
 static Texture2D shotgunner_tex;
 static Texture2D fatman_tex;
 
+static Sound doorbells[4];
+
 Texture2D* characters_get_texture(Character_Type type) {
     switch(type) {
         case CHARACTERS_SALESMAN:   return &salesman_tex;
@@ -24,6 +26,18 @@ Texture2D* characters_get_texture(Character_Type type) {
         case CHARACTERS_NERD:       return &nerd_tex;
         case CHARACTERS_SHOTGUNNER: return &shotgunner_tex;
         case CHARACTERS_FATMAN:     return &fatman_tex;
+        case CHARACTERS_COUNT:
+        case CHARACTERS_NONE: oc_assert(false); break;
+    }
+}
+
+Sound characters_get_sound(Character_Type type) {
+    switch(type) {
+        case CHARACTERS_OLDLADY:    return doorbells[0];
+        case CHARACTERS_NERD:       return doorbells[1];
+        case CHARACTERS_SHOTGUNNER: return doorbells[2];
+        case CHARACTERS_FATMAN:     return doorbells[3];
+        case CHARACTERS_SALESMAN:
         case CHARACTERS_COUNT:
         case CHARACTERS_NONE: oc_assert(false); break;
     }
@@ -49,6 +63,12 @@ void characters_init() {
     SetTextureWrap(shotgunner_tex, TEXTURE_WRAP_CLAMP);
     fatman_tex = LoadTexture("resources/fatman.png");
     SetTextureWrap(fatman_tex, TEXTURE_WRAP_CLAMP);
+
+
+    doorbells[0] = LoadSound("resources/sounds/doorbell_a.wav");
+    doorbells[1] = LoadSound("resources/sounds/doorbell_b.wav");
+    doorbells[2] = LoadSound("resources/sounds/doorbell_c.wav");
+    doorbells[3] = LoadSound("resources/sounds/doorbell_d.wav");
 }
 
 void characters_cleanup() {

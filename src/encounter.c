@@ -307,7 +307,7 @@ void pick_encounter_update(void) {
                     game.current_item_index = selected_item;
                     game.current_item = game.briefcase.items[selected_item];
                     game.encounter = get_encounter_fn();
-                    game_go_to_state(GAME_STATE_IN_ENCOUNTER);
+                    game_go_to_state(GAME_STATE_IN_ENCOUNTER, true);
                 }
             }
         }
@@ -334,7 +334,7 @@ void day_summary_update(void) {
         .custom = { .customData = make_cool_background() },
         .cornerRadius = CLAY_CORNER_RADIUS(16)
     }) {
-        CLAY_TEXT(oc_format(&frame_arena, "Day {} Summary", game.current_day), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
+        CLAY_TEXT(oc_format(&frame_arena, "Day {} Summary", game.current_day+1), CLAY_TEXT_CONFIG({ .fontSize = 60, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY_TEXT(oc_format(&frame_arena, "Sold {} items today", sold), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
         CLAY(CLAY_ID("ItemsList"), {
             .layout = { .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM, .padding = {50} },
@@ -382,7 +382,7 @@ void day_summary_update(void) {
                 CLAY_TEXT((CLAY_STRING("Next Day")), CLAY_TEXT_CONFIG({ .fontSize = 40, .fontId = FONT_ITIM, .textColor = {255, 255, 255, 255} }));
                 if (Clay_Hovered() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 					PlaySound(game_sounds.button_click);
-                    game_go_to_state(GAME_STATE_SELECT_ITEMS);
+                    game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
                 }
             }
         }

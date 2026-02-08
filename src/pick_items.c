@@ -7,7 +7,7 @@
 
 #include "pick_items.h"
 
-static Texture2D shop_bg_tex;
+Texture2D shop_bg_tex;
 static Texture2D shelf_tex;
 static Texture2D briefcase_tex;
 static Shader item_bg_shader;
@@ -127,7 +127,7 @@ void pick_items_update() {
 
     Oc_String_Builder builder;
     oc_sb_init(&builder, &arena);
-    wprint(&builder.writer, "Day {}/4", game.current_day);
+    wprint(&builder.writer, "Day {}/4", game.current_day+1);
     string day_string = oc_sb_to_string(&builder);
 
     oc_sb_init(&builder, &arena);
@@ -270,7 +270,7 @@ void pick_items_update() {
                         game.briefcase.items[i] = data.picked[i];
                     }
 
-                    game_go_to_state(GAME_STATE_START_DAY);
+                    game_go_to_state(GAME_STATE_START_DAY, true);
                 }
             }
         }
