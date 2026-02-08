@@ -242,7 +242,6 @@ int main(void)
         game_parameters.screen_width = GetScreenWidth();
         game_parameters.screen_height = GetScreenHeight();
 
-
         if (game.current_prerender) game.current_prerender();
 
         Clay_SetLayoutDimensions((Clay_Dimensions) { game_parameters.screen_width, game_parameters.screen_height });
