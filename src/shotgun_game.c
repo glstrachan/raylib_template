@@ -40,6 +40,8 @@ static float base_velocity;
 
 static Sound flingSound;
 static Sound alertSound;
+static Sound explodeSound;
+static Sound shootSound;
 
 static inline float get_random_float() {
     return ((float)GetRandomValue(0, INT_MAX) / (float)INT_MAX);
@@ -82,12 +84,14 @@ void shotgun_game_init() {
 
     flingSound = LoadSound("resources/sounds/duck-hunt_fling.wav");
     alertSound = LoadSound("resources/sounds/duck-hunt_warning.wav");
+    explodeSound = LoadSound("resources/sounds/duck-hunt_explosion.wav");
+    shootSound = LoadSound("resources/sounds/duck-hunt_shoot.wav");
     
     // TODO: Change this based on current day
 
     // depending on the day make it more items
 
-    num_items = game.current_day * 15;
+    num_items = (game.current_day + 1) * 25;
     base_velocity = (float)game.current_day * 1.0;
 
     shotgun_game_add_items();
@@ -100,6 +104,8 @@ bool shotgun_game_update() {
 
     // We check if the user is trying to shoot and if they hit an item
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        PlaySound(shootSound);
+        
         for(uint32_t i = 0; i < shotgun_game_items.count; i++) {
             Shotgun_Game_Item* game_item = &shotgun_game_items.items[i];
 
@@ -111,6 +117,7 @@ bool shotgun_game_update() {
                     // TODO: Add scoring logic
                     score += 1;
                     game_item->state = SHOTGUN_ITEM_STATE_DESTROYED;
+                    PlaySound(explodeSound);
                 }
             }
         }
@@ -188,8 +195,6 @@ bool shotgun_game_update() {
                 else {
                     DrawTexture(alert_tex, game_item->position.x - alert_tex.width * 0.5 - 100, game_item->position.y - alert_tex.height * 0.5, WHITE);
                 }
-
-                
             } break;
             case SHOTGUN_ITEM_STATE_SPAWNED: {
                 game_item->velocity = Vector2Subtract(game_item->velocity, Vector2Scale((Vector2) {0.0, -1.5}, GetFrameTime()));
