@@ -382,7 +382,7 @@ int main(void)
 
     // shotgun_game.init();
     // rhythm_game.init();
-    memory_game.init();
+    // memory_game.init();
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -404,12 +404,12 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                // game_update();
+                game_update();
                 // pick_items_update();
                 // smile_game.update();
                 // shotgun_game.update();
                 // rhythm_game.update();
-                memory_game.update();
+                // memory_game.update();
 
                 Clay_RenderCommandArray renderCommands = Clay_EndLayout();
                 Clay_Raylib_Render(renderCommands, global_font_manager);
