@@ -172,7 +172,7 @@ void game_update() {
                 CLAY_TEXT(lit("They did not buy the item"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 80, .textColor = {200, 30, 0, 255} }));
                 CLAY_TEXT(lit("FAIL"), CLAY_TEXT_CONFIG({ .fontId = FONT_ROBOTO, .fontSize = 60, .textColor = {200, 30, 0, 255} }));
             }
-            if (timer_update(&show_fail_timer)) {
+            if (!is_transitioning && timer_update(&show_fail_timer)) {
                 game_go_to_state(GAME_STATE_SELECT_ITEMS, true);
             }
         }
