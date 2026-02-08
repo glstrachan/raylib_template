@@ -283,10 +283,10 @@ int main(void)
         BeginDrawing();
             ClearBackground((Color){40, 40, 40, 255});
             BeginMode2D(camera);
-                game_update();
+                // game_update();
                 // pick_items_update();
                 // smile_game.update();
-                // shotgun_game.update();
+                shotgun_game.update();
                 // rhythm_game.update();
                 // memory_game.update();
 
