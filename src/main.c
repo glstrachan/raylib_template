@@ -328,9 +328,12 @@ int main(void)
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Traveling Salesman Problems");
 
+	Vector2 scale = GetWindowScaleDPI();
+    #ifdef _WIN32
+        scale = (Vector2){1, 1};
+    #endif
 #ifdef __APPLE__
 	SetWindowPosition(100, 100);
-	Vector2 scale = GetWindowScaleDPI();
 	SetWindowSize(screenWidth/scale.x, screenHeight/scale.y);
 #endif
 
