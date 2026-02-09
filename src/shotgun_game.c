@@ -102,6 +102,9 @@ bool shotgun_game_update() {
     float item_hit_radius = 120.0f;
 
 	Vector2 scale = GetWindowScaleDPI();
+    #ifdef _WIN32
+        scale = (Vector2){1, 1};
+    #endif
     Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY() * scale.y };
 
     // We check if the user is trying to shoot and if they hit an item

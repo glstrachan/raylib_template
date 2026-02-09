@@ -175,6 +175,9 @@ void memory_draw_items_rearranging() {
     // Need to handle three different things
 
 	Vector2 scale = GetWindowScaleDPI();
+    #ifdef _WIN32
+        scale = (Vector2){1, 1};
+    #endif
     Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY() * scale.y };
     uint32_t n = memory_game_items.count;
     float offset_x = (n / 2) * -item_spacing;

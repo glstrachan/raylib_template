@@ -282,6 +282,9 @@ void pick_items_update() {
 
     float selection_radius = 65.0f;
 	Vector2 scale = GetWindowScaleDPI();
+    #ifdef _WIN32
+        scale = (Vector2){1, 1};
+    #endif
     Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY()*scale.y };
 
     if(selection_data.is_selecting) {
