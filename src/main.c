@@ -327,10 +327,13 @@ int main(void)
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Traveling Salesman Problems");
+
+#ifdef __APPLE__
 	SetWindowPosition(100, 100);
 	Vector2 scale = GetWindowScaleDPI();
 	SetWindowSize(screenWidth/scale.x, screenHeight/scale.y);
-	print("{} {}\n", scale.x, scale.y);
+#endif
+
     InitAudioDevice();
     SetTargetFPS(0);
 
