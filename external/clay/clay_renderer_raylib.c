@@ -293,7 +293,8 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, void* fonts)
                         float time = GetTime();
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "time"), &time, SHADER_UNIFORM_FLOAT);
 
-                        Vector2 resolution = {GetScreenWidth(), GetScreenHeight()};
+						Vector2 scale = GetWindowScaleDPI();
+                        Vector2 resolution = {GetScreenWidth()*scale.x, GetScreenHeight()*scale.y};
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "screenResolution"), &resolution, SHADER_UNIFORM_VEC2);
                         Vector2 elementResolution = {boundingBox.width, boundingBox.height};
                         SetShaderValue(data->shader, GetShaderLocation(data->shader, "elementResolution"), &elementResolution, SHADER_UNIFORM_VEC2);

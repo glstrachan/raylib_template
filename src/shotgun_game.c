@@ -101,7 +101,8 @@ void shotgun_game_init() {
 bool shotgun_game_update() {
     float item_hit_radius = 120.0f;
 
-    Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
+	Vector2 scale = GetWindowScaleDPI();
+    Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY() * scale.y };
 
     // We check if the user is trying to shoot and if they hit an item
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

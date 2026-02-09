@@ -95,7 +95,7 @@ void pick_encounter(void) {
     // game.current_character = CHARACTERS_FATMAN;
     // game.encounter = &sample_encounter_;
     game.current_character = shuffled_characters[next_character++];
-    game.current_character = CHARACTERS_OLDLADY;
+    /* game.current_character = CHARACTERS_OLDLADY; */
     selected_item = -1;
 }
 
@@ -183,7 +183,8 @@ void pick_encounter_update(void) {
         }) {
             float base_x = 670.0f;
             float base_y = 680.0f;
-            Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
+			Vector2 scale = GetWindowScaleDPI();
+            Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY() * scale.y };
             float selection_radius = 65.0f;
 
             for (uint32_t i = 0, dest = 0; i < oc_len(game.briefcase.items); i++) {

@@ -281,7 +281,8 @@ void pick_items_update() {
     #define PICKED_PICKABLE(i) (*((i) < 6 ? &data.pickable[i] : &data.picked[(i) - 6]))
 
     float selection_radius = 65.0f;
-    Vector2 mouse = (Vector2) { (float)GetMouseX(), (float)GetMouseY() };
+	Vector2 scale = GetWindowScaleDPI();
+    Vector2 mouse = (Vector2) { (float)GetMouseX() * scale.x, (float)GetMouseY()*scale.y };
 
     if(selection_data.is_selecting) {
             for(int i = 0; i < 10; i++) {

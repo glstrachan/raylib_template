@@ -271,7 +271,8 @@ void rhythm_game_prerender(void) {
         }
 
         Vector2 texture_screen_pos = { 100.0f + game_parameters.screen_width/2.0f - tv_texture.width/2.0f, 96.0f + game_parameters.screen_height/2.0f - tv_texture.height/2.0f };
-        Vector2 mouse = { GetMouseX() - texture_screen_pos.x, GetMouseY() - texture_screen_pos.y };
+		Vector2 scale = GetWindowScaleDPI();
+        Vector2 mouse = { (GetMouseX() * scale.x) - texture_screen_pos.x, (GetMouseY() * scale.y) - texture_screen_pos.y };
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             for (int i = 0; i < points_count; i++) {
                 if (Vector2Distance(points[i], mouse) < POINT_RADIUS) {
