@@ -1,6 +1,7 @@
 #include "dialog.h"
 #include "encounter.h"
 
+#include <limits.h>
 #include <raylib.h>
 #include "game.h"
 

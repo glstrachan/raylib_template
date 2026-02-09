@@ -316,13 +316,21 @@ Font_Manager* global_font_manager;
 Music hold_music;
 Game_Sounds game_sounds = { 0 };
 
+#ifdef _WIN32
 int entry_main(void)
+#else
+int main(void)
+#endif
 {
     const int screenWidth = 1920;
     const int screenHeight = 1080;
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Traveling Salesman Problems");
+	SetWindowPosition(100, 100);
+	Vector2 scale = GetWindowScaleDPI();
+	SetWindowSize(screenWidth/scale.x, screenHeight/scale.y);
+	print("{} {}\n", scale.x, scale.y);
     InitAudioDevice();
     SetTargetFPS(0);
 
@@ -411,8 +419,8 @@ int entry_main(void)
         float dt = GetFrameTime();
 
         Oc_Arena_Save save = oc_arena_save(&frame_arena);
-        game_parameters.screen_width = GetScreenWidth();
-        game_parameters.screen_height = GetScreenHeight();
+        /* game_parameters.screen_width = GetScreenWidth(); */
+        /* game_parameters.screen_height = GetScreenHeight(); */
 
         if (game.current_prerender) game.current_prerender();
 

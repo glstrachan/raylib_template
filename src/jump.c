@@ -1,6 +1,6 @@
 #include "dialog.h"
 
-#if defined(__x86_64__)
+#if defined(__x86_64__) || defined(_M_X64)
 
 void __attribute__((naked)) my_longjmp(volatile __jmp_buf buf, int value) {
 // asm volatile("lea (%%rip), %%rax\n push %%rax" ::: "rax", "memory");
@@ -38,7 +38,7 @@ asm volatile (
     );
 }
 
-#elif defined(__arch64__)
+#elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm64__)
 
 void __attribute__((naked)) my_longjmp(volatile __jmp_buf buf, int value) {
 // asm volatile("lea (%%rip), %%rax\n push %%rax" ::: "rax", "memory");
@@ -55,9 +55,9 @@ asm volatile (
 	"ldp d10, d11, [x0,#128]\n"
 	"ldp d12, d13, [x0,#144]\n"
 	"ldp d14, d15, [x0,#160]\n"
-	"cmp w1, 0"
-	"csinc w0, w1, wzr, ne"
-	"br x30"
+	"cmp w1, 0\n"
+	"csinc w0, w1, wzr, ne\n"
+	"br x30\n"
 );
 }
 

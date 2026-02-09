@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include <Windows.h>
 
 extern int entry_main(void);
@@ -9,3 +10,4 @@ int WinMain(
 ) {
     return entry_main();
 }
+#endif
