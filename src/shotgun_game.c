@@ -229,6 +229,7 @@ bool shotgun_game_update() {
         }
         else if(GetTime() - end_time > 1.0f) {
             game_submit_minigame_score((float)score / (float)num_items);
+            ShowCursor();
 
             return true;
         }

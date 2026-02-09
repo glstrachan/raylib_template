@@ -139,6 +139,7 @@ static int dialog_count;
     dialog_count++;                                                              \
 } while (0)
 
+[[clang::optnone]]
 void smile_dialog_sequence(void) {
     encounter_begin(&dialog_sequence);
     

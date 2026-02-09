@@ -3,4 +3,6 @@
 *.a
 build/
 build*/
+/build_rel_with_debug
+/build_rel
 /package

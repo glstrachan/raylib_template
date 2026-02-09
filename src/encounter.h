@@ -85,5 +85,5 @@ extern Sound start_sounds[];
 } while (0)
 #endif
 
-#define encounter_begin(...) Encounter_Sequence* __current_sequence = (&encounter_top_sequence, ## __VA_ARGS__ /* omg lol */)
+#define encounter_begin(...) volatile Encounter_Sequence* volatile __current_sequence = (&encounter_top_sequence, ## __VA_ARGS__ /* omg lol */)
 #define encounter_end() do { __current_sequence->is_done = true; my_longjmp(__current_sequence->jump_back_buf, 1); } while (0)

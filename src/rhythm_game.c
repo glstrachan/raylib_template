@@ -34,7 +34,7 @@ static enum {
 } current_state = STATE_POPIN;
 static int current_round;
 static int target_rounds;
-const float ACCURACY_LENIENCY = 0.4f;
+const float ACCURACY_LENIENCY = 0.25f;
 static float accuracy;
 static int total_shots;
 
@@ -330,13 +330,14 @@ void rhythm_game_prerender(void) {
         }
         if (IsKeyPressed(KEY_SPACE) && current_shot_point_index < points_count) {
             float this_accuracy  = 0.0f;
-            if (current_shot_point_index == rhythm_sequence_note_index) {
-                this_accuracy = Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
-            } else if (current_shot_point_index == rhythm_sequence_note_index - 1) {
-                this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
-            } else if (current_shot_point_index == rhythm_sequence_note_index + 1) {
-                this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
-            }
+            // if (current_shot_point_index == rhythm_sequence_note_index) {
+            //     this_accuracy = Clamp(timer_interpolate(&rhythm_sequence_timer) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            // } else if (current_shot_point_index == rhythm_sequence_note_index - 1) {
+            //     this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            // } else if (current_shot_point_index == rhythm_sequence_note_index + 1) {
+            //     this_accuracy = Clamp((1.0f - timer_interpolate(&rhythm_sequence_timer)) / ACCURACY_LENIENCY, 0.0f, 1.0f);
+            // }
+            this_accuracy = 1.0f;
 			// if (this_accuracy > 0.8f) {
 			// 	PlaySound(sound_response_hit);
 			// } else {

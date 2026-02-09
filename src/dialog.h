@@ -53,5 +53,5 @@ typedef struct {
     bool use_bottom_text;
 } Dialog_Parameter;
 
-bool _dialog_text(Encounter_Sequence* sequence, string speaker_name, string text, Dialog_Parameter parameters);
-int _dialog_selection(Encounter_Sequence* sequence, string prompt, int count, const char* items[], Dialog_Parameter parameters);
+bool _dialog_text(volatile Encounter_Sequence* volatile sequence, string speaker_name, string text, Dialog_Parameter parameters);
+int _dialog_selection(volatile Encounter_Sequence* volatile sequence, string prompt, int count, const char* items[], Dialog_Parameter parameters);

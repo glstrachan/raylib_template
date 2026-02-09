@@ -18,6 +18,7 @@ void encounter_update(void) {
     encounter_sequence_update(&encounter_top_sequence);
 }
 
+// [[clang::optnone]]
 void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encounter) {
     const int STACK_SIZE = 10 * 1024 * 1024;
     if (!sequence->stack) {
@@ -31,22 +32,24 @@ void encounter_sequence_start(Encounter_Sequence* sequence, Encounter_Fn encount
 
     static Encounter_Sequence* this_sequence;
     this_sequence = sequence; // needed since we modify rsp
-    asm volatile("mov %%rsp, %0" : "=r" (this_sequence->old_stack));
-    asm volatile("mov %0, %%rsp" :: "r" (top_of_stack));
+
+    arch_get_stack_pointer(this_sequence->old_stack);
+    arch_set_stack_pointer(top_of_stack);
     if (my_setjmp(this_sequence->jump_back_buf) == 0) {
         this_sequence->encounter();
     }
-    asm volatile("mov %0, %%rsp" :: "r" (this_sequence->old_stack));
+    arch_set_stack_pointer(this_sequence->old_stack);
 }
 
+[[clang::optnone]]
 void encounter_sequence_update(Encounter_Sequence* sequence) {
     // static Encounter_Sequence* static_sequence;
     // static_sequence = sequence;
-    asm volatile("mov %%rsp, %0" : "=r" (sequence->old_stack));
+    // arch_get_stack_pointer(sequence->old_stack);
     if (my_setjmp(sequence->jump_back_buf) == 0) {
         my_longjmp(sequence->jump_buf, 1);
     }
-    asm volatile("mov %0, %%rsp" :: "r" (sequence->old_stack) : "rsp");
+    // arch_set_stack_pointer(sequence->old_stack);
 }
 
 bool encounter_is_done(void) {
@@ -90,9 +93,9 @@ void pick_encounter_init(void) {
 
 void pick_encounter(void) {
     // game.current_character = CHARACTERS_FATMAN;
-    // game.current_character = CHARACTERS_OLDLADY;
     // game.encounter = &sample_encounter_;
     game.current_character = shuffled_characters[next_character++];
+    game.current_character = CHARACTERS_OLDLADY;
     selected_item = -1;
 }
 
